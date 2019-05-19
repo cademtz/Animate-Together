@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/Icons">
+        <file>Brush.png</file>
+        <file>Eraser.png</file>
+        <file>Line.png</file>
+        <file>Rectangle.png</file>
+        <file>Eyedropper.png</file>
+        <file>Lock.png</file>
+    </qresource>
+</RCC>

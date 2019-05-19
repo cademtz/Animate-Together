@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindowClass</class>
+ <widget class="QMainWindow" name="MainWindowClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>901</width>
+    <height>440</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Animate Together</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow, .QFrame {
+	background-color: rgb(50, 50, 50);
+}</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="tool_stack">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>1</number>
+    </property>
+    <property name="topMargin">
+     <number>1</number>
+    </property>
+    <property name="rightMargin">
+     <number>1</number>
+    </property>
+    <property name="bottomMargin">
+     <number>1</number>
+    </property>
+    <item>
+     <widget class="QFrame" name="mainframe">
+      <property name="styleSheet">
+       <string notr="true">QCheckBox {
+	color: rgb(225, 225, 225);
+	font: 500 8pt &quot;Arial&quot;;
+}
+QPushButton, QLineEdit, QSpinBox {
+	border: 1px solid rgb(75, 75, 75);
+	background-color: rgb(35, 35, 35);
+	color: rgb(200, 200, 200);
+}
+QPushButton:hover, QLineEdit:focus, QSpinBox:focus {
+	border-color: rgb(0, 128, 255);
+	color: rgb(255, 255, 255);
+}
+QPushButton:hover:pressed {
+	background-color: rgb(25, 25, 25);
+}</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QWidget" name="w_panels" native="true">
+       <property name="geometry">
+        <rect>
+         <x>780</x>
+         <y>0</y>
+         <width>100</width>
+         <height>439</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="MainWindow.qrc"/>
+ </resources>
+ <connections/>
+</ui>
