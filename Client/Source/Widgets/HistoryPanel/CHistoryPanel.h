@@ -5,8 +5,8 @@
  *	Created: 3/6/2019 9:06:26 PM
  */
 
-#ifndef CHistory_H
-#define CHistory_H
+#ifndef CHistoryPanel_H
+#define CHistoryPanel_H
 #ifdef _WIN32
 #pragma once
 #endif
@@ -14,16 +14,16 @@
 #include <qwidget.h>
 
 class MainWindow;
-class CHistory : public QWidget
+class CHistoryPanel : public QWidget
 {
 	bool m_focused = false;
 	MainWindow* m_parent;
 
 public:
-	CHistory(MainWindow* Window, QWidget* Parent = 0);
+	CHistoryPanel(MainWindow* Window, QWidget* Parent = 0);
 
 protected:
 	void paintEvent(QPaintEvent* Event);
 };
 
-#endif // CHistory_H
+#endif // CHistoryPanel_H

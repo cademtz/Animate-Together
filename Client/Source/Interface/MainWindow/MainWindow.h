@@ -6,9 +6,9 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_MainWindow.h"
+#include "Widgets/LayerPanel/CLayerPanel.h"
+#include "Widgets/HistoryPanel/CHistoryPanel.h"
 
-class CHistory;
-class CLayerList;
 class CTitleBar;
 class CProject;
 class CLayer;
@@ -25,15 +25,16 @@ class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 
-	CHistory* m_history;
-	CLayerList* m_layerlist;
+	CHistoryPanel* m_history;
+	CLayerPanel* m_layerpanel;
 	CTitleBar* m_titlebar;
 	CProject* m_proj;
 	CCanvas* m_canvas;
 	CToolBar* m_toolbar;
 	CTimeline* m_timeline;
 
-	QLayout* l_panels, * l_mainlayout;
+	QLayout* l_mainlayout;
+	QVBoxLayout* l_panels;
 
 	static QString m_globalstyle;
 
@@ -50,13 +51,15 @@ public:
 	void SetActiveProj(CProject* Project);
 	inline CProject* GetActiveProj() const { return m_proj; }
 	CLayer* GetActiveLayer() const;
-	inline CHistory* GetHistory() const { return m_history; }
-	inline CLayerList* GetLayerList() const { return m_layerlist; }
+	inline CHistoryPanel* GetHistory() const { return m_history; }
+	inline CLayerPanel* GetLayerPanel() const { return m_layerpanel; }
 	inline CCanvas* GetCanvas() const { return m_canvas; }
 	inline CToolBar* GetToolBar() const { return m_toolbar; }
 	inline static QString GetGlobalStyle() { return m_globalstyle; }
+	static void TogglePanel(QWidget* Panel);
+	inline static void ToggleHistory() { TogglePanel(MainWindow::Get().GetHistory()); }
+	inline static void ToggleLayers() { TogglePanel(MainWindow::Get().GetLayerPanel()); }
 
-	void LayerEvent(e_layerevent Event);
 	void UndoStackEvent(const CUndoAction* Undo);
 
 	static void Undo();

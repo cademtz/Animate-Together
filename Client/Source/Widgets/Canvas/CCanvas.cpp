@@ -88,7 +88,12 @@ void CCanvas::tabletEvent(QTabletEvent * event)
 	if (m_tool == e_tool::Eyedrop) // Eyedropper is independent of active layers
 	{
 		if (event->type() == QEvent::TabletPress || event->type() == QEvent::TabletMove)
-			CToolBar::getPalette()->setFirst(m_imgcanvas.pixel(event->pos()));
+		{
+			QRect r = m_imgcanvas.rect();
+			r.moveTopLeft(m_scroll);
+			if (r.contains(event->pos())) // Only pick a color if it's within the canvas
+				CToolBar::getPalette()->setFirst(m_imgcanvas.pixel(event->pos() - m_scroll));
+		}
 		return;
 	}
 

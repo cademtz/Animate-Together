@@ -37,12 +37,6 @@
     <ClCompile Include="Source\Widgets\ColorBox\CColorBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Widgets\History\CHistory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Widgets\LayerList\CLayerList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Widgets\MiniPalette\CMiniPalette.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -56,6 +50,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Widgets\LayerPanel\CLayerPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Widgets\HistoryPanel\CHistoryPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Widgets\LayerArea\CLayerArea.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -126,12 +129,6 @@
     <ClInclude Include="Source\Widgets\ColorBox\CColorBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Widgets\History\CHistory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Widgets\LayerList\CLayerList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Widgets\MiniPalette\CMiniPalette.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -145,6 +142,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Widgets\ToolBar\CToolBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Widgets\LayerPanel\CLayerPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Widgets\HistoryPanel\CHistoryPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Widgets\LayerArea\CLayerArea.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

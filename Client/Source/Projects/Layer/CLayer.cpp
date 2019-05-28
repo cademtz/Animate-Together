@@ -10,7 +10,6 @@
 #include "Interface/ColorPicker/ColorPicker.h"
 #include "Projects/CProject.h"
 #include "Widgets/Canvas/CCanvas.h"
-#include "Widgets/LayerList/CLayerList.h"
 
 CLayer::CLayer(CProject* Parent, const std::string & Name, QSize Dimensions, bool Private, bool Visible)
 	: m_proj(Parent), m_name(Name), m_dimensions(Dimensions), m_private(Private), m_visible(Visible)

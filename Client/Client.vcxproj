@@ -159,11 +159,15 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Widgets\History\CHistory.cpp">
+    <ClCompile Include="Source\Widgets\HistoryPanel\CHistoryPanel.cpp">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Source\Widgets\LayerList\CLayerList.cpp">
+    <ClCompile Include="Source\Widgets\LayerArea\CLayerArea.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Widgets\LayerPanel\CLayerPanel.cpp">
       <SubType>
       </SubType>
     </ClCompile>
@@ -207,6 +211,10 @@
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Animate Together\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
     </QtMoc>
     <ClInclude Include="Source\Widgets\ColorBox\CColorBox.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Widgets\LayerArea\CLayerArea.h">
       <SubType>
       </SubType>
     </ClInclude>
@@ -254,11 +262,11 @@
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="Source\Widgets\History\CHistory.h">
+    <ClInclude Include="Source\Widgets\HistoryPanel\CHistoryPanel.h">
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="Source\Widgets\LayerList\CLayerList.h">
+    <ClInclude Include="Source\Widgets\LayerPanel\CLayerPanel.h">
       <SubType>
       </SubType>
     </ClInclude>

@@ -1,4 +1,4 @@
-QLabel, QCheckBox {
+QCheckBox {
 	color: rgb(225, 225, 225);
 	font: 8px "Tahoma";
 }

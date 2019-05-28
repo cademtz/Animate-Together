@@ -13,6 +13,8 @@
 #include <qmenubar.h>
 #include <qstyle.h>
 #include <qcommonstyle.h>
+#include <qlayout.h>
+
 #include "Interface/CreateProject/CreateProject.h"
 #include "Interface/MainWindow/MainWindow.h"
 #include "Projects/CProject.h"
@@ -26,32 +28,52 @@ void CTitleBar::SaveProject(e_export Type)
 CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 {
 	m_parent = Window;
-	m_font = QFont("Arial", 10);
 	m_fButtons = QFont("Arial", 14, 0);
 	setFixedHeight(24);
-	setStyleSheet("\
-	QPushButton { border: none; color: rgb(160, 160, 160); }			\
-	QPushButton:hover:!pressed { background-color: rgb(64, 64, 64); }	\
-	QPushButton:hover:pressed { background-color: rgb(20, 110, 230); }");
+	setStyleSheet(
+		"QPushButton { border: none; color: rgb(160, 160, 160); }"
+		"QPushButton:hover:!pressed { background-color: rgb(64, 64, 64); }"
+		"QPushButton:hover:pressed { background-color: rgb(20, 110, 230); }");
+
+	m_name = new QLabel("Animate Together", this);
+	m_name->setContentsMargins(9, 0, 3, 0);
+	QPalette pal = m_name->palette();
+	pal.setBrush(QPalette::Foreground, QColor(150, 150, 150));
+	m_name->setPalette(pal);
+	m_name->setFont(QFont("Tahoma", 8));
 
 	m_menubar = new QMenuBar(this);
+
 	m_close = new QPushButton("X", this);
 	m_close->setFont(m_fButtons);
+	m_close->setStyleSheet(styleSheet());
+	m_close->setFixedWidth(m_close->height());
 	connect(m_close, &QPushButton::released, this, &CTitleBar::CloseParent);
 	
-	m_minmax = new QPushButton(QString::fromWCharArray(L"\x25A1"), this);
+	m_minmax = new QPushButton(QString::fromWCharArray(L"\x25A1"), this); // TO DO: Maybe actual icons, and not this hacky stuff?
 	m_minmax->setFont(m_fButtons);
+	m_minmax->setStyleSheet(styleSheet());
+	m_minmax->setFixedWidth(m_minmax->height());
 	connect(m_minmax, &QPushButton::released, this, &CTitleBar::MinMaxParent);
 
 	m_hide = new QPushButton("_", this);
 	m_hide->setFont(m_fButtons);
+	m_hide->setStyleSheet(styleSheet());
+	m_hide->setFixedWidth(m_hide->height());
 	connect(m_hide, &QPushButton::released, this, &CTitleBar::HideParent);
 
-	m_close->setStyleSheet(styleSheet());
-	m_minmax->setStyleSheet(styleSheet());
-	m_hide->setStyleSheet(styleSheet());
+	m_layout = new QHBoxLayout(this);
+	m_layout->setMargin(0);
+	m_layout->setSpacing(0);
+	m_layout->setAlignment(Qt::AlignVCenter);
 
-	m_menubar->setFont(m_font);
+	m_layout->addWidget(m_name);
+	m_layout->addWidget(m_menubar);
+	m_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
+	m_layout->addWidget(m_hide);
+	m_layout->addWidget(m_minmax);
+	m_layout->addWidget(m_close);
+
 	m_menubar->setStyleSheet(
 		"QMenuBar {"
 			"font-weight: bold;"
@@ -69,9 +91,13 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 			"color: rgb(255, 255, 255);"
 		"}");
 
-	QMenu* file = new QMenu("File", m_menubar), * edit = new QMenu("Edit", m_menubar), * layer = new QMenu("Layer", m_menubar);
-	QAction* newproj = new QAction("New"), *save = new QAction("Save as..."), *exp = new QAction("Export layers"),
-		*undo = new QAction("Undo"), *redo = new QAction("Redo"), * fill = new QAction("Fill");
+	QMenu
+		*file = new QMenu("File", m_menubar), *edit = new QMenu("Edit", m_menubar), *layer = new QMenu("Layer", m_menubar),
+		*window = new QMenu("Window", m_menubar);
+	QAction
+		*newproj = new QAction("New", this), *save = new QAction("Save as...", this), *exp = new QAction("Export layers", this),
+		*undo = new QAction("Undo", this), *redo = new QAction("Redo", this), *fill = new QAction("Fill", this), *history = new QAction("History", this),
+		*layers = new QAction("Layers", this);
 
 	connect(save, &QAction::triggered, [] { SaveProject(e_export::flat); });
 	connect(exp, &QAction::triggered, [] { SaveProject(e_export::layers); });
@@ -79,6 +105,8 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 	connect(undo, &QAction::triggered, &MainWindow::Undo);
 	connect(redo, &QAction::triggered, &MainWindow::Redo);
 	connect(newproj, &QAction::triggered, &CreateProject::Open);
+	connect(history, &QAction::triggered, &MainWindow::ToggleHistory);
+	connect(layers, &QAction::triggered, &MainWindow::ToggleLayers);
 
 	fill->setShortcut(Qt::CTRL + Qt::Key_F);
 	save->setShortcut(Qt::CTRL + Qt::Key_S);
@@ -89,10 +117,15 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 	file->insertSeparator(save);
 	edit->addActions({ undo, redo });
 	layer->addAction(fill);
+	window->addActions({ history, layers });
 
 	m_menubar->addMenu(file);
 	m_menubar->addMenu(edit);
 	m_menubar->addMenu(layer);
+	m_menubar->addMenu(window);
+
+	m_menubar->move(120, 3);
+	m_menubar->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
 	SetBackground(Background);
 }
@@ -136,20 +169,10 @@ void CTitleBar::mouseMoveEvent(QMouseEvent * Event)
 
 void CTitleBar::resizeEvent(QResizeEvent * Event)
 {
-	m_menubar->setGeometry(120, 3, width() - 120, m_menubar->height());
-	m_close->setGeometry(geometry().width() - geometry().height(), 0, geometry().height(), geometry().height());
-	m_minmax->setGeometry(geometry().width() - geometry().height() * 2, 0, geometry().height(), geometry().height());
-	m_hide->setGeometry(geometry().width() - geometry().height() * 3, 0, geometry().height(), geometry().height());
-}
-
-void CTitleBar::paintEvent(QPaintEvent * Event)
-{
-	QPainter paint(this);
-
-	static QStaticText title = QStaticText(m_parent->windowTitle());
-	paint.setPen(QColor(180, 180, 180));
-	paint.setFont(m_font);
-	paint.drawStaticText(6, 3, title);
+	//m_menubar->setGeometry(120, 3, width() - 120, m_menubar->height());
+	//m_close->setGeometry(geometry().width() - geometry().height(), 0, geometry().height(), geometry().height());
+	//m_minmax->setGeometry(geometry().width() - geometry().height() * 2, 0, geometry().height(), geometry().height());
+	//m_hide->setGeometry(geometry().width() - geometry().height() * 3, 0, geometry().height(), geometry().height());
 }
 
 void CTitleBar::CloseParent()

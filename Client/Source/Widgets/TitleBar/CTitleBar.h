@@ -15,12 +15,16 @@
 #include <qpushbutton.h>
 
 enum class e_export;
+class QHBoxLayout;
+class QLabel;
 
 class CTitleBar : public QWidget
 {
 	QMainWindow* m_parent;
-	QFont m_font;
 	QFont m_fButtons;
+
+	QHBoxLayout* m_layout;
+	QLabel* m_name;
 
 	QPoint m_cursor;
 	QColor m_background;
@@ -42,7 +46,6 @@ protected:
 	void mousePressEvent(QMouseEvent* Event);
 	void mouseMoveEvent(QMouseEvent* Event);
 	void resizeEvent(QResizeEvent* Event);
-	void paintEvent(QPaintEvent* Event);
 	// - Calls 'close()' on the parent, triggering the close event
 	void CloseParent();
 	// - Toggles normal and maximum parent size with 'showNormal()' and 'showMaximized()'

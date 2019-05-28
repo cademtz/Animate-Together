@@ -1,27 +1,21 @@
 /*	Description:
- *		A panel that displays the current project's layers and provides user interaction
+ *		Widget that displays an interactive layer list
  *
  *	Author: Hold on!
- *	Created: 3/7/2019 11:22:53 PM
+ *	Created: 5/27/2019 10:30:44 AM
  */
 
-#ifndef CLayerList_H
-#define CLayerList_H
+#ifndef CLayerArea_H
+#define CLayerArea_H
 #ifdef _WIN32
 #pragma once
 #endif
 
 #include <qwidget.h>
-#include <qscrollbar.h>
-#include <qlayout.h>
-#include <qlabel.h>
 
-class MainWindow;
-class QPushButton;
-class QHBoxLayout;
 class CLayer;
 
-class CLayerList : public QWidget
+class CLayerArea : public QWidget
 {
 	enum class e_drag
 	{
@@ -35,35 +29,23 @@ class CLayerList : public QWidget
 	int m_insert = -1;
 	QPoint m_cursor;
 
-	QHBoxLayout* m_lbuttons, * m_ltop;
-	QVBoxLayout* m_layout;
-	QScrollBar* m_scroll;
-	QWidget* m_layers, * m_buttons, * m_top;
-	QLabel* m_name;
-	QPushButton* m_add, * m_del;
-	MainWindow* m_parent;
-
 	void DrawItems(QPainter& paint);
 	void DrawItem(QPainter& paint, const CLayer* Layer, const QRect& region);
 
 	CLayer* SelectLayer(QMouseEvent* Event);
 
 public:
-	CLayerList(MainWindow* Window, QWidget* Parent = 0);
-
-	void AddLayer();
-	void DelLayer();
-
-	QRect GetListRegion();
+	CLayerArea(QWidget* Parent = 0);
 	QRect GetLayerRegion();
 
 protected:
+	void resizeEvent(QResizeEvent* Event);
+
 	void paintEvent(QPaintEvent* Event);
-	void wheelEvent(QWheelEvent* Event);
 	void mouseMoveEvent(QMouseEvent* Event);
 	void mousePressEvent(QMouseEvent* Event);
 	void mouseReleaseEvent(QMouseEvent* Event);
 	void mouseDoubleClickEvent(QMouseEvent* Event);
 };
 
-#endif // CLayerList_H
+#endif // CLayerArea_H

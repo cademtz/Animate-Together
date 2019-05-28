@@ -9,10 +9,8 @@
 #include "Projects/CProject.h"
 #include "Widgets/Canvas/CCanvas.h"
 #include "Widgets/ToolBar/CToolBar.h"
-#include "Widgets/History/CHistory.h"
 #include "Widgets/TitleBar/CTitleBar.h"
 #include "Widgets/Timeline/CTimeline.h"
-#include "Widgets/LayerList/CLayerList.h"
 #include "Widgets/MiniPalette/CMiniPalette.h"
 #include "Interface/ColorPicker/ColorPicker.h"
 
@@ -25,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
 	if (!f.exists())
 	{
 		QMessageBox msg;
-		msg.setText("ghey");
+		msg.setText("Failed to load global style sheet");
 		msg.exec();
 	}
 	else
@@ -39,15 +37,16 @@ MainWindow::MainWindow(QWidget *parent)
 	ui.setupUi(this);
 
 	m_toolbar = new CToolBar(ui.centralWidget);
-	m_history = new CHistory(this, ui.mainframe);
-	m_layerlist = new CLayerList(this, ui.mainframe);
+	m_history = new CHistoryPanel(this, ui.mainframe);
+	m_layerpanel = new CLayerPanel(this, ui.mainframe);
 	//m_timeline = new CTimeline(ui.mainframe);
 
+	ui.w_panels->setFixedWidth(150);
 	l_panels = new QVBoxLayout(ui.w_panels);
-	l_panels->setSpacing(5);
+	l_panels->setSpacing(0);
 	l_panels->setMargin(0);
 	l_panels->addWidget(m_history);
-	l_panels->addWidget(m_layerlist);
+	l_panels->addWidget(m_layerpanel);
 
 	m_titlebar = new CTitleBar(this, QColor(40, 40, 40));
 
@@ -72,7 +71,6 @@ MainWindow::MainWindow(QWidget *parent)
 	resize(width(), height() + m_titlebar->height() + m_toolbar->height());// + m_timeline->minimumHeight());
 
 	CUndoStack::Listen([this](const CUndoAction* Undo) { UndoStackEvent(Undo); });
-	CProject::Listen([this](e_layerevent Event) { LayerEvent(Event); });
 }
 
 MainWindow::~MainWindow()
@@ -97,10 +95,21 @@ CLayer * MainWindow::GetActiveLayer() const
 			return layer;
 	return nullptr;
 }
-
-void MainWindow::LayerEvent(e_layerevent Event)
+void MainWindow::TogglePanel(QWidget * Panel)
 {
-	m_layerlist->update();
+	auto& w = Get();
+	for (size_t i = 0; i < w.l_panels->count(); i++)
+	{
+		auto item = w.l_panels->itemAt(i);
+		if (item->widget() == Panel)
+		{
+			item->widget()->hide();
+			w.l_panels->removeItem(item);
+			return;
+		}
+	}
+	Panel->show();
+	w.l_panels->addWidget(Panel);
 }
 
 void MainWindow::UndoStackEvent(const CUndoAction* Undo)

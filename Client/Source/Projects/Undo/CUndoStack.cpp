@@ -6,8 +6,6 @@
  */
 
 #include "CUndoStack.h"
-#include "Interface/MainWindow/MainWindow.h"
-#include "Widgets/History/CHistory.h"
 
 std::list<UndoEvent_t> CUndoStack::m_listeners;
 
