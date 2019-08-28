@@ -9,11 +9,9 @@
 #include <qpainter.h>
 #include <qstatictext.h>
 #include <qevent.h>
-#include "Interface/MainWindow/MainWindow.h"
 #include "Projects/CProject.h"
 
-CHistoryPanel::CHistoryPanel(MainWindow * Window, QWidget * Parent) : QWidget(Parent), m_parent(Window)
-{
+CHistoryPanel::CHistoryPanel(QWidget * Parent) : QWidget(Parent) {
 	setStyleSheet("background-color: rgb(30, 30, 30); color: rgb(200, 200, 200)");
 }
 
@@ -26,10 +24,10 @@ void CHistoryPanel::paintEvent(QPaintEvent * Event)
 	paint.setPen(QColor(200, 200, 200));
 	paint.drawStaticText(6, 3, name);
 
-	if (CProject* proj = m_parent->GetActiveProj())
+	if (CProject* proj = CProject::ActiveProject())
 	{
 		size_t y = name.size().height() + 7;
-		for (auto action : proj->GetUndos().GetActions())
+		for (auto action : proj->Undos().GetActions())
 		{
 			QString text = action->WasUndone() ? "- " : "+ ";
 			paint.drawText(6, y += name.size().height(), text + action->GetTypeStr());

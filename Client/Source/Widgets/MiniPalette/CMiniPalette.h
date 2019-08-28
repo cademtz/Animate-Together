@@ -17,7 +17,6 @@
 
 class CMiniPalette : public QWidget
 {
-	QColor m_first, m_second;
 	static const QRect firstRect();
 	const QRect secondRect();
 
@@ -26,29 +25,17 @@ class CMiniPalette : public QWidget
 public:
 	CMiniPalette(QWidget* Parent = nullptr);
 
-	void swap();
-	void reset();
-
-	inline QColor first() const { return m_first; }
-	inline void setFirst(QColor First) {
-		m_first = First;
-		update();
-		PalletteEvent();
-	}
-	inline QColor second() const { return m_second; }
-	inline void setSecond(QColor Second) {
-		m_second = Second;
-		update();
-		PalletteEvent();
-	}
+	void Swap();
+	void SetToDefault();
 
 	// - When called, shows a color picker window
 	// @ First:	Sets the first color when true, otherwise the second
-	void pickColor(bool First = true);
+	void PickColor(bool First = true);
 
 	// - Adds a pointer to your function to the listener list
 	// - Listeners are called when one of the colors changes
 	static inline void Listen(std::function<void(CMiniPalette*)> Func) { m_listeners.push_back(Func); }
+
 	// - Calls all event listeners
 	void PalletteEvent();
 

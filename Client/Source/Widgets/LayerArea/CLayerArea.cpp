@@ -10,17 +10,16 @@
 #include <qevent.h>
 
 #include "Projects/CProject.h"
-#include "Interface/MainWindow/MainWindow.h"
 #include "Interface/EditLayer/EditLayer.h"
 
 void CLayerArea::DrawItems(QPainter & paint)
 {
-	CProject* proj = MainWindow::Get().GetActiveProj();
+	CProject* proj = CProject::ActiveProject();
 	if (!proj)
 		return;
 
 	QRect region = GetLayerRegion();
-	for (auto layer : proj->GetLayers())
+	for (auto layer : proj->Layers())
 	{
 		DrawItem(paint, layer, region);
 		region.moveTop(region.top() + region.height());
@@ -36,7 +35,7 @@ QRect iconRegion(const QRect & region)
 void CLayerArea::DrawItem(QPainter & paint, const CLayer * Layer, const QRect & region)
 {
 	QPen old = paint.pen();
-	if (Layer == MainWindow::Get().GetActiveProj()->GetActiveLayer())
+	if (Layer == CProject::ActiveProject()->ActiveLayer())
 	{
 		paint.setPen(QColor(100, 100, 100));
 		paint.drawRect(region);
@@ -55,11 +54,11 @@ void CLayerArea::DrawItem(QPainter & paint, const CLayer * Layer, const QRect & 
 
 CLayer* CLayerArea::SelectLayer(QMouseEvent * Event)
 {
-	static bool bAssign; // Choose either On or Off and STICK WITH IT! No rapid flickering!
-	if (CProject* proj = MainWindow::Get().GetActiveProj())
+	static bool bAssign; // Choose either on or off and STICK WITH IT! No rapid flickering!
+	if (CProject* proj = CProject::ActiveProject())
 	{
 		QRect region = GetLayerRegion();
-		for (auto layer : proj->GetLayers())
+		for (auto layer : proj->Layers())
 		{
 			if ((m_drag == e_drag::null || m_drag == e_drag::hide) && iconRegion(region).contains(Event->pos()))
 			{
@@ -96,7 +95,7 @@ CLayerArea::CLayerArea(QWidget * Parent) : QWidget(Parent)
 	pal.setBrush(QPalette::Foreground, QColor(200, 200, 200));
 	setPalette(pal);
 
-	CProject::Listen([this](e_layerevent Event) { update(); }); // BAD IDEA, listener can crash if the instance has been destroyed. Maybe a way to un-listen? (deafen haha)
+	CLayer::Listen([this](CLayerEvent* Event) { update(); }); // BAD IDEA, listener can crash if the instance has been destroyed. Maybe a way to un-listen? (deafen haha)
 }
 
 QRect CLayerArea::GetLayerRegion() {
@@ -106,17 +105,17 @@ QRect CLayerArea::GetLayerRegion() {
 void CLayerArea::resizeEvent(QResizeEvent * Event)
 {
 	resize(((QWidget*)parent())->size());
-	if (CProject* proj = MainWindow::Get().GetActiveProj())
-		setFixedHeight(GetLayerRegion().height() * proj->GetLayers().size() + 1);
+	if (CProject* proj = CProject::ActiveProject())
+		setFixedHeight(GetLayerRegion().height() * proj->Layers().size() + 1);
 }
 
 void CLayerArea::paintEvent(QPaintEvent * Event)
 {
-	CProject* proj = MainWindow::Get().GetActiveProj();
+	CProject* proj = CProject::ActiveProject();
 	if (!proj)
 		return;
 
-	setFixedHeight(GetLayerRegion().height() * proj->GetLayers().size() + 1);
+	setFixedHeight(GetLayerRegion().height() * proj->Layers().size() + 1);
 
 	QPainter paint = QPainter(this);
 	DrawItems(paint);
@@ -125,9 +124,9 @@ void CLayerArea::paintEvent(QPaintEvent * Event)
 		return;
 
 	QRect region = GetLayerRegion(), fill;
-	for (int i = 0; i < proj->GetLayers().size(); i++)
+	for (int i = 0; i < proj->Layers().size(); i++)
 	{
-		if (proj->GetLayers()[i] != proj->GetActiveLayer() && region.contains(m_cursor))
+		if (proj->Layers()[i] != proj->ActiveLayer() && region.contains(m_cursor))
 		{
 			QPoint p = m_cursor - region.topLeft();
 			QSize s = QSize(region.width(), 5);
@@ -180,9 +179,9 @@ void CLayerArea::mouseReleaseEvent(QMouseEvent * Event)
 	if (drag == e_drag::layer) // Were we previously dragging a layer?
 	{
 		CProject* proj;
-		if (m_insert != -1 && (proj = MainWindow::Get().GetActiveProj()))
+		if (m_insert != -1 && (proj = CProject::ActiveProject()))
 		{
-			proj->ShiftLayer(proj->GetActiveLayer(), m_insert);
+			proj->ShiftLayer(proj->ActiveLayer(), m_insert);
 			m_insert = -1;
 		}
 		update();
@@ -193,5 +192,5 @@ void CLayerArea::mouseDoubleClickEvent(QMouseEvent * Event)
 {
 	m_cursor = Event->pos();
 	if (CLayer* layer = SelectLayer(Event))
-		EditLayer::Open(MainWindow::Get().GetActiveProj(), layer);
+		EditLayer::Open(CProject::ActiveProject(), layer);
 }

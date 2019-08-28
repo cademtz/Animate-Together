@@ -11,8 +11,6 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QFormLayout>
-#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
@@ -24,26 +22,21 @@ QT_BEGIN_NAMESPACE
 class Ui_CreateProject
 {
 public:
-    QWidget *w_dlg;
-    QHBoxLayout *horizontalLayout;
     QPushButton *create_btn;
     QPushButton *cancel_btn;
-    QWidget *formLayoutWidget;
-    QFormLayout *formLayout;
-    QLabel *label;
-    QSpinBox *spin_width;
-    QLabel *label_2;
-    QSpinBox *spin_height;
-    QLineEdit *line_name;
     QLabel *label_3;
+    QLineEdit *line_name;
+    QLabel *label_4;
+    QSpinBox *spin_width;
+    QSpinBox *spin_height;
 
     void setupUi(QWidget *CreateProject)
     {
         if (CreateProject->objectName().isEmpty())
             CreateProject->setObjectName(QString::fromUtf8("CreateProject"));
-        CreateProject->resize(211, 161);
+        CreateProject->resize(211, 231);
         CreateProject->setStyleSheet(QString::fromUtf8("QWidget#CreateProject {\n"
-"	background-color: rgb(50, 50, 50);\n"
+"	background-color: rgb(40, 40, 40);\n"
 "}\n"
 "* {\n"
 "	font-family: \"Arial\";\n"
@@ -51,8 +44,8 @@ public:
 "}\n"
 "\n"
 "QLabel {\n"
-"	font-weight: bold;\n"
-"	color: rgb(200, 200, 200);\n"
+"	color: rgb(225, 225, 225);\n"
+"	font: 16px \"Verdana\"\n"
 "}\n"
 "\n"
 "QCheckBox {\n"
@@ -60,8 +53,8 @@ public:
 "	font: 500 8pt \"Arial\";\n"
 "}\n"
 "QPushButton, QLineEdit, QSpinBox {\n"
-"	border: 1px solid rgb(75, 75, 75);\n"
-"	background-color: rgb(35, 35, 35);\n"
+"	border: none;\n"
+"	background-color: rgb(30, 30, 30);\n"
 "	color: rgb(200, 200, 200);\n"
 "}\n"
 "QPushButton:hover, QLineEdit:focus, QSpinBox:focus {\n"
@@ -71,78 +64,49 @@ public:
 "QPushButton:hover:pressed {\n"
 "	background-color: rgb(25, 25, 25);\n"
 "}"));
-        w_dlg = new QWidget(CreateProject);
-        w_dlg->setObjectName(QString::fromUtf8("w_dlg"));
-        w_dlg->setGeometry(QRect(0, 110, 211, 51));
-        w_dlg->setStyleSheet(QString::fromUtf8(".QWidget {\n"
-"	background-color: rgb(40, 40, 40);\n"
-"}"));
-        horizontalLayout = new QHBoxLayout(w_dlg);
-        horizontalLayout->setSpacing(6);
-        horizontalLayout->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        create_btn = new QPushButton(w_dlg);
+        create_btn = new QPushButton(CreateProject);
         create_btn->setObjectName(QString::fromUtf8("create_btn"));
+        create_btn->setGeometry(QRect(10, 200, 91, 23));
         create_btn->setMinimumSize(QSize(0, 23));
-
-        horizontalLayout->addWidget(create_btn);
-
-        cancel_btn = new QPushButton(w_dlg);
+        create_btn->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 128, 255);\n"
+"color: rgb(225, 225, 225);"));
+        cancel_btn = new QPushButton(CreateProject);
         cancel_btn->setObjectName(QString::fromUtf8("cancel_btn"));
+        cancel_btn->setGeometry(QRect(110, 200, 91, 23));
         cancel_btn->setMinimumSize(QSize(0, 23));
-
-        horizontalLayout->addWidget(cancel_btn);
-
-        formLayoutWidget = new QWidget(CreateProject);
-        formLayoutWidget->setObjectName(QString::fromUtf8("formLayoutWidget"));
-        formLayoutWidget->setGeometry(QRect(10, 10, 191, 101));
-        formLayout = new QFormLayout(formLayoutWidget);
-        formLayout->setSpacing(6);
-        formLayout->setContentsMargins(11, 11, 11, 11);
-        formLayout->setObjectName(QString::fromUtf8("formLayout"));
-        formLayout->setContentsMargins(0, 0, 0, 0);
-        label = new QLabel(formLayoutWidget);
-        label->setObjectName(QString::fromUtf8("label"));
-
-        formLayout->setWidget(1, QFormLayout::LabelRole, label);
-
-        spin_width = new QSpinBox(formLayoutWidget);
-        spin_width->setObjectName(QString::fromUtf8("spin_width"));
-        spin_width->setMinimumSize(QSize(0, 25));
-        spin_width->setButtonSymbols(QAbstractSpinBox::NoButtons);
-        spin_width->setMaximum(999999999);
-        spin_width->setValue(1920);
-
-        formLayout->setWidget(1, QFormLayout::FieldRole, spin_width);
-
-        label_2 = new QLabel(formLayoutWidget);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
-
-        formLayout->setWidget(2, QFormLayout::LabelRole, label_2);
-
-        spin_height = new QSpinBox(formLayoutWidget);
-        spin_height->setObjectName(QString::fromUtf8("spin_height"));
-        spin_height->setMinimumSize(QSize(0, 25));
-        spin_height->setButtonSymbols(QAbstractSpinBox::NoButtons);
-        spin_height->setMaximum(999999999);
-        spin_height->setValue(1080);
-
-        formLayout->setWidget(2, QFormLayout::FieldRole, spin_height);
-
-        line_name = new QLineEdit(formLayoutWidget);
+        label_3 = new QLabel(CreateProject);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setGeometry(QRect(10, 10, 191, 21));
+        label_3->setAlignment(Qt::AlignCenter);
+        line_name = new QLineEdit(CreateProject);
         line_name->setObjectName(QString::fromUtf8("line_name"));
+        line_name->setGeometry(QRect(10, 34, 191, 31));
         line_name->setMinimumSize(QSize(0, 25));
         line_name->setStyleSheet(QString::fromUtf8("font-weight: bold;\n"
 "color: white;\n"
 "font-family: \"Arial\";"));
-
-        formLayout->setWidget(0, QFormLayout::FieldRole, line_name);
-
-        label_3 = new QLabel(formLayoutWidget);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
-
-        formLayout->setWidget(0, QFormLayout::LabelRole, label_3);
-
+        label_4 = new QLabel(CreateProject);
+        label_4->setObjectName(QString::fromUtf8("label_4"));
+        label_4->setGeometry(QRect(10, 80, 191, 22));
+        label_4->setAlignment(Qt::AlignCenter);
+        spin_width = new QSpinBox(CreateProject);
+        spin_width->setObjectName(QString::fromUtf8("spin_width"));
+        spin_width->setGeometry(QRect(10, 104, 191, 31));
+        spin_width->setMinimumSize(QSize(0, 25));
+        spin_width->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        spin_width->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);
+        spin_width->setMinimum(1);
+        spin_width->setMaximum(999999999);
+        spin_width->setValue(1920);
+        spin_height = new QSpinBox(CreateProject);
+        spin_height->setObjectName(QString::fromUtf8("spin_height"));
+        spin_height->setGeometry(QRect(10, 140, 191, 31));
+        spin_height->setMinimumSize(QSize(0, 25));
+        spin_height->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        spin_height->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);
+        spin_height->setMinimum(1);
+        spin_height->setMaximum(999999999);
+        spin_height->setValue(1080);
 
         retranslateUi(CreateProject);
 
@@ -151,13 +115,12 @@ public:
 
     void retranslateUi(QWidget *CreateProject)
     {
-        CreateProject->setWindowTitle(QApplication::translate("CreateProject", "CreateProject", nullptr));
+        CreateProject->setWindowTitle(QApplication::translate("CreateProject", "New project", nullptr));
         create_btn->setText(QApplication::translate("CreateProject", "Create", nullptr));
         cancel_btn->setText(QApplication::translate("CreateProject", "Cancel", nullptr));
-        label->setText(QApplication::translate("CreateProject", "Width", nullptr));
-        label_2->setText(QApplication::translate("CreateProject", "Height", nullptr));
-        line_name->setPlaceholderText(QApplication::translate("CreateProject", "New project", nullptr));
         label_3->setText(QApplication::translate("CreateProject", "Name", nullptr));
+        line_name->setPlaceholderText(QApplication::translate("CreateProject", "New project", nullptr));
+        label_4->setText(QApplication::translate("CreateProject", "Dimensions", nullptr));
     } // retranslateUi
 
 };

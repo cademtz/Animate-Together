@@ -44,14 +44,14 @@ void EditLayer::Confirm()
 
 void EditLayer::closeEvent(QCloseEvent * Event)
 {
-	if (!m_ok || MainWindow::Get().GetActiveProj() != m_proj)
+	if (!m_ok || CProject::ActiveProject() != m_proj)
 		return;
 	if (!m_layer)
-		m_proj->AddLayer(ui.tb_layername->text().isEmpty() ? "New layer " + std::to_string(m_proj->GetLayers().size() + 1) : ui.tb_layername->text().toStdString(), ui.cb_private->isChecked());
+		m_proj->AddLayer(ui.tb_layername->text().isEmpty() ? "New layer " + std::to_string(m_proj->Layers().size() + 1) : ui.tb_layername->text().toStdString(), ui.cb_private->isChecked());
 	else if (m_proj->HasLayer(m_layer))
 	{
-		m_layer->SetName(ui.tb_layername->text().isEmpty() ? "Layer " + std::to_string(m_proj->GetLayerIndex(m_layer) + 1) : ui.tb_layername->text().toStdString());
+		m_layer->SetName(ui.tb_layername->text().isEmpty() ? "Layer " + std::to_string(m_proj->IndexOf(m_layer) + 1) : ui.tb_layername->text().toStdString());
 		m_layer->SetPrivate(ui.cb_private->isChecked());
-		CProject::LayerEvent(e_layerevent::edit);
+		m_layer->LayerEvent(CLayerEvent::Edit);
 	}
 }

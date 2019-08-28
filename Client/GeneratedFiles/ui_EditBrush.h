@@ -32,21 +32,21 @@ public:
     {
         if (EditBrush->objectName().isEmpty())
             EditBrush->setObjectName(QString::fromUtf8("EditBrush"));
-        EditBrush->resize(201, 141);
+        EditBrush->resize(201, 151);
         EditBrush->setStyleSheet(QString::fromUtf8("#EditBrush {\n"
-"	background-color: rgb(50, 50, 50);\n"
+"	background-color: rgb(40, 40, 40);\n"
 "}\n"
 "* {\n"
 "	font-family: \"Arial\";\n"
 "	font-weight: bold;\n"
 "}\n"
-"QLabel, QCheckBox {\n"
+"QCheckBox {\n"
 "	color: rgb(225, 225, 225);\n"
 "	font: 500 8pt \"Arial\";\n"
 "}\n"
 "QPushButton, QLineEdit, QSpinBox, QDoubleSpinBox {\n"
-"	border: 1px solid rgb(75, 75, 75);\n"
-"	background-color: rgb(35, 35, 35);\n"
+"	border: none;\n"
+"	background-color: rgb(30, 30, 30);\n"
 "	color: rgb(200, 200, 200);\n"
 "}\n"
 "QPushButton:hover, QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus {\n"
@@ -78,11 +78,11 @@ public:
 "  border: none;\n"
 "  width: 2px;\n"
 "  margin: 0px;\n"
-"  border-ra"
-                        "dius: 4px;\n"
+"  border-radius: 4px;\n"
 "}\n"
 "\n"
-"QSlider::add-page:vertical {\n"
+"QSl"
+                        "ider::add-page:vertical {\n"
 "  background: #808080;\n"
 "  border: 1px solid #32414B;\n"
 "  width: 4px;\n"
@@ -130,9 +130,9 @@ public:
 "  border: 2px solid #cccccc;\n"
 "}\n"
 "\n"
-"QScrollBar:h"
-                        "orizontal {\n"
-"  height: 16px;\n"
+"QScrollBar:horizontal {\n"
+"  height: 16p"
+                        "x;\n"
 "  margin: 2px 0px 2px 0px;\n"
 "  background: #282828;\n"
 "  border: 1px solid #323232;\n"
@@ -172,10 +172,10 @@ public:
 "  height: 10px;\n"
 "  width: 10px;\n"
 "  subcontrol-position: right;\n"
-"  subcon"
-                        "trol-origin: margin;\n"
+"  subcontrol-origin: margin;\n"
 "}\n"
-"\n"
+""
+                        "\n"
 "QScrollBar::add-line:vertical {\n"
 "  border-image: url(\":/qss_icons/rc/down_arrow_disabled.png\");\n"
 "  height: 10px;\n"
@@ -209,8 +209,8 @@ public:
 "}\n"
 "\n"
 "QScrollBar::sub-line:vertical {\n"
-""
-                        "  border-image: url(\":/qss_icons/rc/up_arrow_disabled.png\");\n"
+"  border-image: url(\":/qss_"
+                        "icons/rc/up_arrow_disabled.png\");\n"
 "  height: 10px;\n"
 "  width: 10px;\n"
 "  subcontrol-position: top;\n"
@@ -247,13 +247,13 @@ public:
         slide_min->setOrientation(Qt::Horizontal);
         spin_min = new QDoubleSpinBox(EditBrush);
         spin_min->setObjectName(QString::fromUtf8("spin_min"));
-        spin_min->setGeometry(QRect(10, 80, 61, 22));
+        spin_min->setGeometry(QRect(10, 80, 61, 26));
         spin_min->setButtonSymbols(QAbstractSpinBox::NoButtons);
         spin_min->setMinimum(0.010000000000000);
         spin_min->setMaximum(1000.000000000000000);
         spin_max = new QDoubleSpinBox(EditBrush);
         spin_max->setObjectName(QString::fromUtf8("spin_max"));
-        spin_max->setGeometry(QRect(10, 110, 61, 22));
+        spin_max->setGeometry(QRect(10, 110, 61, 26));
         spin_max->setButtonSymbols(QAbstractSpinBox::NoButtons);
         spin_max->setMinimum(0.010000000000000);
         spin_max->setMaximum(1000.000000000000000);
@@ -264,7 +264,7 @@ public:
         slide_max->setOrientation(Qt::Horizontal);
         spin_hard = new QSpinBox(EditBrush);
         spin_hard->setObjectName(QString::fromUtf8("spin_hard"));
-        spin_hard->setGeometry(QRect(10, 10, 181, 22));
+        spin_hard->setGeometry(QRect(10, 10, 181, 26));
         spin_hard->setButtonSymbols(QAbstractSpinBox::NoButtons);
         spin_hard->setMaximum(100);
         slide_hard = new QSlider(EditBrush);

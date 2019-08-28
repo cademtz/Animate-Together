@@ -45,10 +45,7 @@ EditBrush::EditBrush(const QPoint& Pos, BrushScale_t* Scale, QWidget *parent)
 void EditBrush::paintEvent(QPaintEvent * Event)
 {
 	QPainter paint(this);
-	QLinearGradient grad = QLinearGradient(0, 0, 0, (qreal)height() - 1);
-	grad.setColorAt(0, QColor(0, 128, 255));
-	grad.setColorAt(1, QColor(100, 150, 255));
-	paint.setPen(QPen(grad, 1));
+	paint.setPen(QColor(55, 55, 55));
 	paint.drawRect(0, 0, width() - 1, height() - 1);
 }
 

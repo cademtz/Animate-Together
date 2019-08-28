@@ -120,6 +120,10 @@
     </QtRcc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Graphics\GraphicsFrame\CGraphicsFrame.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Interface\CreateProject\CreateProject.cpp" />
     <ClCompile Include="Source\Interface\EditBrush\EditBrush.cpp" />
     <ClCompile Include="Source\Brushes\CBaseBrush.cpp">
@@ -137,6 +141,14 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">input</DynamicSource>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
     </ClCompile>
+    <ClCompile Include="Source\Projects\Events\Events.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Projects\Frame\CFrame.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Projects\Layer\CLayer.cpp">
       <SubType>
       </SubType>
@@ -145,6 +157,7 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Projects\Palette\CPalette.cpp" />
     <ClCompile Include="Source\Projects\Undo\CUndoAction.cpp">
       <SubType>
       </SubType>
@@ -158,6 +171,10 @@
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Widgets\ColorBox\CColorBox.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Widgets\FrameList\CFrameList.cpp">
       <SubType>
       </SubType>
     </ClCompile>
@@ -192,8 +209,8 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Source\Interface\MainWindow\MainWindow.h">
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Animate Together\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Animate Together\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Client\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Client\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
@@ -212,7 +229,32 @@
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Animate Together\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Animate Together\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
     </QtMoc>
+    <ClInclude Include="Source\Graphics\GraphicsFrame\CGraphicsFrame.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Projects\Events\CEventHandler.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Projects\Events\Events.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Projects\Frame\CFrame.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Projects\Frame\CRasterFrame.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Projects\Palette\CPalette.h" />
     <ClInclude Include="Source\Widgets\ColorBox\CColorBox.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Widgets\FrameList\CFrameList.h">
       <SubType>
       </SubType>
     </ClInclude>
@@ -231,8 +273,8 @@
     <QtMoc Include="Source\Interface\EditLayer\EditLayer.h" />
     <QtMoc Include="Source\Interface\ColorPicker\ColorPicker.h" />
     <QtMoc Include="Source\Interface\EditBrush\EditBrush.h">
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Animate Together\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Animate Together\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Client\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Client\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
     </QtMoc>
     <ClInclude Include="Source\Brushes\Brushes.h">
       <SubType>
@@ -253,8 +295,8 @@
     <QtMoc Include="Source\Widgets\Canvas\CCanvas.h">
       <SubType>
       </SubType>
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Animate Together\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
-      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Animate Together\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Client\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Client\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
     </QtMoc>
     <ClInclude Include="Source\Projects\Undo\CUndoAction.h">
       <SubType>

@@ -14,15 +14,24 @@
 #include <qwidget.h>
 #include <qframe.h>
 #include <qlayout.h>
+#include <vector>
+#include "Projects/CProject.h"
+
+class CFrameList;
+class CLayerEvent;
 
 class CTimeline : public QWidget
 {
 	QHBoxLayout* m_layout;
-	QWidget* m_layers, * m_frames;
+	QWidget* m_layers;
+	CFrameList* m_framelist;
 	QFrame* m_divide;
 
 public:
 	CTimeline(QWidget* Parent);
+
+protected:
+	void LayerEvent(CLayerEvent* Event);
 };
 
 #endif // CTimeline_H

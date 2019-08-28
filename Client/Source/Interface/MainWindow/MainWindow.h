@@ -10,7 +10,6 @@
 #include "Widgets/HistoryPanel/CHistoryPanel.h"
 
 class CTitleBar;
-class CProject;
 class CLayer;
 class CCanvas;
 class CToolBar;
@@ -28,7 +27,6 @@ class MainWindow : public QMainWindow
 	CHistoryPanel* m_history;
 	CLayerPanel* m_layerpanel;
 	CTitleBar* m_titlebar;
-	CProject* m_proj;
 	CCanvas* m_canvas;
 	CToolBar* m_toolbar;
 	CTimeline* m_timeline;
@@ -48,9 +46,7 @@ public:
 		return inst;
 	}
 
-	void SetActiveProj(CProject* Project);
-	inline CProject* GetActiveProj() const { return m_proj; }
-	CLayer* GetActiveLayer() const;
+	CLayer* ActiveLayer() const;
 	inline CHistoryPanel* GetHistory() const { return m_history; }
 	inline CLayerPanel* GetLayerPanel() const { return m_layerpanel; }
 	inline CCanvas* GetCanvas() const { return m_canvas; }

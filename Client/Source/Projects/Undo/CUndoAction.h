@@ -20,7 +20,9 @@ enum class e_UndoType
 	LayerDel,
 	LayerAdd,
 	LayerFill,
-	LayerShift
+	LayerShift,
+	FrameDel,
+	FrameAdd
 };
 
 constexpr const char* str_UndoType[] =
@@ -31,7 +33,9 @@ constexpr const char* str_UndoType[] =
 	"LayerDel",
 	"LayerAdd",
 	"LayerFill",
-	"LayerShift"
+	"LayerShift",
+	"FrameDel",
+	"FrameAdd"
 };
 
 class CUndoAction
@@ -100,15 +104,15 @@ public:
 class CProject;
 class CLayer;
 
-class CUndoLayerDelete : public CUndoAction
+class CUndoLayerDel : public CUndoAction
 {
 	CProject& m_proj;
 	CLayer* m_layer;
 	size_t m_index;
 	
 public:
-	~CUndoLayerDelete() { if (!m_wasUndone) delete m_layer; }
-	CUndoLayerDelete(CProject& Project, CLayer* Layer, size_t LayerIndex) : m_proj(Project), m_layer(Layer), m_index(LayerIndex) {
+	~CUndoLayerDel() { if (!m_wasUndone) delete m_layer; }
+	CUndoLayerDel(CProject& Project, CLayer* Layer, size_t LayerIndex) : m_proj(Project), m_layer(Layer), m_index(LayerIndex) {
 		m_type = e_UndoType::LayerDel;
 	}
 
@@ -156,6 +160,24 @@ class CUndoLayerShift : public CUndoAction
 
 public:
 	CUndoLayerShift(CProject& Project, CLayer* Layer);
+};
+
+class CFrame;
+
+class CUndoFrameDel : public CUndoAction
+{
+	CFrame* m_frame;
+
+public:
+	CUndoFrameDel(CFrame* Frame) { m_frame = Frame; }
+};
+
+class CUndoFrameAdd : public CUndoAction
+{
+	CFrame* m_frame;
+
+public:
+	CUndoFrameAdd(CFrame* Frame) { m_frame = Frame; }
 };
 
 #endif // CUndoAction_H

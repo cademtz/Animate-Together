@@ -18,26 +18,28 @@
 #include "Widgets/LayerArea/CLayerArea.h"
 #include "Projects/CProject.h"
 
-CLayerPanel::CLayerPanel(MainWindow * Window, QWidget * Parent) : QWidget(Parent), m_parent(Window)
+CLayerPanel::CLayerPanel(QWidget * Parent) : QWidget(Parent)
 {
 	setObjectName("CLayerPanel");
-	setStyleSheet("\
-		QWidget#CLayerPanel {					\
-			background: #323232;				\
-			color: rgb(200, 200, 200);			\
-		}										\
-		QPushButton {							\
-			border: none;						\
-			background-color: rgb(50, 50, 50);	\
-			color: rgb(200, 200, 200);			\
-		}										\
-		QPushButton:hover {						\
-			border: 1px solid rgb(0, 128, 255);	\
-			color: rgb(255, 255, 255);			\
-		}										\
-		QPushButton:hover:pressed {				\
-			background-color: rgb(25, 25, 25);	\
-		} " + MainWindow::GetGlobalStyle()); // AAAAAAAAAAAAAAAAA
+	setStyleSheet(
+		MainWindow::GetGlobalStyle() +
+		"QWidget#CLayerPanel {"
+			"background: #323232;"
+			"color: rgb(200, 200, 200);"
+		"}"
+		"QPushButton {"
+			"border: none;"
+			"background-color: rgb(50, 50, 50);"
+			"color: rgb(200, 200, 200);"
+		"}"
+		"QPushButton:hover {"
+			//"border: 1px solid rgb(50, 50, 50);"
+			"background-color: rgb(66, 66, 66);"
+			"color: rgb(255, 255, 255);"
+		"}"
+		"QPushButton:hover:pressed {"
+			"background-color: rgb(25, 25, 25);"
+		"}"); // AAAAAAAAAAAAAAAAA
 
 	m_name = new QLabel("Layers", this);
 	m_name->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
@@ -88,12 +90,12 @@ CLayerPanel::CLayerPanel(MainWindow * Window, QWidget * Parent) : QWidget(Parent
 
 void CLayerPanel::AddLayer()
 {
-	if (CProject* proj = MainWindow::Get().GetActiveProj())
+	if (CProject* proj = CProject::ActiveProject())
 		EditLayer::Open(proj);
 }
 
 void CLayerPanel::DelLayer()
 {
-	if (CProject* proj = MainWindow::Get().GetActiveProj())
-		proj->RemoveLayer(proj->GetActiveLayer());
+	if (CProject* proj = CProject::ActiveProject())
+		proj->RemoveLayer(proj->ActiveLayer());
 }

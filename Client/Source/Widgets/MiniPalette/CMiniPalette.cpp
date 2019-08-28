@@ -10,6 +10,7 @@
 #include <qpainter.h>
 #include <qshortcut.h>
 #include "Interface/ColorPicker/ColorPicker.h"
+#include "Projects/CProject.h"
 
 std::list<std::function<void(CMiniPalette*)>> CMiniPalette::m_listeners;
 
@@ -25,38 +26,52 @@ const QRect CMiniPalette::secondRect()
 	return r;
 }
 
-CMiniPalette::CMiniPalette(QWidget * Parent) : QWidget(Parent), m_first(0, 0, 0), m_second(255, 255, 255)
+CMiniPalette::CMiniPalette(QWidget * Parent) : QWidget(Parent)
 {
 	setFixedSize(25, 25);
 	
 	QShortcut* x = new QShortcut(Qt::Key_X, this);
 	QShortcut* d = new QShortcut(Qt::Key_D, this);
-	connect(x, &QShortcut::activated, this, &CMiniPalette::swap);
-	connect(d, &QShortcut::activated, this, &CMiniPalette::reset);
+	connect(x, &QShortcut::activated, this, &CMiniPalette::Swap);
+	connect(d, &QShortcut::activated, this, &CMiniPalette::SetToDefault);
+
+	CPalette::Listen([this](CPaletteEvent* e) { update(); });
 }
 
-void CMiniPalette::swap()
+void CMiniPalette::Swap()
 {
-	QColor c = m_second;
-	m_second = m_first, m_first = c;
+	CProject * proj;
+	if (!(proj = CProject::ActiveProject()))
+		return;
+
+	proj->Palette().Swap();
 	update();
 	PalletteEvent();
 }
 
-void CMiniPalette::reset()
+void CMiniPalette::SetToDefault()
 {
-	m_first = QColor(0, 0, 0), m_second = QColor(255, 255, 255);
+	CProject* proj;
+	if (!(proj = CProject::ActiveProject()))
+		return;
+
+	proj->Palette().SetDefaultPalette();
 	update();
 	PalletteEvent();
 }
 
-void CMiniPalette::pickColor(bool First)
+void CMiniPalette::PickColor(bool First)
 {
-	QColor* color = First ? &m_first : &m_second;
-	ColorPicker::Open(*color, [this, color](ColorPicker* c) {
-		*color = c->m_color;
-		update();
-		PalletteEvent();
+	CProject* proj;
+	if (!(proj = CProject::ActiveProject()))
+		return;
+
+	QColor color = First ? proj->Palette().First() : proj->Palette().Second();
+	ColorPicker::Open(color, [this, proj, First](ColorPicker* c)
+		{
+			First ? proj->Palette().SetFirst(c->m_color) : proj->Palette().SetSecond(c->m_color);
+			update();
+			PalletteEvent();
 		});
 }
 
@@ -68,11 +83,15 @@ void CMiniPalette::PalletteEvent()
 
 void CMiniPalette::paintEvent(QPaintEvent * e)
 {
+	CProject* proj;
+	if (!(proj = CProject::ActiveProject()))
+		return;
+
 	QPainter paint(this);
 
 	QRect a = firstRect(), b = secondRect();
 
-	paint.fillRect(b, m_second);
+	paint.fillRect(b, proj->Palette().Second());
 	paint.setPen(Qt::black);
 	paint.drawRect(b);
 	paint.setPen(Qt::white);
@@ -80,7 +99,7 @@ void CMiniPalette::paintEvent(QPaintEvent * e)
 	b.setSize(b.size() - QSize(2, 2));
 	paint.drawRect(b);
 
-	paint.fillRect(a, m_first);
+	paint.fillRect(a, proj->Palette().First());
 	paint.setPen(Qt::black);
 	paint.drawRect(a);
 	paint.setPen(Qt::white);
@@ -91,12 +110,16 @@ void CMiniPalette::paintEvent(QPaintEvent * e)
 
 void CMiniPalette::mousePressEvent(QMouseEvent * e)
 {
-	QColor* color;
-	if ((firstRect().contains(e->pos()) && (color = &m_first)) || (secondRect().contains(e->pos()) && (color = &m_second)))
-		pickColor(color == &m_first);
-		/*ColorPicker::Open(*color, [this, color](ColorPicker* c) {
-				*color = c->m_color;
-				update();
-				PalletteEvent();
-			});*/
+	CProject* proj;
+	if (!(proj = CProject::ActiveProject()))
+		return;
+
+	bool first = false, second = false;
+	if (firstRect().contains(e->pos()))
+		first = true;
+	else if (secondRect().contains(e->pos()))
+		second = true;
+
+	if (first || second) // Either will be true if one of the rects was clicked
+		PickColor(first);
 }

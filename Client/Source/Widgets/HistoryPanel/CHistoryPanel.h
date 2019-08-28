@@ -13,14 +13,12 @@
 
 #include <qwidget.h>
 
-class MainWindow;
 class CHistoryPanel : public QWidget
 {
 	bool m_focused = false;
-	MainWindow* m_parent;
 
 public:
-	CHistoryPanel(MainWindow* Window, QWidget* Parent = 0);
+	CHistoryPanel(QWidget* Parent = 0);
 
 protected:
 	void paintEvent(QPaintEvent* Event);

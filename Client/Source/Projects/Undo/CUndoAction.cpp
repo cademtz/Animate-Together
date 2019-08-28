@@ -38,7 +38,7 @@ CUndoErase::CUndoErase(QPixmap & Source, int X, int Y, int W, int H) : m_destina
 	CUndoStack::UndoEvent(this);
 }
 
-void CUndoLayerDelete::Undo()
+void CUndoLayerDel::Undo()
 {
 	m_wasUndone ? m_proj.TakeBack(m_index) : m_proj.PutBack(m_layer, m_index);
 	m_wasUndone = !m_wasUndone;
@@ -76,5 +76,5 @@ void CUndoLayerFill::Undo()
 
 CUndoLayerShift::CUndoLayerShift(CProject& Project, CLayer * Layer) : m_proj(Project), m_layer(Layer)
 {
-	m_type = e_UndoType::LayerShift, m_previndex = Project.GetLayerIndex(Layer);
+	m_type = e_UndoType::LayerShift, m_previndex = Project.IndexOf(Layer);
 }

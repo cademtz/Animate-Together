@@ -21,15 +21,15 @@
 
 void CTitleBar::SaveProject(e_export Type)
 {
-	if (CProject* proj = MainWindow::Get().GetActiveProj())
+	if (CProject* proj = CProject::ActiveProject())
 		proj->Export(Type);
 }
 
 CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 {
 	m_parent = Window;
-	m_fButtons = QFont("Arial", 14, 0);
-	setFixedHeight(24);
+	m_fButtons = QFont("Arial", 13, QFont::Bold);
+	setFixedHeight(22);
 	setStyleSheet(
 		"QPushButton { border: none; color: rgb(160, 160, 160); }"
 		"QPushButton:hover:!pressed { background-color: rgb(64, 64, 64); }"
@@ -43,23 +43,24 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 	m_name->setFont(QFont("Tahoma", 8));
 
 	m_menubar = new QMenuBar(this);
+	m_menubar->setContentsMargins(10, 0, 10, 0);
 
-	m_close = new QPushButton("X", this);
+	m_close = new QPushButton("x", this);
 	m_close->setFont(m_fButtons);
 	m_close->setStyleSheet(styleSheet());
-	m_close->setFixedWidth(m_close->height());
+	m_close->setFixedSize(height() * 1.5, height());
 	connect(m_close, &QPushButton::released, this, &CTitleBar::CloseParent);
 	
-	m_minmax = new QPushButton(QString::fromWCharArray(L"\x25A1"), this); // TO DO: Maybe actual icons, and not this hacky stuff?
+	m_minmax = new QPushButton("o", this); // TO DO: Maybe actual icons, and not this hacky stuff?
 	m_minmax->setFont(m_fButtons);
 	m_minmax->setStyleSheet(styleSheet());
-	m_minmax->setFixedWidth(m_minmax->height());
+	m_minmax->setFixedSize(m_close->size());
 	connect(m_minmax, &QPushButton::released, this, &CTitleBar::MinMaxParent);
 
-	m_hide = new QPushButton("_", this);
+	m_hide = new QPushButton("-", this);
 	m_hide->setFont(m_fButtons);
 	m_hide->setStyleSheet(styleSheet());
-	m_hide->setFixedWidth(m_hide->height());
+	m_hide->setFixedSize(m_close->size());
 	connect(m_hide, &QPushButton::released, this, &CTitleBar::HideParent);
 
 	m_layout = new QHBoxLayout(this);
@@ -76,18 +77,18 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 
 	m_menubar->setStyleSheet(
 		"QMenuBar {"
-			"font-weight: bold;"
-			"color: rgb(160, 160, 160);"
-			"selection-background-color: rgb(0, 104, 204);"
+			"color: rgb(175, 175, 175);"
+			"selection-background-color: rgb(28, 28, 28);"
+			"selection-border: 1px solid white;"
 		"}"
 		"QMenu {"
-			"font-weight: bold;"
-			"color: rgb(200, 200, 200);"
-			"background-color: rgb(25, 25, 25);"
-			"selection-background-color: rgb(0, 104, 204);"
+			"color: rgb(220, 220, 220);"
+			"background-color: rgb(28, 28, 28);"
+			"selection-background-color: rgb(50, 50, 50);"
+			"border: 1px solid rgb(50, 50, 50);"
 		"}"
 		"QMenuBar:selected, QMenu:hover {"
-			"background-color: rgb(0, 104, 204);"
+			"background-color: rgb(55, 55, 55);"
 			"color: rgb(255, 255, 255);"
 		"}");
 
@@ -101,7 +102,7 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 
 	connect(save, &QAction::triggered, [] { SaveProject(e_export::flat); });
 	connect(exp, &QAction::triggered, [] { SaveProject(e_export::layers); });
-	connect(fill, &QAction::triggered, [] { if (CLayer* layer = MainWindow::Get().GetActiveLayer()) layer->Fill(); });
+	connect(fill, &QAction::triggered, [] { if (CLayer* layer = MainWindow::Get().ActiveLayer()) layer->Fill(); });
 	connect(undo, &QAction::triggered, &MainWindow::Undo);
 	connect(redo, &QAction::triggered, &MainWindow::Redo);
 	connect(newproj, &QAction::triggered, &CreateProject::Open);

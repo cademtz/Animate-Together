@@ -16,7 +16,6 @@
 #include <qlayout.h>
 #include <qlabel>
 
-class MainWindow;
 class QPushButton;
 class QHBoxLayout;
 class QScrollArea;
@@ -44,10 +43,9 @@ class CLayerPanel : public QWidget
 	QWidget* m_buttons;
 	QLabel* m_name;
 	QPushButton* m_add, * m_del;
-	MainWindow* m_parent;
 
 public:
-	CLayerPanel(MainWindow* Window, QWidget* Parent = 0);
+	CLayerPanel(QWidget* Parent = 0);
 
 	void AddLayer();
 	void DelLayer();

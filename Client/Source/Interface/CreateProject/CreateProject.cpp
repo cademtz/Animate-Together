@@ -17,8 +17,8 @@ void CreateProject::OnCreate()
 	CProject* project = new CProject(ui.line_name->text().toStdString(), QSize(ui.spin_width->value(), ui.spin_height->value()));
 	project->AddLayer("New layer");
 
-	CProject* last = MainWindow::Get().GetActiveProj();
-	MainWindow::Get().SetActiveProj(project);
+	CProject* last = CProject::ActiveProject();
+	CProject::SetActiveProject(project);
 	if (last)
 		delete last;
 	close();

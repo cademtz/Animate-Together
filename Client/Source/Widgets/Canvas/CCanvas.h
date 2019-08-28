@@ -38,7 +38,6 @@ public:
 	inline const e_tool tool() { return m_tool; }
 	void setTabletDevice(QTabletEvent *event);
 	inline CProject* GetProj() const { return m_proj; }
-	void SetProj(CProject* Project);
 
 protected:
 	void tabletEvent(QTabletEvent *event) override;
