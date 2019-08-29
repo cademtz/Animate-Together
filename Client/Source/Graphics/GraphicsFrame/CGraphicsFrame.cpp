@@ -8,13 +8,6 @@
 #include "CGraphicsFrame.h"
 #include <qpainter.h>
 
-void CGraphicsFrame::setGeometry(const QRectF & geom)
-{
-	prepareGeometryChange();
-	QGraphicsLayoutItem::setGeometry(geom);
-	setPos(geom.topLeft());
-}
-
 void CGraphicsFrame::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
 	bool filled = State() != CFrame::Hold;
@@ -37,7 +30,8 @@ void CGraphicsFrame::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 
 QSizeF CGraphicsFrame::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
-	switch (which) {
+	switch (which)
+	{
 	case Qt::MinimumSize:
 	case Qt::PreferredSize:
 	case Qt::MaximumSize:
@@ -46,4 +40,11 @@ QSizeF CGraphicsFrame::sizeHint(Qt::SizeHint which, const QSizeF &constraint) co
 		break;
 	}
 	return constraint;
+}
+
+void CGraphicsFrame::setGeometry(const QRectF & geom)
+{
+	prepareGeometryChange();
+	QGraphicsLayoutItem::setGeometry(geom);
+	setPos(geom.topLeft());
 }

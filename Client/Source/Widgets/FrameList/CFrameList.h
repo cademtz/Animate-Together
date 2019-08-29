@@ -16,10 +16,12 @@
 
 class CLayer;
 class CProjectEvent;
+class CGraphicsScrubBar;
+
 class CFrameList : public QGraphicsView
 {
 	QLayout* m_layout;
-	QGraphicsItem* m_scrubbar;
+	CGraphicsScrubBar* m_scrubbar;
 	QGraphicsRectItem* m_playhead;
 	QGraphicsLineItem* m_playline;
 	QGraphicsGridLayout* m_grid;
@@ -32,6 +34,7 @@ public:
 	void ProjectEvent(CProjectEvent* Event);
 	void mousePressEvent(QMouseEvent* Event);
 	void mouseMoveEvent(QMouseEvent* Event);
+	bool eventFilter(QObject* object, QEvent* event);
 };
 
 #endif // CFrameList_H

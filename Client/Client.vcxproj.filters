@@ -74,6 +74,9 @@
     <ClCompile Include="Source\Projects\Frame\CFrame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Graphics\GraphicsScrubBar\CGraphicsScrubBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -187,6 +190,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\GraphicsFrame\CGraphicsFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\GraphicsScrubBar\CGraphicsScrubBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\GraphicsTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

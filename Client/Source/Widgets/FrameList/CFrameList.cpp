@@ -14,6 +14,7 @@
 #include "Projects/CProject.h"
 #include "Projects/Events/Events.h"
 #include "Graphics/GraphicsFrame/CGraphicsFrame.h"
+#include "Graphics/GraphicsScrubBar/CGraphicsScrubBar.h"
 
 const QRectF frame_bounds(0, 0, 9, 18);
 const QRectF circ_size(0, 0, 5, 5);
@@ -41,21 +42,23 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 				filled = rand() % 2;
 
 			CGraphicsFrame* frame = new CGraphicsFrame(filled ? CFrame::Key : CFrame::Hold);
-			m_grid->addItem(frame, r, c, Qt::AlignLeft);
+			m_grid->addItem(frame, r + 1, c, Qt::AlignLeft);
 			scene()->addItem(frame);
 		}
 	}
 
 	QGraphicsWidget* graphics_list = new QGraphicsWidget();
+	graphics_list->setPos(0, 18);
 	graphics_list->setLayout(m_grid);
 	scene()->addItem(graphics_list);
 
-	m_scrubbar = scene()->addRect(QRectF(0, 0, scene()->width(), 18), QPen(Qt::transparent), QColor(50, 50, 50));
+	m_scrubbar = new CGraphicsScrubBar(QRectF(0, 0, scene()->width(), 18));//scene()->addRect(QRectF(0, 0, scene()->width(), 18), QPen(Qt::transparent), QColor(50, 50, 50));
 	m_playhead = new QGraphicsRectItem(QRectF(QPointF(0, 0), frame_bounds.size() - QSize(1, 0)), m_scrubbar);
 	m_playline = new QGraphicsLineItem(m_playhead->rect().center().x(), m_playhead->rect().height(), m_playhead->rect().center().x(), sceneRect().height(), m_playhead);
 	m_playhead->setBrush(QColor(180, 0, 0, 128));
 	m_playhead->setPen(QColor(180, 0, 0));
 	m_playline->setPen(m_playhead->pen());
+	m_grid->addItem(m_scrubbar, 0, 0);
 
 	centerOn(0, 0);
 
@@ -147,4 +150,10 @@ void CFrameList::mousePressEvent(QMouseEvent * Event)
 void CFrameList::mouseMoveEvent(QMouseEvent * Event)
 {
 	Scrub(Event);
+}
+
+bool CFrameList::eventFilter(QObject * object, QEvent * event)
+{
+	//if (object == scene() && event->type() == QEvent::Resize)
+	return false;
 }
