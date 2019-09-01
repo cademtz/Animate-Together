@@ -69,7 +69,7 @@ public:
 	// - Opens the color picker and fills the layer with the chosen color
 	void Fill();
 
-	inline size_t Index() const;
+	size_t Index() const;
 
 
 	// ========== Frame functions ========== //

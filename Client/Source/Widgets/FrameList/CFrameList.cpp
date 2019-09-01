@@ -11,13 +11,22 @@
 #include <qevent.h>
 #include <qgraphicsitem.h>
 #include <qgraphicswidget.h>
+#include <qgraphicslinearlayout.h>
 #include "Projects/CProject.h"
+#include "Projects/Layer/CLayer.h"
 #include "Projects/Events/Events.h"
 #include "Graphics/GraphicsFrame/CGraphicsFrame.h"
 #include "Graphics/GraphicsScrubBar/CGraphicsScrubBar.h"
 
 const QRectF frame_bounds(0, 0, 9, 18);
 const QRectF circ_size(0, 0, 5, 5);
+
+void CFrameList::SceneWidthChanged()
+{
+	m_rows->updateGeometry();
+	if (m_scrubbar)
+		m_scrubbar->SetWidth(m_rows->contentsRect().width());
+}
 
 CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 {
@@ -29,36 +38,23 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 	setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
 	setScene(new QGraphicsScene(this));
-	m_grid = new QGraphicsGridLayout();
-	m_grid->setSpacing(0);
-	m_grid->setContentsMargins(0, 0, 0, 0);
+	m_rows = new QGraphicsLinearLayout(Qt::Vertical);
+	m_rows->setSpacing(0);
+	m_rows->setContentsMargins(0, 0, 0, 0);
 
-	for (int r = 0; r < 3; r++)
-	{
-		for (int c = 0; c < 110; c++)
-		{
-			static bool filled = true;
-			if (c > 1 && c % 2)
-				filled = rand() % 2;
+	m_widget = new QGraphicsWidget();
+	connect(m_widget, &QGraphicsWidget::widthChanged, this, &CFrameList::SceneWidthChanged);
+	m_widget->setLayout(m_rows);
+	scene()->addItem(m_widget);
 
-			CGraphicsFrame* frame = new CGraphicsFrame(filled ? CFrame::Key : CFrame::Hold);
-			m_grid->addItem(frame, r + 1, c, Qt::AlignLeft);
-			scene()->addItem(frame);
-		}
-	}
-
-	QGraphicsWidget* graphics_list = new QGraphicsWidget();
-	graphics_list->setPos(0, 18);
-	graphics_list->setLayout(m_grid);
-	scene()->addItem(graphics_list);
-
-	m_scrubbar = new CGraphicsScrubBar(QRectF(0, 0, scene()->width(), 18));//scene()->addRect(QRectF(0, 0, scene()->width(), 18), QPen(Qt::transparent), QColor(50, 50, 50));
+	m_scrubbar = new CGraphicsScrubBar(m_widget);
 	m_playhead = new QGraphicsRectItem(QRectF(QPointF(0, 0), frame_bounds.size() - QSize(1, 0)), m_scrubbar);
-	m_playline = new QGraphicsLineItem(m_playhead->rect().center().x(), m_playhead->rect().height(), m_playhead->rect().center().x(), sceneRect().height(), m_playhead);
+	m_playline = new QGraphicsLineItem(m_playhead->rect().center().x(), m_playhead->rect().height(), m_playhead->rect().center().x(), m_widget->boundingRect().height() + m_playhead->rect().height(), m_playhead);
 	m_playhead->setBrush(QColor(180, 0, 0, 128));
 	m_playhead->setPen(QColor(180, 0, 0));
 	m_playline->setPen(m_playhead->pen());
-	m_grid->addItem(m_scrubbar, 0, 0);
+	m_rows->insertItem(0, m_scrubbar);
+	scene()->addItem(m_scrubbar);
 
 	centerOn(0, 0);
 
@@ -67,45 +63,82 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 	connect(addframe, &QShortcut::activated, [] {
 		CProject::ActiveProject()->ActiveLayer()->AddFrame(true);
 		});
+	QShortcut* addhold = new QShortcut(Qt::Key_F6, this);
+	connect(addhold, &QShortcut::activated, [] {
+		CProject::ActiveProject()->ActiveLayer()->AddFrame(false);
+		});
 
-	/*CFrame::Listen([this](CFrameEvent* Event) {
-		// On add, find the frame object in the needed position and set to key frame type
-		// if none exists, add one in place
-		switch (Event->Action())
+	CFrame::Listen([this](CFrameEvent* Event) {
+		FrameEvent(Event);
+		});
+
+	CLayer::Listen([this](CLayerEvent* Event) {
+		LayerEvent(Event);
+		});
+}
+
+void CFrameList::FrameEvent(CFrameEvent * Event)
+{
+	size_t index = Event->Frame()->Index();
+	CLayer* layer = Event->Frame()->Layer();
+	auto row = (QGraphicsLinearLayout*)m_rows->itemAt(Event->Frame()->Layer()->Index() + 1);
+	if (!row)
+		return;
+
+	switch (Event->Action())
+	{
+	case CFrameEvent::Replace:
+	{
+		auto frame = (CGraphicsFrame*)row->itemAt(Event->Frame()->Index());
+		if (frame)
 		{
-		case CFrameEvent::Replace:
-			size_t index = Event->Frame()->Index();
-			int x = index * 8, y = m_scrubbar->y() + m_scrubbar->boundingRect().height() + frame_bounds.height()* Event->Frame()->Layer()->Index();
-			if (QGraphicsItem* frame = scene()->itemAt(x, y, transform()))
-				if (frame->type() == CGraphicsFrame::GraphicsType)
-					((CGraphicsFrame*)frame)->SetState(Event->Frame()->State());
-			update();
-			break;
-		case CFrameEvent::Remove:
-		case CFrameEvent::Add:
-			break;
+			frame->SetFrame(Event->Frame());
+			scene()->update(frame->geometry());
 		}
-		});*/
-
-	/*CLayer::Listen([this](CLayerEvent* Event) {
-		switch (Event->Action())
+		else
 		{
-		case CLayerEvent::Add:
-			QRectF bruh = frame_bounds;
-			bruh.moveTop(m_scrubbar->y() + m_scrubbar->boundingRect().height() + frame_bounds.height() * Event->Layer()->Index());
-			bruh.moveTop(frame_bounds.height());
-
-			auto& frames = Event->Layer()->Frames();
-			for (size_t i = 0; i < frames.size(); i++)
-			{
-				QGraphicsItem* frame = new CGraphicsFrame(frames[i]->State());
-				frame->setPos(bruh.topLeft());
-				scene()->addItem(frame);
-
-				bruh.moveLeft(bruh.left() + bruh.width() - 1);
-			}
+			CGraphicsFrame* frame = new CGraphicsFrame(Event->Frame());
+			row->insertItem(index, frame);
+			scene()->addItem(frame);
 		}
-		});*/
+		break;
+	}
+	case CFrameEvent::Remove:
+		break;
+	case CFrameEvent::Insert:
+	{
+		if (!(m_rows->count() - 1))
+			break;
+		auto frame = new CGraphicsFrame(Event->Frame());
+		row->insertItem(index, frame);
+		scene()->addItem(frame);
+		SceneWidthChanged();
+		break;
+	}
+	case CFrameEvent::Add:
+	{
+		if (!(m_rows->count() - 1))
+			break;
+		auto frame = new CGraphicsFrame(Event->Frame());
+		row->addItem(frame);
+		scene()->addItem(frame);
+		SceneWidthChanged();
+		break;
+	}
+	}
+}
+
+void CFrameList::LayerEvent(CLayerEvent * Event)
+{
+	switch (Event->Action())
+	{
+	case CLayerEvent::Add:
+		auto col = new QGraphicsLinearLayout(Qt::Horizontal);
+		col->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+		col->setSpacing(0);
+		col->setContentsMargins(0, 0, 0, 0);
+		m_rows->addItem(col);
+	}
 }
 
 void CFrameList::Scrub(QMouseEvent * Event)
@@ -114,8 +147,21 @@ void CFrameList::Scrub(QMouseEvent * Event)
 	if (!(proj = CProject::ActiveProject()))
 		return;
 
+	static bool drag = false;
 	QPoint p = mapToScene(Event->pos()).toPoint();
-	if (m_scrubbar->contains(p)) // itemAt fails at weird times, so we just check if it's within our scrub bar
+
+	switch (Event->type())
+	{
+	case QEvent::MouseButtonPress:
+		if (m_scrubbar->boundingRect().contains(p)) // itemAt fails at weird times, so we just check if it's within our scrub bar
+			drag = true;
+		break;
+	case QEvent::MouseButtonRelease:
+		drag = false;
+		break;
+	}
+
+	if (drag)
 	{
 		QPoint newpos((p.x() / 8) * 8, m_playhead->y());
 		if (newpos.x() < 0 || newpos.x() + m_playhead->rect().width() > m_scrubbar->boundingRect().right())
@@ -135,25 +181,17 @@ void CFrameList::ProjectEvent(CProjectEvent * Event)
 	switch (Event->Action())
 	{
 	case CProjectEvent::ActiveFrame:
-		int frame = (m_playhead->x() - sceneRect().x()) / 8;
-		if (frame != CProject::ActiveProject()->ActiveFrame())
-			m_playhead->setPos(frame * 8, m_playhead->y());
+		m_playhead->setPos(Event->Project()->ActiveFrame() * 8, m_playhead->y());
 		break;
 	}
 }
 
-void CFrameList::mousePressEvent(QMouseEvent * Event)
-{
+void CFrameList::mousePressEvent(QMouseEvent * Event) {
 	Scrub(Event);
 }
-
-void CFrameList::mouseMoveEvent(QMouseEvent * Event)
-{
+void CFrameList::mouseReleaseEvent(QMouseEvent * Event) {
 	Scrub(Event);
 }
-
-bool CFrameList::eventFilter(QObject * object, QEvent * event)
-{
-	//if (object == scene() && event->type() == QEvent::Resize)
-	return false;
+void CFrameList::mouseMoveEvent(QMouseEvent * Event) {
+	Scrub(Event);
 }

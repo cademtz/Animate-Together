@@ -13,17 +13,18 @@
 
 #include "Graphics/GraphicsTypes.h"
 #include <qgraphicslayoutitem.h>
+#include <qgraphicswidget.h>
 #include "Projects/Frame/CFrame.h"
 
-class CGraphicsFrame : public  QGraphicsLayoutItem, public QGraphicsItem
+class CGraphicsFrame : public QGraphicsLayoutItem, public QGraphicsItem
 {
-	CFrame::e_state m_state;
+	CFrame* m_frame;
 
 public:
-	CGraphicsFrame(CFrame::e_state State, QGraphicsItem* Parent = 0) : QGraphicsItem(Parent), m_state(State) { }
+	CGraphicsFrame(CFrame* Frame, QGraphicsItem* Parent = 0) : QGraphicsItem(Parent), m_frame(Frame) { }
 
-	inline CFrame::e_state State() const { return m_state; }
-	inline void SetState(CFrame::e_state State) { m_state = State; }
+	inline CFrame* Frame() const { return m_frame; }
+	void SetFrame(CFrame* Frame);
 
 	int		type() const { return (int)e_graphicstype::Frame; }
 	void	paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

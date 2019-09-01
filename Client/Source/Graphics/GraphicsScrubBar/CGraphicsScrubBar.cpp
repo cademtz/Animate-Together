@@ -9,17 +9,21 @@
 #include <qgraphicsscene.h>
 #include <qpainter.h>
 
-CGraphicsScrubBar::CGraphicsScrubBar(const QRectF& Rect, QGraphicsItem * Parent) : QGraphicsRectItem(Rect, Parent)
-{
-	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	setBrush(QColor(50, 50, 50));
-	//setMinimumHeight(18);
-	//setGeometry(QRectF(0, 0,))
+CGraphicsScrubBar::CGraphicsScrubBar(QGraphicsItem * Parent) : QGraphicsItem(Parent), m_size(QSizeF(9, 18)) {
+	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
-/*void CGraphicsScrubBar::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget) {
+void CGraphicsScrubBar::SetWidth(qreal Width)
+{
+	m_size.setWidth(Width);
+	QRectF r = geometry();
+	r.setSize(m_size);
+	setGeometry(r);
+}
+
+void CGraphicsScrubBar::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget) {
 	painter->fillRect(boundingRect(), QColor(50, 50, 50));
-}*/
+}
 
 QSizeF CGraphicsScrubBar::sizeHint(Qt::SizeHint which, const QSizeF & constraint) const
 {
@@ -28,14 +32,14 @@ QSizeF CGraphicsScrubBar::sizeHint(Qt::SizeHint which, const QSizeF & constraint
 	case Qt::MinimumSize:
 	case Qt::PreferredSize:
 	case Qt::MaximumSize:
-		return rect().size();
+		return m_size;
 	default:
 		break;
 	}
 	return constraint;
 }
 
-/*void CGraphicsScrubBar::setGeometry(const QRectF & geom)
+void CGraphicsScrubBar::setGeometry(const QRectF & geom)
 {
 	prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(geom);
@@ -43,5 +47,5 @@ QSizeF CGraphicsScrubBar::sizeHint(Qt::SizeHint which, const QSizeF & constraint
 }
 
 QRectF CGraphicsScrubBar::boundingRect() const {
-	return QRectF(0, 0, scene() ? scene()->width() : 18, 18);
-}*/
+	return QRectF(QPointF(0, 0), m_size);
+}

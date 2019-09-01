@@ -17,6 +17,7 @@ enum class e_graphicstype : int
 {
 	null = QGraphicsItem::UserType,
 	Frame,
+	FrameList,
 	ScrubBar,
 };
 

@@ -14,16 +14,20 @@
 #include "Graphics/GraphicsTypes.h"
 #include <qgraphicslayoutitem.h>
 
-class CGraphicsScrubBar : public QGraphicsLayoutItem, public QGraphicsRectItem
+class CGraphicsScrubBar : public QGraphicsLayoutItem, public QGraphicsItem
 {
+	QSizeF m_size;
 public:
-	CGraphicsScrubBar(const QRectF& Rect, QGraphicsItem* Parent = 0);
+	CGraphicsScrubBar(QGraphicsItem* Parent = 0);
+
+	inline qreal Width() const { return m_size.width(); }
+	void SetWidth(qreal Width);
 
 	int		type() const { return (int)e_graphicstype::ScrubBar; }
-	//void	paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+	void	paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QSizeF	sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
-	//void	setGeometry(const QRectF &geom);
-	//QRectF	boundingRect() const;
+	void	setGeometry(const QRectF &geom);
+	QRectF	boundingRect() const;
 };
 
 #endif // CGraphicsScrubBar_H

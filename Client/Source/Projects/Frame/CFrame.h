@@ -40,7 +40,7 @@ protected:
 	CLayer* m_layer;
 	CFrame* m_parent;
 
-	CFrame(CLayer* Layer, e_type Type, e_state State) { m_layer = Layer, m_type = Type, m_state = State; }
+	CFrame(CLayer* Layer, e_type Type, e_state State) : m_layer(Layer), m_type(Type), m_state(State) { }
 
 public:
 	inline e_state State() const { return m_state; }

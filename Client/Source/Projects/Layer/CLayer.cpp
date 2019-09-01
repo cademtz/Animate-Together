@@ -50,6 +50,9 @@ void CLayer::Fill(QColor Color)
 void CLayer::Fill() {
 	ColorPicker::Open(Qt::GlobalColor::white, [this](ColorPicker* picker) { Fill(picker->m_color); });
 }
+size_t CLayer::Index() const {
+	return Project()->IndexOf(this);
+}
 
 CRasterFrame * CLayer::ActiveFrame() const
 {
@@ -68,32 +71,55 @@ size_t CLayer::IndexOf(const CFrame * Frame)
 
 void CLayer::AddFrame(bool IsKey, size_t Index)
 {
-	if (!m_frames.size())
-		m_frames.push_back(new CRasterFrame(this));
-
-	bool active = false;
 	if (Index == UINT_MAX)
-		Index = Project()->ActiveFrame(), active = true;
+		Index = Project()->ActiveFrame();
 
-	if (Index > m_frames.size() - 1) // If active index past end of list, add holds between, then push a key frame back
+	if (!m_frames.size())
 	{
+		m_frames.push_back(new CRasterFrame(this)); // The first frame must always be a key frame
+		CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
+		if (!Index)
+			return;
+	}
+
+	if (Index > m_frames.size() - 1) // If active index past end of list, add holds between, then push a frame back
+	{
+		// Grab the last frame. If we add a hold, we need to find the previous key
+
 		CFrame* last = m_frames.back();
 		for (size_t i = m_frames.size(); i < Index; i++)
+		{
 			m_frames.push_back(new CRasterFrame(this, last));
-		m_frames.push_back(new CRasterFrame(this));
+			CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
+		}
+		m_frames.push_back(new CRasterFrame(this, IsKey ? 0 : last));
+		CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
 	}
-	else if (m_frames[Index]->Type() == CFrame::Hold) // Else, if it's a hold frame then replace
+	else if (!IsKey || m_frames[Index]->Type() == CFrame::Hold) // Else, if it's a hold frame
 	{
-		CRasterFrame** pos = &m_frames[Index], * old = *pos;
-		*pos = new CRasterFrame(this);
-		CFrame::CreateEvent(CFrameEvent(*pos, CFrameEvent::Replace, old));
+		if (IsKey)	// Then replace with a new key frame
+		{
+			CRasterFrame** pos = &m_frames[Index], *old = *pos;
+			*pos = new CRasterFrame(this);
+			CFrame::CreateEvent(CFrameEvent(*pos, CFrameEvent::Replace, old));
+		}
+		else // Then insert a new hold frame after it
+		{
+			CRasterFrame* frame = new CRasterFrame(this, m_frames[Index]->Parent<CRasterFrame>());
+			m_frames.insert(m_frames.begin() + Index + 1, frame);
+			CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Insert));
+			Project()->SetActiveFrame(Index + 1);
+		}
 	}
 	else // Else, move active index to next frame
 	{
 		Index++;
 		
 		if (Index > m_frames.size() - 1) // If we've reached the end, push a key frame back
+		{
 			m_frames.push_back(new CRasterFrame(this));
+			CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
+		}
 		else if (m_frames[Index]->Type() == CFrame::Hold) // Else if we hit a hold frame, replace it with a key
 			AddFrame(IsKey, Index);
 
@@ -110,9 +136,8 @@ CFrame * CLayer::LastFrame() const
 
 CFrame * CLayer::LastKey() const
 {
-	for (auto it = m_frames.rbegin(); it != m_frames.rend(); it++)
-		if ((*it)->Type() != CFrame::Hold)
-			return *it;
+	if (CFrame* frame = LastFrame())
+		return frame->State() == CFrame::Hold ? frame->Parent() : frame;
 	return nullptr;
 }
 

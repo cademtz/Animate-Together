@@ -8,14 +8,24 @@
 #include "CGraphicsFrame.h"
 #include <qpainter.h>
 
+void CGraphicsFrame::SetFrame(CFrame * Frame)
+{
+	if (Frame == m_frame)
+		return;
+	m_frame = Frame;
+	update();
+}
+
 void CGraphicsFrame::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
-	bool filled = State() != CFrame::Hold;
+	painter->setClipRect(boundingRect());
+
+	bool filled = Frame()->State() != CFrame::Hold;
 	QRectF bounds = boundingRect();
 
 	painter->setPen(QPen(QColor(43, 43, 43)));
 	painter->fillRect(bounds, filled ? QColor(100, 100, 100) : QColor(75, 75, 75));
-	painter->drawRect(bounds.x() - 1, bounds.y(), bounds.width() + 1, bounds.height());
+	painter->drawRect(bounds.x() - 1, bounds.y(), bounds.width(), bounds.height());
 
 	if (filled)
 	{
@@ -24,8 +34,17 @@ void CGraphicsFrame::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 	}
 
 	painter->setPen(Qt::black);
-	painter->setBrush(filled ? Qt::black : Qt::transparent);
-	painter->drawEllipse(bounds.x() + 1, bounds.y() + 10, 4, 4);
+
+	switch (Frame()->State())
+	{
+	case CFrame::Key:
+	case CFrame::Empty:
+		painter->setBrush(filled ? Qt::black : Qt::transparent);
+		painter->drawEllipse(bounds.x() + 1, bounds.y() + 10, 4, 4);
+		break;
+	case CFrame::Hold:
+		painter->drawRect(bounds.x() + 1, bounds.y() + 8, 4, 7);
+	}
 }
 
 QSizeF CGraphicsFrame::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const

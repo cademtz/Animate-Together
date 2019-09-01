@@ -12,29 +12,37 @@
 #endif
 
 #include <qgraphicsview.h>
-#include <qgraphicsgridlayout.h>
 
 class CLayer;
+class CFrameEvent;
+class CLayerEvent;
 class CProjectEvent;
+class CGraphicsWidget;
 class CGraphicsScrubBar;
+class QGraphicsLinearLayout;
 
 class CFrameList : public QGraphicsView
 {
-	QLayout* m_layout;
 	CGraphicsScrubBar* m_scrubbar;
 	QGraphicsRectItem* m_playhead;
 	QGraphicsLineItem* m_playline;
-	QGraphicsGridLayout* m_grid;
+
+	QGraphicsWidget* m_widget;
+	QGraphicsLinearLayout* m_rows;
+
+	void SceneWidthChanged();
 
 public:
 	CFrameList(QWidget* Parent = nullptr);
 
+	void FrameEvent(CFrameEvent* Event);
+	void LayerEvent(CLayerEvent* Event);
 	void Scrub(QMouseEvent* Event);
 
 	void ProjectEvent(CProjectEvent* Event);
 	void mousePressEvent(QMouseEvent* Event);
+	void mouseReleaseEvent(QMouseEvent* Event);
 	void mouseMoveEvent(QMouseEvent* Event);
-	bool eventFilter(QObject* object, QEvent* event);
 };
 
 #endif // CFrameList_H

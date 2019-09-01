@@ -116,7 +116,8 @@ public:
 		null = 0,
 		Add,
 		Remove,
-		Replace
+		Replace,
+		Insert
 	};
 
 private:
