@@ -13,11 +13,10 @@
 
 std::list<LayerCallback_t> CLayer::m_listeners;
 
-void CLayer::LayerEvent(CLayer * Layer, CLayerEvent::e_action Action)
+void CLayer::LayerEvent(CLayerEvent& Event)
 {
-	CLayerEvent e(Layer, Action);
 	for (auto fn : m_listeners)
-		fn(&e);
+		fn(&Event);
 }
 
 FrameList_t::iterator CLayer::GetFramePos(const CFrame* Frame)
@@ -95,7 +94,7 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 		m_frames.push_back(new CRasterFrame(this, IsKey ? 0 : last));
 		CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
 	}
-	else if (!IsKey || m_frames[Index]->Type() == CFrame::Hold) // Else, if it's a hold frame
+	else if (!IsKey || m_frames[Index]->State() == CFrame::Hold) // Else, if it's a hold frame
 	{
 		if (IsKey)	// Then replace with a new key frame
 		{
@@ -120,7 +119,7 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 			m_frames.push_back(new CRasterFrame(this));
 			CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
 		}
-		else if (m_frames[Index]->Type() == CFrame::Hold) // Else if we hit a hold frame, replace it with a key
+		else if (m_frames[Index]->State() == CFrame::Hold) // Else if we hit a hold frame, replace it with a key
 			AddFrame(IsKey, Index);
 
 		Project()->SetActiveFrame(Index);

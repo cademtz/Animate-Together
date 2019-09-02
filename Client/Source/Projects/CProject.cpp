@@ -23,7 +23,7 @@ void CProject::ProjectEvent(CProjectEvent::e_action Action)
 void CProject::PutBack(CLayer * Layer, size_t Index)
 {
 	m_layers.insert(m_layers.begin() + Index, Layer);
-	CLayer::LayerEvent(Layer, CLayerEvent::Add);
+	Layer->LayerEvent(CLayerEvent::Add);
 }
 
 void CProject::TakeBack(size_t Index)
@@ -33,7 +33,7 @@ void CProject::TakeBack(size_t Index)
 		SetActiveLayer(0);
 	CLayer* layer = *pos;
 	m_layers.erase(pos);
-	CLayer::LayerEvent(layer, CLayerEvent::Remove);
+	CLayer::LayerEvent(CLayerEvent(layer, CLayerEvent::Remove, Index));
 }
 
 std::deque<CLayer*>::iterator CProject::GetLayerPos(const CLayer * Layer)
@@ -75,7 +75,7 @@ void CProject::SetActiveLayer(CLayer * Layer)
 		return;
 
 	m_activelayer = Layer;
-	CLayer::LayerEvent(m_activelayer, CLayerEvent::Switched);
+	CLayer::LayerEvent(CLayerEvent(Layer, CLayerEvent::Switched));
 }
 
 size_t CProject::IndexOf(const CLayer * Layer)
@@ -126,7 +126,7 @@ CLayer * CProject::AddLayer(const std::string & Name, bool Private, bool Visible
 	pos = m_layers.insert(pos, layer);
 	m_undo.Push(new CUndoLayerAdd(*this, layer, pos - m_layers.begin()));
 	SetActiveLayer(layer);
-	CLayer::LayerEvent(layer, CLayerEvent::Add);
+	layer->LayerEvent(CLayerEvent::Add);
 	return layer;
 }
 
@@ -136,7 +136,7 @@ CLayer * CProject::InsertLayer(size_t Index, const std::string & Name, bool Priv
 		return 0;
 	CLayer* layer = *m_layers.insert(m_layers.begin() + Index, new CLayer(this, Name, Dimensions(), Private, Visible));
 	SetActiveLayer(layer);
-	CLayer::LayerEvent(layer, CLayerEvent::Add);
+	layer->LayerEvent(CLayerEvent::Add);
 	return layer;
 }
 
@@ -150,9 +150,10 @@ const bool CProject::RemoveLayer(CLayer * Layer)
 		{
 			if (*it == m_activelayer)
 				SetActiveLayer(0);
+			size_t prev = IndexOf(Layer);
 			m_undo.Push(new CUndoLayerDel(*this, *it, it - m_layers.begin()));
 			m_layers.erase(it);
-			CLayer::LayerEvent(Layer, CLayerEvent::Remove);
+			CLayer::LayerEvent(CLayerEvent(Layer, CLayerEvent::Remove, prev));
 			return true;
 		}
 	}
@@ -169,7 +170,7 @@ bool CProject::ShiftLayer(CLayer * Layer, size_t Index)
 	size_t prev = IndexOf(Layer);
 	m_layers.insert(m_layers.begin() + Index, Layer);
 	m_layers.erase(m_layers.begin() + (Index < prev ? prev + 1 : prev));
-	CLayer::LayerEvent(Layer, CLayerEvent::Moved);
+	CLayer::LayerEvent(CLayerEvent(Layer, CLayerEvent::Moved, prev));
 	return true;
 }
 

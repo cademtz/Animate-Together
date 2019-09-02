@@ -31,15 +31,18 @@ class CFrameList : public QGraphicsView
 	QGraphicsLinearLayout* m_rows;
 
 	void SceneWidthChanged();
-
-public:
-	CFrameList(QWidget* Parent = nullptr);
-
+	void ProjectEvent(CProjectEvent* Event);
 	void FrameEvent(CFrameEvent* Event);
 	void LayerEvent(CLayerEvent* Event);
 	void Scrub(QMouseEvent* Event);
 
-	void ProjectEvent(CProjectEvent* Event);
+	//void SetProject(CProject*);
+
+	void ShortcutEvent(const QShortcut* Shortcut);
+
+public:
+	CFrameList(QWidget* Parent = nullptr);
+
 	void mousePressEvent(QMouseEvent* Event);
 	void mouseReleaseEvent(QMouseEvent* Event);
 	void mouseMoveEvent(QMouseEvent* Event);

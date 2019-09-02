@@ -21,8 +21,11 @@ class CGraphicsFrame : public QGraphicsLayoutItem, public QGraphicsItem
 	CFrame* m_frame;
 
 public:
-	CGraphicsFrame(CFrame* Frame, QGraphicsItem* Parent = 0) : QGraphicsItem(Parent), m_frame(Frame) { }
+	CGraphicsFrame(CFrame* Frame, QGraphicsLayoutItem* Parent = 0) : QGraphicsLayoutItem(Parent), m_frame(Frame) { }
+	~CGraphicsFrame()
+	{
 
+	}
 	inline CFrame* Frame() const { return m_frame; }
 	void SetFrame(CFrame* Frame);
 

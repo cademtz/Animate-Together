@@ -98,8 +98,8 @@ public:
 	// ========== Event functions ========== //
 
 
-	inline void LayerEvent(CLayerEvent::e_action Action) { LayerEvent(this, Action); }
-	static void LayerEvent(CLayer* Layer, CLayerEvent::e_action Action);
+	inline void LayerEvent(CLayerEvent::e_action Action) { LayerEvent(CLayerEvent(this, Action)); }
+	static void LayerEvent(CLayerEvent& Event);
 
 	// - Adds a pointer to your function to the listener list
 	// - Listeners are called when a layer is changed or interacted with

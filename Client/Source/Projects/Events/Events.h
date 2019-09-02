@@ -74,14 +74,19 @@ public:
 private:
 	CLayer* m_layer;
 	e_action m_action;
+	size_t m_oldindex;
 
 public:
-	CLayerEvent(CLayer* Layer, e_action Action) : CCustomEvent(e_type::LayerEvent), m_layer(Layer), m_action(Action) { }
+	CLayerEvent(CLayer* Layer, e_action Action, size_t Index = UINT_MAX);
 
 	inline CLayer* Layer() const { return m_layer; }
-	//inline CProject* Project() const { return m_layer->Project(); }
 	CProject* Project() const;
 	inline e_action Action() const { return m_action; }
+
+	// - In the 'Moved' and 'Remove' events, it returns the index before the event
+	// - Otherwise, it is the layer's index after the event or UINT_MAX if no layer specified
+	// - Current index can be found using the layer or project.
+	inline size_t OldIndex() const { return m_oldindex; }
 };
 
 // Sent when the active project has changed

@@ -21,7 +21,7 @@ public:
 	CGraphicsScrubBar(QGraphicsItem* Parent = 0);
 
 	inline qreal Width() const { return m_size.width(); }
-	void SetWidth(qreal Width);
+	void SetWidth(qreal Width = 9);
 
 	int		type() const { return (int)e_graphicstype::ScrubBar; }
 	void	paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
