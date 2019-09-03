@@ -62,14 +62,20 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 	CLayer::Listen([this](CLayerEvent* Event) { LayerEvent(Event); });
 }
 
+void CFrameList::SceneWidthChanged()
+{
+	m_rows->updateGeometry();
+	if (m_scrubbar)
+		m_scrubbar->SetWidth(m_rows->contentsRect().width());
+}
+
 void CFrameList::ProjectEvent(CProjectEvent * Event)
 {
 	switch (Event->Action())
 	{
 	case CProjectEvent::ActiveProject:
-		// Clear all items except the first (For our scrub bar)
-		// For some odd reason, a linearlayout is always the first item even though nothing is added before the scrub bar
-		while (m_rows->count() > 2)
+
+		while (m_rows->count() > 1) // Don't delete first item, which is the scrub bar
 		{
 			auto item = (QGraphicsLinearLayout*)m_rows->itemAt(m_rows->count() - 1);
 			while (item->count())
@@ -96,8 +102,11 @@ void CFrameList::ProjectEvent(CProjectEvent * Event)
 
 void CFrameList::FrameEvent(CFrameEvent * Event)
 {
+	if (Event->Frame()->Layer()->Project() != CProject::ActiveProject())
+		return;
+
 	size_t index = Event->Frame()->Index();
-	auto row = (QGraphicsLinearLayout*)m_rows->itemAt(Event->Frame()->Layer()->Index() + 2);
+	auto row = (QGraphicsLinearLayout*)m_rows->itemAt(Event->Frame()->Layer()->Index() + 1);
 	if (!row)
 		return;
 
@@ -140,56 +149,54 @@ void CFrameList::FrameEvent(CFrameEvent * Event)
 	}
 }
 
-void CFrameList::SceneWidthChanged()
-{
-	m_rows->updateGeometry();
-	if (m_scrubbar)
-		m_scrubbar->SetWidth(m_rows->contentsRect().width());
-}
-
 void CFrameList::LayerEvent(CLayerEvent * Event)
 {
-	size_t index = Event->OldIndex();
+	if (!Event->Layer() || !Event->Project() ||
+		Event->Layer()->Project() != CProject::ActiveProject())
+		return;
 
-	int count = m_rows->count();
-	for (int i = 0; i < count; i++)
-	{
-		auto item = m_rows->itemAt(i);
-		auto geom = item->geometry();
-	}
+	size_t index = Event->OldIndex(), count = Event->Project()->Layers().size(), newindex = Event->Layer()->Index();
 
 	switch (Event->Action())
 	{
 	case CLayerEvent::Moved:
 	{
-		auto oldrow = (QGraphicsLinearLayout*)m_rows->itemAt(index + 1), newrow = (QGraphicsLinearLayout*)m_rows->itemAt(Event->Layer()->Index() + 2);
-		if (!oldrow || !newrow)
-			break;
-		m_rows->removeItem(oldrow);
-		m_rows->insertItem(Event->Layer()->Index() + 1, oldrow);
-	}
-	case CLayerEvent::Remove:
-	{
-		if (index + 2 > m_rows->count())
+		if (index + 1 >= m_rows->count())
 			break;
 		auto row = (QGraphicsLinearLayout*)m_rows->itemAt(index + 1);
 		if (!row)
 			break;
 
 		m_rows->removeItem(row);
+		if (newindex >= count - 1)
+			m_rows->addItem(row);
+		else if (newindex > index)
+			m_rows->insertItem(newindex + 2, row);
+		else if (newindex < index)
+			m_rows->insertItem(newindex + 1, row);
+		break;
+	}
+	case CLayerEvent::Remove:
+	{
+		if (index + 1 >= m_rows->count())
+			break;
+		auto row = (QGraphicsLinearLayout*)m_rows->itemAt(index + 1);
+		if (!row)
+			break;
+
 		while (row->count())
 			delete row->itemAt(row->count() - 1);
 		delete row;
-		m_rows->activate();
 		break;
 	}
 	case CLayerEvent::Add:
+		int count = m_rows->count();
 		auto row = new QGraphicsLinearLayout(Qt::Horizontal);
 		row->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
 		row->setSpacing(0);
 		row->setContentsMargins(0, 0, 0, 0);
 
-		if (index >= Event->Layer()->Project()->Layers().size() - 1)
+		if (index >= count - 1)
 			m_rows->addItem(row);
 		else
 			m_rows->insertItem(index + 1, row);
@@ -200,6 +207,7 @@ void CFrameList::LayerEvent(CLayerEvent * Event)
 			row->addItem(gframe);
 			scene()->addItem(gframe);
 		}
+		SceneWidthChanged();
 		break;
 	}
 }

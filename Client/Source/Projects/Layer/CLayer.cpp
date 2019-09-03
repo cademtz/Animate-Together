@@ -43,10 +43,16 @@ CLayer::~CLayer()
 
 void CLayer::Fill(QColor Color)
 {
+	if (!Pixmap())
+		return;
+
 	m_proj->Undos().Push(new CUndoLayerFill(*Pixmap(), Color));
 	Pixmap()->fill(Color);
 }
-void CLayer::Fill() {
+void CLayer::Fill()
+{
+	if (!Pixmap())
+		return;
 	ColorPicker::Open(Qt::GlobalColor::white, [this](ColorPicker* picker) { Fill(picker->m_color); });
 }
 size_t CLayer::Index() const {
@@ -55,9 +61,23 @@ size_t CLayer::Index() const {
 
 CRasterFrame * CLayer::ActiveFrame() const
 {
-	if (Project()->ActiveFrame() > m_frames.size() - 1)
+	if (m_frames.empty() || Project()->ActiveFrame() > m_frames.size() - 1)
 		return 0;
 	return m_frames[Project()->ActiveFrame()];
+}
+
+QPixmap * CLayer::Pixmap()
+{
+	if (CRasterFrame* frame = ActiveFrame())
+	{
+		if (frame->Pixmap()->isNull())
+		{
+			*frame->Pixmap() = QPixmap(m_dimensions);
+			frame->Pixmap()->fill(Qt::transparent);
+		}
+		return frame->Pixmap();
+	}
+	return nullptr;
 }
 
 size_t CLayer::IndexOf(const CFrame * Frame)
@@ -104,7 +124,7 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 		}
 		else // Then insert a new hold frame after it
 		{
-			CRasterFrame* frame = new CRasterFrame(this, m_frames[Index]->Parent<CRasterFrame>());
+			CRasterFrame* frame = new CRasterFrame(this, m_frames[Index]->State() == CFrame::Hold ? m_frames[Index]->Parent<CRasterFrame>() : m_frames[Index]);
 			m_frames.insert(m_frames.begin() + Index + 1, frame);
 			CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Insert));
 			Project()->SetActiveFrame(Index + 1);

@@ -31,7 +31,6 @@ class CLayer
 	std::list<size_t> m_selectedindexes;
 
 	QSize m_dimensions;
-	QPixmap m_pixmap;
 	bool m_visible = true, m_private = false;
 
 	static std::list<LayerCallback_t> m_listeners;
@@ -56,7 +55,7 @@ public:
 	inline const std::string& GetName() const { return m_name; }
 	inline void SetName(const std::string& Name) { m_name = Name; }
 
-	inline QPixmap* Pixmap() { return &m_pixmap; }
+	//inline QPixmap* Pixmap() { return &m_pixmap; }
 	inline CProject* Project() const { return m_proj; }
 
 
@@ -74,9 +73,15 @@ public:
 
 	// ========== Frame functions ========== //
 
-
 	inline const FrameList_t& Frames() const { return m_frames; }
+
+	// - Gets the active frame
+	// - Returns null if no frame is active
 	CRasterFrame* ActiveFrame() const;	
+
+	// - Gets the active frame's pixmap
+	// - Returns null if no frame is active
+	QPixmap* Pixmap();
 
 	// - Gets the frame's index in the frame list
 	// - Returns UINT_MAX if the list does not contain 'Frame'

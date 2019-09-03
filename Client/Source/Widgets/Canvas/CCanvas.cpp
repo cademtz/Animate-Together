@@ -55,10 +55,11 @@ CCanvas::CCanvas(QWidget* Parent)
 	connect(dec, &QShortcut::activated, [this] { stepBrush(-1); });
 	connect(inc, &QShortcut::activated, [this] { stepBrush(1); });
 
-	CLayer::Listen([this](CLayerEvent* e) { UndoStackEvent(); });
+	CLayer::Listen([this](CLayerEvent* e) { UpdateCanvas(); });
 	CToolBar::Listen([this](e_tool tool) { setTool(tool); });
 	CPalette::Listen([this](CPaletteEvent* p) { setColor(p->Palette()->First()); });
-	CUndoStack::Listen([this](const CUndoAction* Undo) { UndoStackEvent(); });
+	CUndoStack::Listen([this](const CUndoAction* Undo) { UpdateCanvas(); });
+
 	CProject::Listen([this](CProjectEvent* e)
 		{
 			switch (e->Action())
@@ -68,15 +69,27 @@ CCanvas::CCanvas(QWidget* Parent)
 				update();
 				break;
 			case CProjectEvent::ActiveFrame:
-				update();
+				UpdateCanvas();
 				break;
+			}
+		});
+	CFrame::Listen([this](CFrameEvent* e)
+		{
+			switch (e->Action())
+			{
+			case CFrameEvent::Replace:
+				if (e->Frame() && e->Frame() == e->Frame()->Layer()->ActiveFrame())
+					UpdateCanvas();
 			}
 		});
 
 	updateCursor(1);
 }
 
-void CCanvas::UpdateCanvas() {
+void CCanvas::UpdateCanvas()
+{
+	if (m_drawmode == e_drawmode::up)
+		m_drawmode = e_drawmode::update;
 	update(QRect(m_scroll, m_pixcanvas.size()));
 }
 void CCanvas::setTool(e_tool Tool) {
@@ -153,7 +166,8 @@ void CCanvas::paintEvent(QPaintEvent * event)
 				reg.translate(m_scroll);
 				paint.setClipRegion(reg);
 			}
-			paint.drawPixmap(m_scroll, *(*it)->Pixmap());
+			if ((*it)->Pixmap())
+				paint.drawPixmap(m_scroll, *(*it)->Pixmap());
 			if (showBuffer)
 			{
 				if (m_tool == e_tool::Brush)
@@ -169,45 +183,48 @@ void CCanvas::paintEvent(QPaintEvent * event)
 	{
 		m_drawmode = e_drawmode::up;
 		CLayer* Layer;
-		if (!(Layer = m_proj->ActiveLayer()))
+		if (!(Layer = m_proj->ActiveLayer()) || !Layer->Pixmap())
 			break;
 
-		int l = m_buffer.width(), r = 0, t = m_buffer.height(), b = 0;
-		for (int y = 0; y < m_buffer.height(); ++y) // Find opaque area of buffer
+		if (Layer->Pixmap())
 		{
-			QRgb *row = (QRgb*)m_buffer.scanLine(y);
-			bool rowFilled = false;
-			for (int x = 0; x < m_buffer.width(); ++x)
+			int l = m_buffer.width(), r = 0, t = m_buffer.height(), b = 0;
+			for (int y = 0; y < m_buffer.height(); ++y) // Find opaque area of buffer
 			{
-				if (qAlpha(row[x]))
+				QRgb *row = (QRgb*)m_buffer.scanLine(y);
+				bool rowFilled = false;
+				for (int x = 0; x < m_buffer.width(); ++x)
 				{
-					rowFilled = true, r = std::max(r, x);
-					if (l > x) // Only search for new right bound from here
-						l = x, x = r;
+					if (qAlpha(row[x]))
+					{
+						rowFilled = true, r = std::max(r, x);
+						if (l > x) // Only search for new right bound from here
+							l = x, x = r;
+					}
+				}
+				if (rowFilled)
+				{
+					t = std::min(t, y);
+					b = y;
 				}
 			}
-			if (rowFilled)
-			{
-				t = std::min(t, y);
-				b = y;
-			}
-		}
-		r++, b++;
+			r++, b++;
 
-		paint.begin(Layer->Pixmap());
-		switch (m_tool)
-		{
-		case e_tool::Brush:
-			m_proj->Undos().Push(new CUndoStroke(*Layer->Pixmap(), l, t, r - l, b - t));
-			paint.drawImage(l, t, m_buffer.copy(l, t, r - l, b - t));
-			break;
-		case e_tool::Eraser:
-			m_proj->Undos().Push(new CUndoErase(*Layer->Pixmap(), l, t, r - l, b - t));
-			paint.setCompositionMode(QPainter::CompositionMode_Source);
-			paint.setClipRegion(QBitmap::fromImage(m_buffer.createAlphaMask()));
-			paint.fillRect(l, t, r - l, b - t, QColor(0, 0, 0, 0));
+			paint.begin(Layer->Pixmap());
+			switch (m_tool)
+			{
+			case e_tool::Brush:
+				m_proj->Undos().Push(new CUndoStroke(*Layer->Pixmap(), l, t, r - l, b - t));
+				paint.drawImage(l, t, m_buffer.copy(l, t, r - l, b - t));
+				break;
+			case e_tool::Eraser:
+				m_proj->Undos().Push(new CUndoErase(*Layer->Pixmap(), l, t, r - l, b - t));
+				paint.setCompositionMode(QPainter::CompositionMode_Source);
+				paint.setClipRegion(QBitmap::fromImage(m_buffer.createAlphaMask()));
+				paint.fillRect(l, t, r - l, b - t, QColor(0, 0, 0, 0));
+			}
+			paint.end();
 		}
-		paint.end();
 	}
 	case e_drawmode::update:
 	{
@@ -221,7 +238,7 @@ void CCanvas::paintEvent(QPaintEvent * event)
 		paint.begin(&m_pixcanvas);
 		const std::deque<CLayer*>& layers = m_proj->Layers();
 		for (auto it = layers.rbegin(); it != layers.rend(); it++)
-			if ((*it)->IsVisible())
+			if ((*it)->IsVisible() && (*it)->Pixmap())
 				paint.drawPixmap(0, 0, *(*it)->Pixmap());
 		paint.end();
 		m_imgcanvas = m_pixcanvas.toImage();
@@ -279,12 +296,6 @@ void CCanvas::wheelEvent(QWheelEvent * Event)
 		delta /= 2;
 	m_scroll += delta;
 	update();
-}
-void CCanvas::UndoStackEvent()
-{
-	if (m_drawmode == e_drawmode::up)
-		m_drawmode = e_drawmode::update;
-	UpdateCanvas();
 }
 
 void CCanvas::paintPixmap(QPainter & painter, QTabletEvent * event)
@@ -397,7 +408,7 @@ void CCanvas::updateCursor(qreal Pressure)
 
 void CCanvas::TabletPress(QTabletEvent * Event, CLayer * Layer)
 {
-	if (m_drawmode != e_drawmode::up)
+	if (!Layer->Pixmap() || m_drawmode != e_drawmode::up)
 		return;
 
 	m_drawmode = e_drawmode::down;
@@ -429,6 +440,7 @@ void CCanvas::TabletPress(QTabletEvent * Event, CLayer * Layer)
 
 void CCanvas::TabletMove(QTabletEvent * Event, CLayer * Layer)
 {
+	if (!Layer->Pixmap())
 #ifndef Q_OS_IOS
 		updateCursor(Event->pressure());
 #endif

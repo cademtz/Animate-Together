@@ -46,7 +46,6 @@ protected:
 	void mouseMoveEvent(QMouseEvent* Event);
 	void mouseReleaseEvent(QMouseEvent* Event);
 	void wheelEvent(QWheelEvent* Event);
-	void UndoStackEvent();
 
 private:
 	enum class e_drawmode

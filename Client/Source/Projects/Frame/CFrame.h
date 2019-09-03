@@ -37,8 +37,8 @@ protected:
 	e_type m_type;
 	e_state m_state;
 
-	CLayer* m_layer;
-	CFrame* m_parent;
+	CLayer* m_layer = 0;
+	CFrame* m_parent = 0;
 
 	CFrame(CLayer* Layer, e_type Type, e_state State) : m_layer(Layer), m_type(Type), m_state(State) { }
 

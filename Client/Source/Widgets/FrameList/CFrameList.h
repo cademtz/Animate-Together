@@ -36,8 +36,6 @@ class CFrameList : public QGraphicsView
 	void LayerEvent(CLayerEvent* Event);
 	void Scrub(QMouseEvent* Event);
 
-	//void SetProject(CProject*);
-
 	void ShortcutEvent(const QShortcut* Shortcut);
 
 public:
