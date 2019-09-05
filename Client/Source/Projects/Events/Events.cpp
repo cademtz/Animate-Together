@@ -8,6 +8,10 @@
 #include "Events.h"
 #include "Projects/Layer/CLayer.h"
 #include "Projects/Palette/CPalette.h"
+#include "CEventHandler.h"
+
+template <typename TEventClass, typename TCallback>
+std::list<std::function<TCallback>> CEventHandler<TEventClass, TCallback>::m_listeners;
 
 CLayerEvent::CLayerEvent(CLayer * Layer, e_action Action, size_t Index) :
 	CCustomEvent(e_type::LayerEvent), m_layer(Layer), m_action(Action), m_oldindex(Index)

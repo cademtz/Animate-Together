@@ -22,10 +22,7 @@ class CGraphicsFrame : public QGraphicsLayoutItem, public QGraphicsItem
 
 public:
 	CGraphicsFrame(CFrame* Frame, QGraphicsLayoutItem* Parent = 0) : QGraphicsLayoutItem(Parent), m_frame(Frame) { }
-	~CGraphicsFrame()
-	{
 
-	}
 	inline CFrame* Frame() const { return m_frame; }
 	void SetFrame(CFrame* Frame);
 

@@ -17,10 +17,13 @@
 #include <qpixmap.h>
 #include "Projects/Events/Events.h"
 #include "Projects/Frame/CRasterFrame.h"
+#include "Projects/Events/CEventHandler.h"
 
 class CProject;
 typedef std::function<void(CLayerEvent*)> LayerCallback_t;
 typedef std::deque<CRasterFrame*> FrameList_t;
+
+// To do: Make an abstract layer class that uses abstract frame class
 
 class CLayer
 {
@@ -28,7 +31,7 @@ class CLayer
 
 	std::string m_name;
 	FrameList_t m_frames;
-	std::list<size_t> m_selectedindexes;
+	std::deque<CFrame*> m_selectedframes;
 
 	QSize m_dimensions;
 	bool m_visible = true, m_private = false;
@@ -74,6 +77,14 @@ public:
 	// ========== Frame functions ========== //
 
 	inline const FrameList_t& Frames() const { return m_frames; }
+	inline const std::deque<CFrame*>& SelectedFrames() const { return m_selectedframes; }
+
+	bool IsFrameSelected(CFrame* Frame);
+	bool HasFrame(CFrame* Frame);
+
+	// - Adds or removes a frame from the selected list
+	// - Skips and returns false if the frame is invalid or isn't owned
+	bool SelectFrame(CFrame* Frame, bool Selected = true);
 
 	// - Gets the active frame
 	// - Returns null if no frame is active

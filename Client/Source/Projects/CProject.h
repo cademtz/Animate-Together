@@ -126,8 +126,9 @@ public:
 	// - Returns true if the layer is selected
 	bool IsLayerSelected(const CLayer* Layer);
 
-	// - Sets a layer as selected
-	void SelectLayer(CLayer* Layer);
+	// - Adds or removes a layer from the selected list
+	// - Skips and returns false if the layer is invalid or isn't owned
+	bool SelectLayer(CLayer* Layer, bool Selected = true);
 
 	// - Adds a new layer at a max of 256
 	// - Returns nullptr on failure, otherwise the new layer is given

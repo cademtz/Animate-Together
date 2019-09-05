@@ -8,6 +8,8 @@
 #include "CFrame.h"
 #include "Projects/Layer/CLayer.h"
 
+CFrame::Listeners_t CFrame::m_listeners;
+
 size_t CFrame::Index() const {
 	return Layer()->IndexOf(this);
 }

@@ -7,6 +7,7 @@
 
 #include "CGraphicsFrame.h"
 #include <qpainter.h>
+#include "Projects/CProject.h"
 
 void CGraphicsFrame::SetFrame(CFrame * Frame)
 {
@@ -23,9 +24,7 @@ void CGraphicsFrame::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 	bool filled = Frame()->State() != CFrame::Hold;
 	QRectF bounds = boundingRect();
 
-	painter->setPen(QPen(QColor(43, 43, 43)));
 	painter->fillRect(bounds, filled ? QColor(100, 100, 100) : QColor(75, 75, 75));
-	painter->drawRect(bounds.x() - 1, bounds.y(), bounds.width(), bounds.height());
 
 	if (filled)
 	{
@@ -45,6 +44,10 @@ void CGraphicsFrame::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 	case CFrame::Hold:
 		painter->drawRect(bounds.x() + 1, bounds.y() + 8, 4, 7);
 	}
+
+	painter->setPen(QPen(QColor(43, 43, 43)));
+	painter->setBrush(Frame()->Layer()->IsFrameSelected(Frame()) ? QColor(0, 128, 255, 128) : Qt::transparent);
+	painter->drawRect(bounds.x() - 1, bounds.y(), bounds.width(), bounds.height());
 }
 
 QSizeF CGraphicsFrame::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const

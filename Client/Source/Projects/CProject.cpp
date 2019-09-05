@@ -102,12 +102,21 @@ bool CProject::IsLayerSelected(const CLayer * Layer)
 	return false;
 }
 
-void CProject::SelectLayer(CLayer * Layer)
+bool CProject::SelectLayer(CLayer * Layer, bool Selected)
 {
-	if (!HasLayer(Layer) || IsLayerSelected(Layer))
-		return;
-	m_selectedLayers.push_back(Layer);
-	SetActiveLayer(Layer);
+	if (!HasLayer(Layer))
+		return false;
+	else if (IsLayerSelected(Layer) == Selected)
+		return true;
+
+	if (Selected)
+	{
+		m_selectedLayers.push_back(Layer);
+		SetActiveLayer(Layer);
+	}
+	else
+		m_selectedLayers.erase(GetLayerPos(Layer));
+	return true;
 }
 
 CLayer * CProject::AddLayer(const std::string & Name, bool Private, bool Visible)

@@ -28,10 +28,7 @@ FrameList_t::iterator CLayer::GetFramePos(const CFrame* Frame)
 }
 
 CLayer::CLayer(CProject* Parent, const std::string & Name, QSize Dimensions, bool Private, bool Visible)
-	: m_proj(Parent), m_name(Name), m_dimensions(Dimensions), m_private(Private), m_visible(Visible)
-{
-	m_pixmap = QPixmap(Dimensions);
-	m_pixmap.fill(Qt::transparent);
+	: m_proj(Parent), m_name(Name), m_dimensions(Dimensions), m_private(Private), m_visible(Visible) {
 }
 
 CLayer::~CLayer()
@@ -57,6 +54,36 @@ void CLayer::Fill()
 }
 size_t CLayer::Index() const {
 	return Project()->IndexOf(this);
+}
+
+bool CLayer::IsFrameSelected(CFrame * Frame)
+{
+	for (auto frame : m_selectedframes)
+		if (frame == Frame)
+			return true;
+	return false;
+}
+
+bool CLayer::HasFrame(CFrame * Frame)
+{
+	for (auto frame : m_frames)
+		if (frame == Frame)
+			return true;
+	return false;
+}
+
+bool CLayer::SelectFrame(CFrame * Frame, bool Selected)
+{
+	if (!HasFrame(Frame))
+		return false;
+	else if (IsFrameSelected(Frame) == Selected)
+		return true;
+
+	if (Selected)
+		m_selectedframes.push_back(Frame);
+	else
+		m_selectedframes.erase(m_selectedframes.begin() + (m_frames.begin() - GetFramePos(Frame))); // stank
+	return true;
 }
 
 CRasterFrame * CLayer::ActiveFrame() const

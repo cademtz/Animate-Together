@@ -7,8 +7,9 @@
 
 #include "CUndoAction.h"
 #include <qpainter.h>
-#include "Projects/CProject.h"
 #include "CUndoStack.h"
+#include "Projects/CProject.h"
+#include "Projects/Frame/CFrame.h"
 
 void CUndoStroke::Undo()
 {
@@ -78,3 +79,6 @@ CUndoLayerShift::CUndoLayerShift(CProject& Project, CLayer * Layer) : m_proj(Pro
 {
 	m_type = e_UndoType::LayerShift, m_previndex = Project.IndexOf(Layer);
 }
+
+CUndoFrameDel::CUndoFrameDel(CProject & Project, CFrame * Frame) : m_proj(Project), m_frame(Frame), m_index(m_frame->Index()) { }
+CUndoFrameAdd::CUndoFrameAdd(CProject & Project, CFrame * Frame) : m_proj(Project), m_frame(Frame), m_index(m_frame->Index()) { }

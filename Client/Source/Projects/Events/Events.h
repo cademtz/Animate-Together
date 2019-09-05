@@ -12,8 +12,6 @@
 #endif
 
 #include <qevent.h>
-//#include "Projects/Palette/CPalette.h"
-//#include "Projects/Layer/CLayer.h"
 
 class CProject;
 
@@ -111,6 +109,8 @@ public:
 	inline CProject* Project() const { return m_project; }
 	inline e_action Action() const { return m_action; }
 };
+
+// Sent when a layer's frame or frames are updated
 
 class CFrame;
 class CFrameEvent : public CCustomEvent

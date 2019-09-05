@@ -166,18 +166,22 @@ class CFrame;
 
 class CUndoFrameDel : public CUndoAction
 {
+	CProject& m_proj;
 	CFrame* m_frame;
+	size_t m_index;
 
 public:
-	CUndoFrameDel(CFrame* Frame) { m_frame = Frame; }
+	CUndoFrameDel(CProject& Project, CFrame* Frame);
 };
 
 class CUndoFrameAdd : public CUndoAction
 {
+	CProject& m_proj;
 	CFrame* m_frame;
+	size_t m_index;
 
 public:
-	CUndoFrameAdd(CFrame* Frame) { m_frame = Frame; }
+	CUndoFrameAdd(CProject& Project, CFrame* Frame);
 };
 
 #endif // CUndoAction_H

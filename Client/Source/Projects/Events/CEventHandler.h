@@ -21,11 +21,10 @@ protected:
 	typedef std::function<TCallback> Callback_t;
 	typedef std::list<Callback_t> Listeners_t;
 
-	static Listeners_t& Listeners()
-	{
-		static Listeners_t inst;
-		return inst; // Too much hassle to initialize a private static member variable, so we make a singleton
-	}
+	static inline Listeners_t& Listeners() { return m_listeners; }
+
+private:
+	static Listeners_t m_listeners;
 
 public:
 	static void CreateEvent(TEventClass& Event) {
