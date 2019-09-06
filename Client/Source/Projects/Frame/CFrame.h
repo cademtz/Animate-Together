@@ -47,17 +47,17 @@ public:
 	inline e_type Type() const { return m_type; }
 
 	// - Returns the layer that holds the frame
-	inline CLayer* Layer() const { return m_layer; }
+	inline CLayer* Layer() { return m_layer; }
 
 	// - Returns the index in the parent layer's frame list
-	size_t Index() const;
+	size_t Index();
 
 	// - Returns the parent frame, which must have the same class
 	// - Result may be null if the current state does not require a parent (e.g. Key, Empty)
 	template<typename T = CFrame>
 	inline T* Parent() const { return (T*)m_parent; }
 
-	// - Updates the state to Empty or Key, indicating whether it should be displayed
+	// - Updates the state to Empty or Key, indicating whether it display any image
 	void SetIsEmpty(bool IsEmpty) { m_state = IsEmpty ? Empty : Key; }
 };
 

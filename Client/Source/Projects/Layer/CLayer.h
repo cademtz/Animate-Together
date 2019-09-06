@@ -25,7 +25,7 @@ typedef std::deque<CRasterFrame*> FrameList_t;
 
 // To do: Make an abstract layer class that uses abstract frame class
 
-class CLayer
+class CLayer : public CEventHandler<CLayerEvent>
 {
 	CProject* m_proj;
 
@@ -36,7 +36,7 @@ class CLayer
 	QSize m_dimensions;
 	bool m_visible = true, m_private = false;
 
-	static std::list<LayerCallback_t> m_listeners;
+	//static std::list<LayerCallback_t> m_listeners;
 
 protected:
 	FrameList_t::iterator GetFramePos(const CFrame* Frame);
@@ -55,11 +55,10 @@ public:
 	inline bool IsPrivate() const { return m_private; }
 	void SetPrivate(bool Private) { m_private = Private; }
 
-	inline const std::string& GetName() const { return m_name; }
+	inline const std::string& Name() const { return m_name; }
 	inline void SetName(const std::string& Name) { m_name = Name; }
 
-	//inline QPixmap* Pixmap() { return &m_pixmap; }
-	inline CProject* Project() const { return m_proj; }
+	inline CProject* Project() { return m_proj; }
 
 
 	// ========== Layer functions ========== //
@@ -71,7 +70,7 @@ public:
 	// - Opens the color picker and fills the layer with the chosen color
 	void Fill();
 
-	size_t Index() const;
+	size_t Index();
 
 
 	// ========== Frame functions ========== //
@@ -85,10 +84,11 @@ public:
 	// - Adds or removes a frame from the selected list
 	// - Skips and returns false if the frame is invalid or isn't owned
 	bool SelectFrame(CFrame* Frame, bool Selected = true);
+	inline void ClearSelected() { m_selectedframes.clear(); }
 
 	// - Gets the active frame
 	// - Returns null if no frame is active
-	CRasterFrame* ActiveFrame() const;	
+	CRasterFrame* ActiveFrame();	
 
 	// - Gets the active frame's pixmap
 	// - Returns null if no frame is active
@@ -114,12 +114,7 @@ public:
 	// ========== Event functions ========== //
 
 
-	inline void LayerEvent(CLayerEvent::e_action Action) { LayerEvent(CLayerEvent(this, Action)); }
-	static void LayerEvent(CLayerEvent& Event);
-
-	// - Adds a pointer to your function to the listener list
-	// - Listeners are called when a layer is changed or interacted with
-	static inline void Listen(LayerCallback_t Func) { m_listeners.push_back(Func); }
+	inline void LayerEvent(CLayerEvent::e_action Action) { CreateEvent(CLayerEvent(this, Action)); }
 };
 
 #endif // CLayer_H

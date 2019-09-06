@@ -13,37 +13,45 @@
 
 #include <qgraphicsview.h>
 
-class CLayer;
 class CFrameEvent;
 class CLayerEvent;
 class CProjectEvent;
-class CGraphicsWidget;
 class CGraphicsScrubBar;
 class QGraphicsLinearLayout;
 
 class CFrameList : public QGraphicsView
 {
+	bool m_selecting = false;
+	QRect m_boxselect;
+
 	CGraphicsScrubBar* m_scrubbar;
-	QGraphicsRectItem* m_playhead;
+	QGraphicsRectItem* m_playhead, * m_boxoverlay;
 	QGraphicsLineItem* m_playline;
 
 	QGraphicsWidget* m_widget;
 	QGraphicsLinearLayout* m_rows;
 
-	void SceneWidthChanged();
+	void UpdateScrub();
 	void ProjectEvent(CProjectEvent* Event);
 	void FrameEvent(CFrameEvent* Event);
 	void LayerEvent(CLayerEvent* Event);
-	void Scrub(QMouseEvent* Event);
+	void MouseEvent(QMouseEvent* Event);
+
+	// - Returns true when scrubbing is being handled
+	bool Scrub(QMouseEvent* Event);
+
+	// - Returns true when frame selection is being handled
+	bool Select(QMouseEvent* Event);
 
 	void ShortcutEvent(const QShortcut* Shortcut);
 
+protected:
+	void mousePressEvent(QMouseEvent* Event)	{ MouseEvent(Event); }
+	void mouseReleaseEvent(QMouseEvent* Event)	{ MouseEvent(Event); }
+	void mouseMoveEvent(QMouseEvent* Event)		{ MouseEvent(Event); }
+
 public:
 	CFrameList(QWidget* Parent = nullptr);
-
-	void mousePressEvent(QMouseEvent* Event);
-	void mouseReleaseEvent(QMouseEvent* Event);
-	void mouseMoveEvent(QMouseEvent* Event);
 };
 
 #endif // CFrameList_H

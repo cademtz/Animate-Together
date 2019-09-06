@@ -48,8 +48,7 @@ public:
 	CPaletteEvent(CPalette* Palette) : CCustomEvent(e_type::PaletteEvent), m_palette(Palette) { }
 
 	inline CPalette* Palette() const { return m_palette; }
-	//inline CProject* Project() const { return m_palette->Project(); }
-	CProject* Project() const;
+	CProject* Project();
 };
 
 // Sent when a project's layers have updated
@@ -78,7 +77,7 @@ public:
 	CLayerEvent(CLayer* Layer, e_action Action, size_t Index = UINT_MAX);
 
 	inline CLayer* Layer() const { return m_layer; }
-	CProject* Project() const;
+	CProject* Project();
 	inline e_action Action() const { return m_action; }
 
 	// - In the 'Moved' and 'Remove' events, it returns the index before the event

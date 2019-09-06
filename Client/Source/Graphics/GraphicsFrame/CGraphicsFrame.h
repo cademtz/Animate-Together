@@ -21,17 +21,20 @@ class CGraphicsFrame : public QGraphicsLayoutItem, public QGraphicsItem
 	CFrame* m_frame;
 
 public:
+	static const QRectF m_rect;
+
 	CGraphicsFrame(CFrame* Frame, QGraphicsLayoutItem* Parent = 0) : QGraphicsLayoutItem(Parent), m_frame(Frame) { }
 
 	inline CFrame* Frame() const { return m_frame; }
 	void SetFrame(CFrame* Frame);
 
+	void SelectFrame(bool Select = true);
+
 	int		type() const { return (int)e_graphicstype::Frame; }
 	void	paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QSizeF	sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
 	void	setGeometry(const QRectF &geom);
-	QRectF	boundingRect() const { return QRectF(0, 0, 8, 18); }
-
+	QRectF	boundingRect() const { return m_rect; }
 };
 
 #endif // CGraphicsFrame_H

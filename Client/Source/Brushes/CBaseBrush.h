@@ -21,7 +21,7 @@ namespace BrushesPrivate
 	{
 
 	public:
-		const std::string& GetName() const { return name; }
+		const std::string& Name() const { return name; }
 		static void InitBrushes();
 
 	protected:

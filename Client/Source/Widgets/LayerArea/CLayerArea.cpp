@@ -49,7 +49,7 @@ void CLayerArea::DrawItem(QPainter & paint, const CLayer * Layer, const QRect & 
 
 	paint.setPen(old);
 	int tx = icon.x() + icon.width();
-	paint.drawText(region.x() + tx + 8, region.y(), region.width() - tx - 8, region.height(), Qt::AlignVCenter, QString::fromStdString(Layer->GetName()));
+	paint.drawText(region.x() + tx + 8, region.y(), region.width() - tx - 8, region.height(), Qt::AlignVCenter, QString::fromStdString(Layer->Name()));
 }
 
 CLayer* CLayerArea::SelectLayer(QMouseEvent * Event)

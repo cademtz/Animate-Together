@@ -11,13 +11,7 @@
 #include "Projects/CProject.h"
 #include "Widgets/Canvas/CCanvas.h"
 
-std::list<LayerCallback_t> CLayer::m_listeners;
-
-void CLayer::LayerEvent(CLayerEvent& Event)
-{
-	for (auto fn : m_listeners)
-		fn(&Event);
-}
+CLayer::Listeners_t CLayer::m_listeners;
 
 FrameList_t::iterator CLayer::GetFramePos(const CFrame* Frame)
 {
@@ -52,7 +46,7 @@ void CLayer::Fill()
 		return;
 	ColorPicker::Open(Qt::GlobalColor::white, [this](ColorPicker* picker) { Fill(picker->m_color); });
 }
-size_t CLayer::Index() const {
+size_t CLayer::Index() {
 	return Project()->IndexOf(this);
 }
 
@@ -86,7 +80,7 @@ bool CLayer::SelectFrame(CFrame * Frame, bool Selected)
 	return true;
 }
 
-CRasterFrame * CLayer::ActiveFrame() const
+CRasterFrame * CLayer::ActiveFrame()
 {
 	if (m_frames.empty() || Project()->ActiveFrame() > m_frames.size() - 1)
 		return 0;

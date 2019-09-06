@@ -20,10 +20,10 @@ CLayerEvent::CLayerEvent(CLayer * Layer, e_action Action, size_t Index) :
 		m_oldindex = Layer->Index();
 }
 
- CProject * CLayerEvent::Project() const {
+CProject * CLayerEvent::Project() {
 	return m_layer->Project();
 }
 
-CProject * CPaletteEvent::Project() const {
+CProject * CPaletteEvent::Project() {
 	return m_palette->Project();
 }

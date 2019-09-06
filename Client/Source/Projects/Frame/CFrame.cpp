@@ -10,6 +10,6 @@
 
 CFrame::Listeners_t CFrame::m_listeners;
 
-size_t CFrame::Index() const {
+size_t CFrame::Index() {
 	return Layer()->IndexOf(this);
 }

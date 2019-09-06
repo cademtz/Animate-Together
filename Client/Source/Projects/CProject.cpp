@@ -33,7 +33,7 @@ void CProject::TakeBack(size_t Index)
 		SetActiveLayer(0);
 	CLayer* layer = *pos;
 	m_layers.erase(pos);
-	CLayer::LayerEvent(CLayerEvent(layer, CLayerEvent::Remove, Index));
+	CLayer::CreateEvent(CLayerEvent(layer, CLayerEvent::Remove, Index));
 }
 
 std::deque<CLayer*>::iterator CProject::GetLayerPos(const CLayer * Layer)
@@ -75,7 +75,7 @@ void CProject::SetActiveLayer(CLayer * Layer)
 		return;
 
 	m_activelayer = Layer;
-	CLayer::LayerEvent(CLayerEvent(Layer, CLayerEvent::Switched));
+	CLayer::CreateEvent(CLayerEvent(Layer, CLayerEvent::Switched));
 }
 
 size_t CProject::IndexOf(const CLayer * Layer)
@@ -162,7 +162,7 @@ const bool CProject::RemoveLayer(CLayer * Layer)
 			size_t prev = IndexOf(Layer);
 			m_undo.Push(new CUndoLayerDel(*this, *it, it - m_layers.begin()));
 			m_layers.erase(it);
-			CLayer::LayerEvent(CLayerEvent(Layer, CLayerEvent::Remove, prev));
+			CLayer::CreateEvent(CLayerEvent(Layer, CLayerEvent::Remove, prev));
 			return true;
 		}
 	}
@@ -179,7 +179,7 @@ bool CProject::ShiftLayer(CLayer * Layer, size_t Index)
 	size_t prev = IndexOf(Layer);
 	m_layers.insert(m_layers.begin() + Index, Layer);
 	m_layers.erase(m_layers.begin() + (Index < prev ? prev + 1 : prev));
-	CLayer::LayerEvent(CLayerEvent(Layer, CLayerEvent::Moved, prev));
+	CLayer::CreateEvent(CLayerEvent(Layer, CLayerEvent::Moved, prev));
 	return true;
 }
 
@@ -232,7 +232,7 @@ void CProject::Export(e_export Type)
 		name = file.substr(path.length(), file.length() - type.length() - path.length() - 1);
 		
 		for (auto layer : layers)
-			layer->Pixmap()->save(QString::fromStdString(path + name + " - " + layer->GetName() + '.' +  type), "png");
+			layer->Pixmap()->save(QString::fromStdString(path + name + " - " + layer->Name() + '.' +  type), "png");
 		break;
 	}
 	}
