@@ -80,6 +80,10 @@ CCanvas::CCanvas(QWidget* Parent)
 			case CFrameEvent::Replace:
 				if (e->Frame() && e->Frame() == e->Frame()->Layer()->ActiveFrame())
 					UpdateCanvas();
+			case CFrameEvent::Remove:
+				// Very dangerous code. Fix as soon as any sort of undo/redo for frames is possible
+				if (e->OldIndex() == e->Frame()->Layer()->Project()->ActiveFrame())
+					UpdateCanvas();
 			}
 		});
 

@@ -36,11 +36,11 @@ public:
 protected:
 	e_type m_type;
 	e_state m_state;
-
 	CLayer* m_layer = 0;
-	CFrame* m_parent = 0;
 
-	CFrame(CLayer* Layer, e_type Type, e_state State) : m_layer(Layer), m_type(Type), m_state(State) { }
+	CFrame(CLayer* Layer, e_type Type, e_state State);
+
+	CFrame* _Parent();
 
 public:
 	inline e_state State() const { return m_state; }
@@ -55,7 +55,7 @@ public:
 	// - Returns the parent frame, which must have the same class
 	// - Result may be null if the current state does not require a parent (e.g. Key, Empty)
 	template<typename T = CFrame>
-	inline T* Parent() const { return (T*)m_parent; }
+	inline T* Parent() { return (T*)_Parent(); }
 
 	// - Updates the state to Empty or Key, indicating whether it display any image
 	void SetIsEmpty(bool IsEmpty) { m_state = IsEmpty ? Empty : Key; }

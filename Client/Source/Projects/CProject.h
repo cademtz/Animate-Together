@@ -96,7 +96,7 @@ public:
 	void SetActiveFrame(size_t Frame);
 
 	// - Returns an ordered list of the project's layers
-	inline const LayerList_t& Layers() const { return m_layers; }
+	inline LayerList_t& Layers() { return m_layers; }
 
 	// - Returns a pointer to the active layer
 	// - Return is nullptr if no layers or active layer exists
@@ -152,7 +152,7 @@ public:
 
 	// - Returns the foremost frame from the end of the animation
 	// - Result will be null if no frames exist
-	CFrame* LastFrame() const;
+	CFrame* LastFrame();
 
 
 	// ========== Event functions ========== //

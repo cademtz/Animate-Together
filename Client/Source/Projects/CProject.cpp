@@ -238,7 +238,7 @@ void CProject::Export(e_export Type)
 	}
 }
 
-CFrame * CProject::LastFrame() const
+CFrame * CProject::LastFrame()
 {
 	CLayer* greatest = nullptr;
 	for (auto layer : Layers())

@@ -18,7 +18,6 @@
 #include "Graphics/GraphicsFrame/CGraphicsFrame.h"
 #include "Graphics/GraphicsScrubBar/CGraphicsScrubBar.h"
 
-const QRectF frame_bounds(0, 0, 9, 18);
 const QRectF circ_size(0, 0, 5, 5);
 
 CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
@@ -41,7 +40,7 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 	scene()->addItem(m_widget);
 
 	m_scrubbar = new CGraphicsScrubBar(m_widget);
-	m_playhead = new QGraphicsRectItem(QRectF(QPointF(), CGraphicsFrame::m_rect.size() - QSize(1, 0)), m_scrubbar);
+	m_playhead = new QGraphicsRectItem(QRectF(QPointF(), CGraphicsFrame::m_rect.size() - QSize(1, 1)), m_scrubbar);
 	m_playline = new QGraphicsLineItem(m_playhead);
 	m_boxoverlay = new QGraphicsRectItem();
 
@@ -49,6 +48,7 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 	m_playhead->setPen(QColor(180, 0, 0));
 	m_playline->setPen(m_playhead->pen());
 	m_boxoverlay->setBrush(QColor(64, 128, 255, 128));
+	m_boxoverlay->setPen(QColor(0, 128, 255));
 
 	m_rows->addItem(m_scrubbar);
 	scene()->addItem(m_scrubbar);
@@ -56,12 +56,14 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 	centerOn(0, 0);
 
 	QShortcut* addframe = new QShortcut(Qt::Key_F7, this), * addhold = new QShortcut(Qt::Key_F5, this),
-		* decframe = new QShortcut(Qt::Key_Comma, this), * incframe = new QShortcut(Qt::Key_Period, this);
+		* decframe = new QShortcut(Qt::Key_Comma, this), * incframe = new QShortcut(Qt::Key_Period, this),
+		* delframe = new QShortcut(Qt::Key_Delete, this);
 
 	connect(addframe, &QShortcut::activated, [this, addframe] { ShortcutEvent(addframe); });
 	connect(addhold, &QShortcut::activated, [this, addhold] { ShortcutEvent(addhold); });
 	connect(decframe, &QShortcut::activated, [this, decframe] { ShortcutEvent(decframe); });
 	connect(incframe, &QShortcut::activated, [this, incframe] { ShortcutEvent(incframe); });
+	connect(delframe, &QShortcut::activated, [this, delframe] { ShortcutEvent(delframe); });
 
 	CProject::Listen([this](CProjectEvent* Event) { ProjectEvent(Event); });
 	CFrame::Listen([this](CFrameEvent* Event) { FrameEvent(Event); });
@@ -128,15 +130,11 @@ void CFrameList::FrameEvent(CFrameEvent * Event)
 	{
 		if (auto frame = (CGraphicsFrame*)row->itemAt(Event->Frame()->Index()))
 			frame->SetFrame(Event->Frame());
-		else
-		{
-			frame = new CGraphicsFrame(Event->Frame());
-			row->insertItem(index, frame);
-			scene()->addItem(frame);
-		}
 		break;
 	}
 	case CFrameEvent::Remove:
+		if (auto frame = (CGraphicsFrame*)row->itemAt(Event->OldIndex()))
+			delete frame;
 		break;
 	case CFrameEvent::Insert:
 	{
@@ -258,11 +256,11 @@ bool CFrameList::Scrub(QMouseEvent * Event)
 			newpos.setX(m_scrubbar->boundingRect().right() - m_playhead->boundingRect().width() + 1);
 
 		int frame = newpos.x() / 8;
-		if (frame == proj->ActiveFrame())
-			return false;
-
-		m_playhead->setPos(newpos);
-		proj->SetActiveFrame(frame);
+		if (frame != proj->ActiveFrame())
+		{
+			m_playhead->setPos(newpos);
+			proj->SetActiveFrame(frame);
+		}
 		return true;
 	}
 	return false;
@@ -274,68 +272,108 @@ bool CFrameList::Select(QMouseEvent * Event)
 		Event->pos().x() - m_boxselect.left(),
 		Event->pos().y() - m_boxselect.top()));
 
-	if (Event->type() == QEvent::MouseButtonRelease)
+	if (Event->type() == QEvent::MouseButtonRelease && m_selecting)
 	{
 		m_selecting = false;
 		scene()->removeItem(m_boxoverlay);
+
+		QRect rect = m_boxoverlay->rect().normalized().toRect();
+		rect.moveTopLeft(rect.topLeft() + QPoint(2, 0));
+		QPoint p = rect.topLeft(), end = rect.bottomRight();
+
+		while (p.y() <= end.y())
+		{
+			while (p.x() <= end.x())
+			{
+				QGraphicsItem* item = itemAt(p);
+				if (item && item->type() == (int)e_graphicstype::Frame)
+				{
+					CGraphicsFrame* frame = (CGraphicsFrame*)item;
+					frame->SelectFrame();
+				}
+				p.setX(p.x() + CGraphicsFrame::m_rect.width());
+			}
+			p.setY(p.y() + CGraphicsFrame::m_rect.height());
+			p.setX(rect.left());
+		}
+
 		return false;
 	}
 	else if (Event->type() == QEvent::MouseButtonPress && Event->button() == Qt::MouseButton::LeftButton && !m_selecting)
 	{
-		m_selecting = true;
-
-		m_boxselect.setTopLeft(Event->pos());
-		m_boxselect.setSize(QSize());
-		m_boxoverlay->setVisible(true);
-		m_boxoverlay->setRect(m_boxselect);
-		scene()->addItem(m_boxoverlay);
-
 		if (CProject* proj = CProject::ActiveProject())
 			for (auto layer : proj->Layers())
 				layer->ClearSelected();
 
-		update();
+		if (!m_widget->rect().contains(Event->pos()))
+		{
+			update();
+			return false;
+		}
+
+		m_selecting = true;
+
+		m_boxselect.setTopLeft(Event->pos());
+		m_boxselect.setSize(QSize());
+		m_boxoverlay->setRect(m_boxselect);
+		scene()->addItem(m_boxoverlay);
 	}
 	else if (!m_selecting)
 		return false;
 	
-	QRectF rect = mapToScene(m_boxselect.normalized()).boundingRect();
-	//QPoint p = rect.topLeft(), end = m_boxselect.bottomRight();
-	m_boxoverlay->setRect(rect);
+	QRect _rect = m_boxselect.normalized();
+	if (!_rect.height())
+		_rect.setHeight(1);
+	if (!_rect.width())
+		_rect.setWidth(1);
+	QRectF rect = mapToScene(_rect).boundingRect();
 
-	/*while (p.y() <= end.y())
-	{
-		while (p.x() <= end.x())
-		{
-			QGraphicsItem* item = itemAt(p);
-			if (item && item->type() == (int)e_graphicstype::Frame)
-			{
-				CGraphicsFrame* frame = (CGraphicsFrame*)item;
-				frame->SelectFrame();
-			}
-			p.setX(p.x() + CGraphicsFrame::m_rect.width());
-		}
-		p.setY(p.y() + CGraphicsFrame::m_rect.height());
-	}*/
+	if (rect.right() > m_widget->geometry().right())
+		rect.setRight(m_widget->geometry().right());
+	if (rect.top() < m_widget->geometry().top())
+		rect.setTop(m_widget->geometry().top());
+	if (rect.left() < m_widget->geometry().left())
+		rect.setLeft(m_widget->geometry().left());
+	if (rect.bottom() > m_widget->geometry().bottom())
+		rect.setBottom(m_widget->geometry().bottom());
+
+	QSize step = CGraphicsFrame::m_rect.size().toSize();
+	rect.setLeft(floor(rect.left() / step.width()) * step.width() - 1);
+	rect.setRight(ceil(rect.right() / step.width()) * step.width() - 1);
+	rect.setTop(floor(rect.top() / step.height()) * step.height());
+	rect.setBottom(ceil(rect.bottom() / step.height()) * step.height());
+
+	m_boxoverlay->setRect(rect.normalized());
 
 	return true;
 }
 
+#include <qapplication.h>
 void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
 {
+	CProject* proj = CProject::ActiveProject();
+	if (!proj)
+		return;
+
 	QKeySequence key = Shortcut->key();
 	switch (key[0])
 	{
 	case Qt::Key_F7:
 	case Qt::Key_F6:
 	case Qt::Key_F5:
-		if (CProject* proj = CProject::ActiveProject())
-			if (CLayer* layer = proj->ActiveLayer())
-				layer->AddFrame(key[0] == Qt::Key_F7);
+		if (CLayer* layer = proj->ActiveLayer())
+			layer->AddFrame(key[0] == Qt::Key_F7);
 		break;
 	case Qt::Key_Comma:
 	case Qt::Key_Period:
-		if (CProject* proj = CProject::ActiveProject())
+		/*if (Shift is pressed...)
+		{
+			if (key[0] == Qt::Key_Comma)
+				proj->SetActiveFrame(0);
+			else
+				proj->SetActiveFrame(proj->LastFrame()->Index())
+		}
+		else*/
 		{
 			int step = key[0] == Qt::Key_Comma ? -1 : 1;
 			size_t frame = proj->ActiveFrame() + step;
@@ -343,5 +381,9 @@ void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
 				proj->SetActiveFrame(frame);
 		}
 		break;
+	case Qt::Key_Delete:
+		for (auto layer : proj->Layers())
+			while (layer->SelectedFrames().size())
+				layer->RemoveFrame(layer->SelectedFrames().front());
 	}
 }

@@ -13,7 +13,7 @@
 
 CLayer::Listeners_t CLayer::m_listeners;
 
-FrameList_t::iterator CLayer::GetFramePos(const CFrame* Frame)
+FrameList_t::iterator CLayer::FramePos(const CFrame* Frame)
 {
 	for (auto it = m_frames.begin(); it != m_frames.end(); it++)
 		if (*it == Frame)
@@ -76,7 +76,13 @@ bool CLayer::SelectFrame(CFrame * Frame, bool Selected)
 	if (Selected)
 		m_selectedframes.push_back(Frame);
 	else
-		m_selectedframes.erase(m_selectedframes.begin() + (m_frames.begin() - GetFramePos(Frame))); // stank
+	{
+		for (auto it = m_selectedframes.begin(); it != m_selectedframes.end(); it++)
+		{
+			m_selectedframes.erase(it);
+			break;
+		}
+	}
 	return true;
 }
 
@@ -103,7 +109,7 @@ QPixmap * CLayer::Pixmap()
 
 size_t CLayer::IndexOf(const CFrame * Frame)
 {
-	auto pos = GetFramePos(Frame);
+	auto pos = FramePos(Frame);
 	if (pos != m_frames.end())
 		return pos - m_frames.begin();
 	return UINT_MAX;
@@ -125,14 +131,12 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 	if (Index > m_frames.size() - 1) // If active index past end of list, add holds between, then push a frame back
 	{
 		// Grab the last frame. If we add a hold, we need to find the previous key
-
-		CFrame* last = m_frames.back();
 		for (size_t i = m_frames.size(); i < Index; i++)
 		{
-			m_frames.push_back(new CRasterFrame(this, last));
+			m_frames.push_back(new CRasterFrame(this, true));
 			CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
 		}
-		m_frames.push_back(new CRasterFrame(this, IsKey ? 0 : last));
+		m_frames.push_back(new CRasterFrame(this, IsKey));
 		CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
 	}
 	else if (!IsKey || m_frames[Index]->State() == CFrame::Hold) // Else, if it's a hold frame
@@ -145,7 +149,7 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 		}
 		else // Then insert a new hold frame after it
 		{
-			CRasterFrame* frame = new CRasterFrame(this, m_frames[Index]->State() == CFrame::Hold ? m_frames[Index]->Parent<CRasterFrame>() : m_frames[Index]);
+			CRasterFrame* frame = new CRasterFrame(this, true);
 			m_frames.insert(m_frames.begin() + Index + 1, frame);
 			CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Insert));
 			Project()->SetActiveFrame(Index + 1);
@@ -167,18 +171,42 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 	}
 }
 
-CFrame * CLayer::LastFrame() const
+void CLayer::RemoveFrame(CFrame * Frame)
+{
+	if (!HasFrame(Frame))
+		return;
+
+	/*
+		Infinite recursion caused when deleting all selected frames until m_selectedframes is empty,
+		but HasFrame returns false and the loop continues. What is being missed?
+	*/
+
+	size_t index = IndexOf(Frame);
+	this->SelectFrame(Frame, false);
+	m_frames.erase(FramePos(Frame));
+
+	if (m_frames.size() && m_frames.front()->State() == CFrame::Hold)
+		AddFrame(true, 0);
+
+	CFrame::CreateEvent(CFrameEvent(Frame, CFrameEvent::Remove, 0, index));
+}
+
+CFrame * CLayer::LastFrame()
 {
 	if (m_frames.size())
 		return m_frames.back();
 	return 0;
 }
 
-CFrame * CLayer::LastKey() const
+CFrame * CLayer::LastKey(size_t Index)
 {
-	if (CFrame* frame = LastFrame())
-		return frame->State() == CFrame::Hold ? frame->Parent() : frame;
-	return nullptr;
+	if (!m_frames.size())
+		return 0;
+
+	for (auto it = m_frames.begin() + Index; it != m_frames.begin(); it--)
+		if ((*it)->State() != CFrame::Hold)
+			return *it;
+	return m_frames.front();
 }
 
 void CLayer::SetVisible(bool Visible)

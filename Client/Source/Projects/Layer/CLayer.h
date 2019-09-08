@@ -39,7 +39,7 @@ class CLayer : public CEventHandler<CLayerEvent>
 	//static std::list<LayerCallback_t> m_listeners;
 
 protected:
-	FrameList_t::iterator GetFramePos(const CFrame* Frame);
+	FrameList_t::iterator FramePos(const CFrame* Frame);
 
 public:
 	CLayer(CProject* Parent, const std::string& Name, QSize Dimensions, bool Private = false, bool Visible = true);
@@ -76,7 +76,7 @@ public:
 	// ========== Frame functions ========== //
 
 	inline const FrameList_t& Frames() const { return m_frames; }
-	inline const std::deque<CFrame*>& SelectedFrames() const { return m_selectedframes; }
+	inline std::deque<CFrame*>& SelectedFrames() { return m_selectedframes; }
 
 	bool IsFrameSelected(CFrame* Frame);
 	bool HasFrame(CFrame* Frame);
@@ -99,16 +99,18 @@ public:
 	size_t IndexOf(const CFrame* Frame);
 
 	// - Adds a new frame to the layer
-	// - If 'Index' is left default, the active 
+	// - If 'Index' is left default, the active index is used
 	void AddFrame(bool IsKey, size_t Index = UINT_MAX);
+
+	void RemoveFrame(CFrame* Frame);
 
 	// - Returns the frame at the end of the frame list
 	// - Result will be null if no frames exist
-	CFrame* LastFrame() const;
+	CFrame* LastFrame();
 
-	// - Returns the last key frame
+	// - Returns the last key frame starting at Index
 	// - Result will be null if no frames exist
-	CFrame* LastKey() const;
+	CFrame* LastKey(size_t Index = UINT_MAX);
 
 
 	// ========== Event functions ========== //

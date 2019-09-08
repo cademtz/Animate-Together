@@ -27,3 +27,10 @@ CProject * CLayerEvent::Project() {
 CProject * CPaletteEvent::Project() {
 	return m_palette->Project();
 }
+
+CFrameEvent::CFrameEvent(CFrame * Frame, e_action Action, CFrame * Old, size_t OldIndex)
+	: CCustomEvent(e_type::FrameEvent), m_frame(Frame), m_action(Action), m_old(Old), m_oldindex(OldIndex)
+{
+	if (m_oldindex == UINT_MAX && Frame)
+		m_oldindex = Frame->Index();
+}

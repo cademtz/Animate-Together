@@ -10,6 +10,17 @@
 
 CFrame::Listeners_t CFrame::m_listeners;
 
+CFrame::CFrame(CLayer * Layer, e_type Type, e_state State)
+	: m_layer(Layer), m_type(Type), m_state(State)
+{
+}
+
+CFrame * CFrame::_Parent() {
+	return Layer()->LastKey(Index());
+}
+
 size_t CFrame::Index() {
-	return Layer()->IndexOf(this);
+	if (Layer())
+		return Layer()->IndexOf(this);
+	return UINT_MAX;
 }

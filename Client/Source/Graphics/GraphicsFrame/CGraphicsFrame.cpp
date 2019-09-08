@@ -53,7 +53,7 @@ void CGraphicsFrame::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 	}
 
 	painter->setPen(QPen(QColor(43, 43, 43)));
-	painter->setBrush(Frame()->Layer()->IsFrameSelected(Frame()) ? QColor(0, 128, 255, 128) : Qt::transparent);
+	painter->setBrush(Frame()->Layer()->IsFrameSelected(Frame()) ? QColor(64, 128, 255, 128) : Qt::transparent);
 	painter->drawRect(m_rect.x() - 1, m_rect.y(), m_rect.width(), m_rect.height());
 }
 

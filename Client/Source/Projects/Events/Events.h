@@ -127,15 +127,21 @@ public:
 private:
 	CFrame* m_frame, * m_old;
 	e_action m_action;
+	size_t m_oldindex;
 
 public:
-	CFrameEvent(CFrame* Frame, e_action Action, CFrame* Old = 0) : CCustomEvent(e_type::FrameEvent), m_frame(Frame), m_action(Action), m_old(Old) { }
+	CFrameEvent(CFrame* Frame, e_action Action, CFrame* Old = 0, size_t OldIndex = UINT_MAX);
 
 	// - Gets the frame that previously took the place of the new frame
 	// - Result is non-null only in certain actions (e.g. 'Replace')
 	inline CFrame* OldFrame() const { return m_old; }
 	inline CFrame* Frame() const { return m_frame; }
 	inline e_action Action() const { return m_action; }
+
+	// - In the 'Remove' event, it returns the index before the event
+	// - Otherwise, it is the layer's index after the event or UINT_MAX if no layer specified
+	// - Current index can be found using the layer or project.
+	inline size_t OldIndex() const { return m_oldindex; }
 };
 
 #endif // Events_H
