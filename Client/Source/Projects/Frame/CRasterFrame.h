@@ -20,7 +20,8 @@ class CRasterFrame : public CFrame
 	QPoint m_pos;
 
 public:
-	CRasterFrame(CLayer* Layer, bool IsHold = false) : CFrame(Layer, Raster, IsHold ? Hold : Empty) { }//m_parent = HoldParent; }
+	CRasterFrame(CLayer* Layer, bool IsHold = false) : CFrame(Layer, Raster, IsHold ? Hold : Empty) { }
+	CRasterFrame(CRasterFrame& Frame, CLayer* Layer) : CRasterFrame(Frame) { m_layer = Layer; }
 
 	inline QPixmap* Pixmap() { return State() == Hold ? Parent<CRasterFrame>()->Pixmap() : &m_pixmap; }
 	inline QPoint Pos() { return State() == Hold ? Parent<CRasterFrame>()->Pos() : m_pos; }

@@ -47,7 +47,7 @@ class CPaletteEvent : public CCustomEvent
 public:
 	CPaletteEvent(CPalette* Palette) : CCustomEvent(e_type::PaletteEvent), m_palette(Palette) { }
 
-	inline CPalette* Palette() const { return m_palette; }
+	inline CPalette* Palette() { return m_palette; }
 	CProject* Project();
 };
 
@@ -76,7 +76,7 @@ private:
 public:
 	CLayerEvent(CLayer* Layer, e_action Action, size_t Index = UINT_MAX);
 
-	inline CLayer* Layer() const { return m_layer; }
+	inline CLayer* Layer() { return m_layer; }
 	CProject* Project();
 	inline e_action Action() const { return m_action; }
 
@@ -105,7 +105,7 @@ private:
 public:
 	CProjectEvent(CProject * Project, e_action Action) : CCustomEvent(e_type::ProjectEvent), m_project(Project), m_action(Action) { }
 
-	inline CProject* Project() const { return m_project; }
+	inline CProject* Project() { return m_project; }
 	inline e_action Action() const { return m_action; }
 };
 
@@ -134,12 +134,12 @@ public:
 
 	// - Gets the frame that previously took the place of the new frame
 	// - Result is non-null only in certain actions (e.g. 'Replace')
-	inline CFrame* OldFrame() const { return m_old; }
-	inline CFrame* Frame() const { return m_frame; }
+	inline CFrame* OldFrame() { return m_old; }
+	inline CFrame* Frame() { return m_frame; }
 	inline e_action Action() const { return m_action; }
 
-	// - In the 'Remove' event, it returns the index before the event
-	// - Otherwise, it is the layer's index after the event or UINT_MAX if no layer specified
+	// - In the 'Remove' event it returns the index before the event
+	// - Otherwise, it is the frame's index after the event or UINT_MAX if no frame specified
 	// - Current index can be found using the layer or project.
 	inline size_t OldIndex() const { return m_oldindex; }
 };

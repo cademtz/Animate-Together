@@ -128,7 +128,7 @@ void CFrameList::FrameEvent(CFrameEvent * Event)
 	{
 	case CFrameEvent::Replace:
 	{
-		if (auto frame = (CGraphicsFrame*)row->itemAt(Event->Frame()->Index()))
+		if (auto frame = (CGraphicsFrame*)row->itemAt(index))
 			frame->SetFrame(Event->Frame());
 		break;
 	}
@@ -223,8 +223,8 @@ void CFrameList::LayerEvent(CLayerEvent * Event)
 
 void CFrameList::MouseEvent(QMouseEvent * Event)
 {
-	if (!Scrub(Event));
-		//Select(Event);
+	if (!Scrub(Event))
+		Select(Event);
 }
 
 bool CFrameList::Scrub(QMouseEvent * Event)
@@ -383,7 +383,6 @@ void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
 		break;
 	case Qt::Key_Delete:
 		for (auto layer : proj->Layers())
-			while (layer->SelectedFrames().size())
-				layer->RemoveFrame(layer->SelectedFrames().front());
+			layer->RemoveSelected();
 	}
 }

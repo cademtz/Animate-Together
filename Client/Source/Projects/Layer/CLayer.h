@@ -20,13 +20,15 @@
 #include "Projects/Events/CEventHandler.h"
 
 class CProject;
-typedef std::function<void(CLayerEvent*)> LayerCallback_t;
-typedef std::deque<CRasterFrame*> FrameList_t;
 
 // To do: Make an abstract layer class that uses abstract frame class
 
 class CLayer : public CEventHandler<CLayerEvent>
 {
+protected:
+	typedef std::deque<CRasterFrame*> FrameList_t;
+
+private:
 	CProject* m_proj;
 
 	std::string m_name;
@@ -36,13 +38,9 @@ class CLayer : public CEventHandler<CLayerEvent>
 	QSize m_dimensions;
 	bool m_visible = true, m_private = false;
 
-	//static std::list<LayerCallback_t> m_listeners;
-
-protected:
-	FrameList_t::iterator FramePos(const CFrame* Frame);
-
 public:
 	CLayer(CProject* Parent, const std::string& Name, QSize Dimensions, bool Private = false, bool Visible = true);
+	CLayer(const CLayer& Layer, CProject* Project);
 	~CLayer();
 
 
@@ -102,7 +100,13 @@ public:
 	// - If 'Index' is left default, the active index is used
 	void AddFrame(bool IsKey, size_t Index = UINT_MAX);
 
-	void RemoveFrame(CFrame* Frame);
+	// - Returns the old frame on success, else null pointer on failure.
+	CFrame* ReplaceFrame(size_t Index, CFrame* New);
+	inline void ReplaceFrame(CFrame* Old, CFrame* New) { ReplaceFrame(IndexOf(Old), New); }
+	inline void RemoveFrame(CFrame* Frame) { RemoveFrame(IndexOf(Frame)); }
+	//inline void RemoveFrame(size_t Index) { RemoveFrame(FramePos(Index)); }
+	void RemoveFrame(size_t Index);
+	void RemoveSelected();
 
 	// - Returns the frame at the end of the frame list
 	// - Result will be null if no frames exist
@@ -117,6 +121,17 @@ public:
 
 
 	inline void LayerEvent(CLayerEvent::e_action Action) { CreateEvent(CLayerEvent(this, Action)); }
+
+protected:
+
+
+	// ========== Internal functions ========== //
+
+
+	FrameList_t::iterator FramePos(const CFrame* Frame);
+	inline FrameList_t::iterator FramePos(size_t Index) { return m_frames.begin() + Index; }
+	inline size_t IndexOf(FrameList_t::iterator Pos) const { return Pos - m_frames.begin(); }
+	//FrameList_t::iterator RemoveFrame(FrameList_t::iterator Pos);
 };
 
 #endif // CLayer_H

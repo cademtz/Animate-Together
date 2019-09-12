@@ -50,7 +50,7 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 	m_close->setStyleSheet(styleSheet());
 	m_close->setFixedSize(height() * 1.5, height());
 	connect(m_close, &QPushButton::released, this, &CTitleBar::CloseParent);
-	
+
 	m_minmax = new QPushButton("o", this); // TO DO: Maybe actual icons, and not this hacky stuff?
 	m_minmax->setFont(m_fButtons);
 	m_minmax->setStyleSheet(styleSheet());
@@ -77,19 +77,19 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 
 	m_menubar->setStyleSheet(
 		"QMenuBar {"
-			"color: rgb(175, 175, 175);"
-			"selection-background-color: rgb(28, 28, 28);"
-			"selection-border: 1px solid white;"
+		"color: rgb(175, 175, 175);"
+		"selection-background-color: rgb(28, 28, 28);"
+		"selection-border: 1px solid white;"
 		"}"
 		"QMenu {"
-			"color: rgb(220, 220, 220);"
-			"background-color: rgb(28, 28, 28);"
-			"selection-background-color: rgb(50, 50, 50);"
-			"border: 1px solid rgb(50, 50, 50);"
+		"color: rgb(220, 220, 220);"
+		"background-color: rgb(28, 28, 28);"
+		"selection-background-color: rgb(50, 50, 50);"
+		"border: 1px solid rgb(50, 50, 50);"
 		"}"
 		"QMenuBar:selected, QMenu:hover {"
-			"background-color: rgb(55, 55, 55);"
-			"color: rgb(255, 255, 255);"
+		"background-color: rgb(55, 55, 55);"
+		"color: rgb(255, 255, 255);"
 		"}");
 
 	QMenu
@@ -98,7 +98,7 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 	QAction
 		*newproj = new QAction("New", this), *save = new QAction("Save as...", this), *exp = new QAction("Export layers", this),
 		*undo = new QAction("Undo", this), *redo = new QAction("Redo", this), *fill = new QAction("Fill", this), *history = new QAction("History", this),
-		*layers = new QAction("Layers", this);
+		*layers = new QAction("Layers", this), *l_copy = new QAction("Duplicate", this);
 
 	connect(save, &QAction::triggered, [] { SaveProject(e_export::flat); });
 	connect(exp, &QAction::triggered, [] { SaveProject(e_export::layers); });
@@ -108,6 +108,7 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 	connect(newproj, &QAction::triggered, &CreateProject::Open);
 	connect(history, &QAction::triggered, &MainWindow::ToggleHistory);
 	connect(layers, &QAction::triggered, &MainWindow::ToggleLayers);
+	connect(l_copy, &QAction::triggered, [] { if (CLayer* layer = MainWindow::Get().ActiveLayer()) layer->Project()->Duplicate(layer); });
 
 	fill->setShortcut(Qt::CTRL + Qt::Key_F);
 	save->setShortcut(Qt::CTRL + Qt::Key_S);
@@ -117,7 +118,7 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 	file->addActions({ newproj, save, exp });
 	file->insertSeparator(save);
 	edit->addActions({ undo, redo });
-	layer->addAction(fill);
+	layer->addActions({ fill, l_copy });
 	window->addActions({ history, layers });
 
 	m_menubar->addMenu(file);

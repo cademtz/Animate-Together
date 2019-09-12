@@ -15,6 +15,9 @@ bool CreateProject::Open()
 void CreateProject::OnCreate()
 {
 	CProject* project = new CProject(ui.line_name->text().toStdString(), QSize(ui.spin_width->value(), ui.spin_height->value()));
+
+	// Should have more customization in project settings, but for now these defaults will do.
+	project->AddLayer("Background")->Fill(Qt::white);
 	project->AddLayer("New layer");
 
 	CProject* last = CProject::ActiveProject();

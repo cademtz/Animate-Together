@@ -29,11 +29,14 @@ enum class e_export
 
 class CFrame;
 
-typedef std::deque<CLayer*> LayerList_t;
 typedef std::function<void(CProjectEvent*)> ProjectCallback_t;
 
 class CProject
 {
+protected:
+	typedef std::deque<CLayer*> LayerList_t;
+
+public:
 	std::string m_name;
 	QSize m_dimensions;
 	CPalette m_palette;
@@ -48,20 +51,6 @@ class CProject
 
 	static std::list<ProjectCallback_t> m_listeners;
 	void ProjectEvent(CProjectEvent::e_action Action);
-
-protected:
-	friend class CUndoLayerDel;
-	friend class CUndoLayerAdd;
-
-	// - Inserts an existing layer back into the list
-	void PutBack(CLayer* Layer, size_t Index);
-
-	// - Removes an existing layer from the list
-	void TakeBack(size_t Index);
-
-	// - Returns a layer's position
-	// - On failure, the end position is returned
-	std::deque<CLayer*>::iterator GetLayerPos(const CLayer* Layer);
 
 public:
 	CProject(const std::string& Name, QSize Dimensions);
@@ -138,6 +127,9 @@ public:
 	// - Returns nullptr on failure, otherwise the new layer is given
 	CLayer* InsertLayer(size_t Index, const std::string& Name, bool Private = false, bool Visible = true);
 
+	// - Adds a copy of any layer to the project
+	void Duplicate(CLayer* Layer);
+
 	// - Removes and destroys the layer if it belongs to the project
 	// - Returns false on failure
 	const bool RemoveLayer(CLayer* Layer);
@@ -161,6 +153,26 @@ public:
 	// - Adds a pointer to your function to the listener list
 	// - Listeners are called when the active project is changed
 	static inline void Listen(ProjectCallback_t Func) { m_listeners.push_back(Func); }
+
+protected:
+
+	// ========== Internal functions ========== //
+
+
+	friend class CUndoLayerDel;
+	friend class CUndoLayerAdd;
+
+	// - Inserts an existing layer back into the list
+	void PutBack(CLayer* Layer, size_t Index);
+
+	// - Removes an existing layer from the list
+	void TakeBack(size_t Index);
+
+	// - Returns a layer's position
+	// - On failure, the end position is returned
+	LayerList_t::iterator GetLayerPos(const CLayer* Layer);
+
+	LayerList_t::iterator ActivePos();
 };
 
 #endif // CProject_H

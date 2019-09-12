@@ -42,6 +42,9 @@ protected:
 
 	CFrame* _Parent();
 
+	friend class CLayer;
+	void SetLayer(CLayer* Layer) { m_layer = Layer; }
+
 public:
 	inline e_state State() const { return m_state; }
 	inline e_type Type() const { return m_type; }

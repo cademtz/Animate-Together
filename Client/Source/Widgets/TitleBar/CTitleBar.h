@@ -41,6 +41,7 @@ public:
 	inline const QColor& GetBackground() const { return m_background; }
 	// - Sets a new background color for the title bar
 	void SetBackground(const QColor& Col);
+
 protected:
 	void mouseDoubleClickEvent(QMouseEvent *Event);
 	void mousePressEvent(QMouseEvent* Event);

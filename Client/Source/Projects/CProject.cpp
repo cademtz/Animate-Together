@@ -20,30 +20,6 @@ void CProject::ProjectEvent(CProjectEvent::e_action Action)
 		fn(&e);
 }
 
-void CProject::PutBack(CLayer * Layer, size_t Index)
-{
-	m_layers.insert(m_layers.begin() + Index, Layer);
-	Layer->LayerEvent(CLayerEvent::Add);
-}
-
-void CProject::TakeBack(size_t Index)
-{
-	auto pos = m_layers.begin() + Index;
-	if (*pos == m_activelayer)
-		SetActiveLayer(0);
-	CLayer* layer = *pos;
-	m_layers.erase(pos);
-	CLayer::CreateEvent(CLayerEvent(layer, CLayerEvent::Remove, Index));
-}
-
-std::deque<CLayer*>::iterator CProject::GetLayerPos(const CLayer * Layer)
-{
-	for (auto it = m_layers.begin(); it != m_layers.end(); it++)
-		if (*it == Layer)
-			return it;
-	return m_layers.end();
-}
-
 CProject::CProject(const std::string& Name, QSize Dimensions) : m_layers(), m_palette(this)
 {
 	SetName(Name);
@@ -124,18 +100,12 @@ CLayer * CProject::AddLayer(const std::string & Name, bool Private, bool Visible
 	if (m_layers.size() >= MAX_LAYERS)
 		return 0;
 
-	std::deque<CLayer*>::iterator pos = m_layers.begin();
-	if (m_activelayer)
-	{
-		pos = GetLayerPos(m_activelayer);
-		if (pos == m_layers.end())
-			return 0;
-	}
+	auto pos = ActivePos();
 	CLayer* layer = new CLayer(this, Name, m_dimensions, Private, Visible);
 	pos = m_layers.insert(pos, layer);
 	m_undo.Push(new CUndoLayerAdd(*this, layer, pos - m_layers.begin()));
-	SetActiveLayer(layer);
 	layer->LayerEvent(CLayerEvent::Add);
+	SetActiveLayer(layer);
 	return layer;
 }
 
@@ -144,9 +114,19 @@ CLayer * CProject::InsertLayer(size_t Index, const std::string & Name, bool Priv
 	if (m_layers.size() >= MAX_LAYERS)
 		return 0;
 	CLayer* layer = *m_layers.insert(m_layers.begin() + Index, new CLayer(this, Name, Dimensions(), Private, Visible));
-	SetActiveLayer(layer);
 	layer->LayerEvent(CLayerEvent::Add);
+	SetActiveLayer(layer);
 	return layer;
+}
+
+void CProject::Duplicate(CLayer * Layer)
+{
+	CLayer* copy = new CLayer(*Layer, this);
+	auto pos = ActivePos();
+	pos = m_layers.insert(pos, copy);
+	m_undo.Push(new CUndoLayerAdd(*this, copy, pos - m_layers.begin()));
+	copy->LayerEvent(CLayerEvent::Add);
+	SetActiveLayer(copy);
 }
 
 const bool CProject::RemoveLayer(CLayer * Layer)
@@ -247,4 +227,39 @@ CFrame * CProject::LastFrame()
 			greatest = layer;
 	}
 	return greatest->LastFrame();
+}
+
+void CProject::PutBack(CLayer * Layer, size_t Index)
+{
+	m_layers.insert(m_layers.begin() + Index, Layer);
+	Layer->LayerEvent(CLayerEvent::Add);
+}
+
+void CProject::TakeBack(size_t Index)
+{
+	auto pos = m_layers.begin() + Index;
+	if (*pos == m_activelayer)
+		SetActiveLayer(0);
+	CLayer* layer = *pos;
+	m_layers.erase(pos);
+	CLayer::CreateEvent(CLayerEvent(layer, CLayerEvent::Remove, Index));
+}
+
+CProject::LayerList_t::iterator CProject::GetLayerPos(const CLayer * Layer)
+{
+	for (auto it = m_layers.begin(); it != m_layers.end(); it++)
+		if (*it == Layer)
+			return it;
+	return m_layers.end();
+}
+
+CProject::LayerList_t::iterator CProject::ActivePos()
+{
+	if (m_activelayer)
+	{
+		auto pos = GetLayerPos(m_activelayer);
+		if (pos != m_layers.end())
+			return pos;
+	}
+	return m_layers.begin();
 }
