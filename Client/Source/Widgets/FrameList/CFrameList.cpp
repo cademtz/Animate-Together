@@ -136,21 +136,15 @@ void CFrameList::FrameEvent(CFrameEvent * Event)
 		if (auto frame = (CGraphicsFrame*)row->itemAt(Event->OldIndex()))
 			delete frame;
 		break;
-	case CFrameEvent::Insert:
-	{
-		if (!(m_rows->count() - 1))
-			break;
-		auto frame = new CGraphicsFrame(Event->Frame(), row);
-		row->insertItem(index, frame);
-		scene()->addItem(frame);
-		break;
-	}
 	case CFrameEvent::Add:
 	{
 		if (!(m_rows->count() - 1))
 			break;
 		auto frame = new CGraphicsFrame(Event->Frame(), row);
-		row->addItem(frame);
+		if (index >= row->count())
+			row->addItem(frame);
+		else
+			row->insertItem(index, frame);
 		scene()->addItem(frame);
 		break;
 	}

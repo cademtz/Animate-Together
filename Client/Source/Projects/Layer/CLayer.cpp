@@ -127,12 +127,14 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 	if (Index == UINT_MAX)
 		Index = Project()->ActiveFrame();
 
+	std::deque<CFrame*> added;
 	if (!m_frames.size())
 	{
 		m_frames.push_back(new CRasterFrame(this)); // The first frame must always be a key frame
-		CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
+		//CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
 		if (!Index)
 			return;
+		added.push_back(m_frames.front());
 	}
 
 	if (Index > m_frames.size() - 1) // If active index past end of list, add holds between, then push a frame back
@@ -141,10 +143,12 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 		for (size_t i = m_frames.size(); i < Index; i++)
 		{
 			m_frames.push_back(new CRasterFrame(this, true));
-			CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
+			added.push_back(m_frames.back());
+			//CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
 		}
 		m_frames.push_back(new CRasterFrame(this, !IsKey));
-		CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
+		added.push_back(m_frames.back());
+		//CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
 	}
 	else if (!IsKey || m_frames[Index]->State() == CFrame::Hold) // Else, if it's a hold frame
 	{
@@ -153,13 +157,14 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 			CRasterFrame** pos = &m_frames[Index], *old = *pos;
 			SelectFrame(old, false);
 			*pos = new CRasterFrame(this);
-			CFrame::CreateEvent(CFrameEvent(*pos, CFrameEvent::Replace, old));
+			//CFrame::CreateEvent(CFrameEvent(*pos, CFrameEvent::Replace, old));
 		}
 		else // Then insert a new hold frame after it
 		{
 			CRasterFrame* frame = new CRasterFrame(this, true);
 			m_frames.insert(m_frames.begin() + Index + 1, frame);
-			CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Insert));
+			added.push_back(frame);
+			//CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Add));
 			Project()->SetActiveFrame(Index + 1);
 		}
 	}
@@ -170,12 +175,20 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 		if (Index > m_frames.size() - 1) // If we've reached the end, push a key frame back
 		{
 			m_frames.push_back(new CRasterFrame(this));
-			CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
+			added.push_back(m_frames.back());
+			//CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
 		}
 		else if (m_frames[Index]->State() == CFrame::Hold) // Else if we hit a hold frame, replace it with a key
 			AddFrame(IsKey, Index);
 
 		Project()->SetActiveFrame(Index);
+	}
+
+	if (added.size())
+	{
+		Project()->Undos().Push(new CUndoFrame(*this, added, true));
+		for (auto frame : added)
+			CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Add));
 	}
 }
 
@@ -197,14 +210,14 @@ void CLayer::RemoveFrame(size_t Index)
 	if (frame->State() != CFrame::Hold && Index < m_frames.size() - 1 && m_frames[Index + 1]->State() == CFrame::Hold)
 		++Index; // Delete the key's hold frame instead so all other holds keep the same key
 
-	SelectFrame(frame, false);
-	auto result = m_frames.erase(FramePos(Index));
+	Project()->Undos().Push(new CUndoFrame(*this, frame, false));
+	_RemoveFrame(Index);
 	CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Remove, 0, Index));
-	delete frame;
 }
 
 void CLayer::RemoveSelected()
 {
+	std::deque<CFrame*> frames;
 	while (m_selectedframes.size())
 	{
 		CFrame* front = m_selectedframes.front();
@@ -215,11 +228,8 @@ void CLayer::RemoveSelected()
 				CFrame* frame = *pos;
 				bool selected = IsFrameSelected(frame);
 				
-				size_t index = IndexOf(pos);
 				SelectFrame(frame, false);
-				pos = --m_frames.erase(pos); // Erase the key on our own, without RemoveFrame deselecting it
-				CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Remove, 0, index));
-				delete frame;
+				frames.push_back(frame);
 
 				if (!selected)
 				{
@@ -230,8 +240,19 @@ void CLayer::RemoveSelected()
 			if (!IsFrameSelected(front))
 				continue;
 		}
-		//RemoveFrame(IndexOf(frameit)); // Remove by index, as a pointer may exist twice during the loop
-		RemoveFrame(m_selectedframes.front());
+		SelectFrame(front, false);
+		frames.push_back(front);
+	}
+
+	if (!frames.size())
+		return;
+
+	Project()->Undos().Push(new CUndoFrame(*this, frames, false));
+	for (auto frame : frames)
+	{
+		size_t index = IndexOf(frame);
+		_RemoveFrame(index);
+		CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Remove, 0, index));
 	}
 }
 
@@ -267,20 +288,24 @@ CLayer::FrameList_t::iterator CLayer::FramePos(const CFrame* Frame)
 	return m_frames.end();
 }
 
-/*CLayer::FrameList_t::iterator CLayer::RemoveFrame(FrameList_t::iterator Pos)
+void CLayer::PutBack(CFrame * Frame, size_t Index)
 {
-	size_t index = IndexOf(Pos);
-	CFrame* frame = *Pos;
-	if (frame->State() != CFrame::Hold && index < m_frames.size() - 1 && (*(Pos + 1))->State() == CFrame::Hold)
-	{
-		//SelectFrame(frame, false);
-		frame = *++Pos, ++index; // Delete the key's hold frame instead so all other holds keep the same key
-	}
-
-	SelectFrame(frame, false);
-	auto result = m_frames.erase(Pos);
-	CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Remove, 0, index));
-	delete frame;
-	return result;
+	m_frames.insert(m_frames.begin() + Index, (CRasterFrame*)Frame);
+	CFrame::CreateEvent(CFrameEvent(Frame, CFrameEvent::Add));
 }
-*/
+
+void CLayer::TakeBack(CFrame* Frame)
+{
+	auto pos = FramePos(Frame);
+	CFrame* frame = *pos;
+	size_t index = IndexOf(pos);
+	m_frames.erase(pos);
+	CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Remove, 0, index));
+}
+
+void CLayer::_RemoveFrame(size_t Index)
+{
+	CFrame* frame = m_frames[Index];
+	SelectFrame(frame, false);
+	m_frames.erase(FramePos(Index));
+}

@@ -104,7 +104,6 @@ public:
 	CFrame* ReplaceFrame(size_t Index, CFrame* New);
 	inline void ReplaceFrame(CFrame* Old, CFrame* New) { ReplaceFrame(IndexOf(Old), New); }
 	inline void RemoveFrame(CFrame* Frame) { RemoveFrame(IndexOf(Frame)); }
-	//inline void RemoveFrame(size_t Index) { RemoveFrame(FramePos(Index)); }
 	void RemoveFrame(size_t Index);
 	void RemoveSelected();
 
@@ -131,7 +130,13 @@ protected:
 	FrameList_t::iterator FramePos(const CFrame* Frame);
 	inline FrameList_t::iterator FramePos(size_t Index) { return m_frames.begin() + Index; }
 	inline size_t IndexOf(FrameList_t::iterator Pos) const { return Pos - m_frames.begin(); }
-	//FrameList_t::iterator RemoveFrame(FrameList_t::iterator Pos);
+
+	friend class CUndoFrame;
+	void PutBack(CFrame* Frame, size_t Index);
+	void TakeBack(CFrame* Frame);
+
+	// - Removes a frame directly without calling any events or creating undos
+	void _RemoveFrame(size_t Index);
 };
 
 #endif // CLayer_H

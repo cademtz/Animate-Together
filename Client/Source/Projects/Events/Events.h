@@ -120,8 +120,7 @@ public:
 		null = 0,
 		Add,
 		Remove,
-		Replace,
-		Insert
+		Replace
 	};
 
 private:

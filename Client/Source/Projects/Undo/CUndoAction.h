@@ -48,16 +48,20 @@ protected:
 public:
 	// - Credits to @dtugend for fixing mem leak after I forgot about virtual destructors
 	virtual ~CUndoAction() { }
+
 	// - Restores the data existing before the action was performed
-	// - If 'WasUndone' returns true, this acts as Redo and toggles 'WasUndone'
+	// - If 'Undone' returns true, this acts as Redo and toggles 'Undone'
 	virtual void Undo() = 0;
+
 	// - Returns true if this action is now a Redo
 	// - The return value is affected by calling 'Undo'
-	inline bool WasUndone() const { return m_wasUndone; }
+	inline bool Undone() const { return m_wasUndone; }
+
 	// - Returns the type of action class
-	inline e_UndoType GetType() const { return m_type; }
+	inline e_UndoType Type() const { return m_type; }
+
 	// - Returns the type of action class as a string
-	inline const char* GetTypeStr() const { return str_UndoType[(int)m_type]; }
+	inline const char* TypeSTr() const { return str_UndoType[(int)m_type]; }
 };
 
 #include <qpixmap.h>
@@ -97,6 +101,7 @@ public:
 
 	// - Returns the pixmap that will have the data restored to
 	inline QPixmap GetDestination() const { return m_destination; }
+
 	// - Sets the pixmap that will have the data restored to
 	inline void SetDestination(QPixmap& Destination) { m_destination = Destination; }
 };
@@ -111,7 +116,7 @@ class CUndoLayerDel : public CUndoAction
 	size_t m_index;
 	
 public:
-	~CUndoLayerDel() { if (!m_wasUndone) delete m_layer; }
+	~CUndoLayerDel() { if (!Undone()) delete m_layer; }
 	CUndoLayerDel(CProject& Project, CLayer* Layer, size_t LayerIndex) : m_proj(Project), m_layer(Layer), m_index(LayerIndex) {
 		m_type = e_UndoType::LayerDel;
 	}
@@ -129,7 +134,7 @@ class CUndoLayerAdd : public CUndoAction
 	size_t m_index;
 
 public:
-	~CUndoLayerAdd() { if (m_wasUndone) delete m_layer; }
+	~CUndoLayerAdd() { if (Undone()) delete m_layer; }
 	CUndoLayerAdd(CProject& Project, CLayer* Layer, size_t LayerIndex) : m_proj(Project), m_layer(Layer), m_index(LayerIndex) {
 		m_type = e_UndoType::LayerAdd;
 	}
@@ -164,24 +169,19 @@ public:
 
 class CFrame;
 
-class CUndoFrameDel : public CUndoAction
+#include <deque>
+class CUndoFrame : public CUndoAction
 {
-	CProject& m_proj;
-	CFrame* m_frame;
-	size_t m_index;
+	CLayer& m_layer;
+	std::deque<CFrame*> m_frames;
+	std::list<size_t> m_indexes;
 
 public:
-	CUndoFrameDel(CProject& Project, CFrame* Frame);
-};
+	~CUndoFrame();
+	CUndoFrame(CLayer& Layer, CFrame* Frame, bool Added);
+	CUndoFrame(CLayer& Layer, const std::deque<CFrame*>& Frames, bool Added);
 
-class CUndoFrameAdd : public CUndoAction
-{
-	CProject& m_proj;
-	CFrame* m_frame;
-	size_t m_index;
-
-public:
-	CUndoFrameAdd(CProject& Project, CFrame* Frame);
+	void Undo();
 };
 
 #endif // CUndoAction_H

@@ -27,7 +27,7 @@ CUndoErase::CUndoErase(QPixmap & Source, int X, int Y, int W, int H) : m_destina
 	m_type = e_UndoType::Erase, m_data = Source.copy(X, Y, W, H);
 }
 
- void CUndoErase::Undo()
+void CUndoErase::Undo()
 {
 	QPixmap m_temp = m_destination.copy(m_x, m_y, m_data.width(), m_data.height()); // Store the current pixmap before our undo/redo
 	QPainter paint(&m_destination);
@@ -75,10 +75,46 @@ void CUndoLayerFill::Undo()
 	CUndoStack::UndoEvent(this);
 }
 
-CUndoLayerShift::CUndoLayerShift(CProject& Project, CLayer * Layer) : m_proj(Project), m_layer(Layer)
-{
+CUndoLayerShift::CUndoLayerShift(CProject& Project, CLayer * Layer) : m_proj(Project), m_layer(Layer) {
 	m_type = e_UndoType::LayerShift, m_previndex = Project.IndexOf(Layer);
 }
 
-CUndoFrameDel::CUndoFrameDel(CProject & Project, CFrame * Frame) : m_proj(Project), m_frame(Frame), m_index(m_frame->Index()) { }
-CUndoFrameAdd::CUndoFrameAdd(CProject & Project, CFrame * Frame) : m_proj(Project), m_frame(Frame), m_index(m_frame->Index()) { }
+CUndoFrame::~CUndoFrame()
+{
+	if (Type() != e_UndoType::FrameDel && Undone())
+		return;
+	for (auto frame : m_frames)
+		delete frame;
+}
+
+CUndoFrame::CUndoFrame(CLayer & Layer, CFrame * Frame, bool Added)
+	: m_layer(Layer), m_frames({ Frame }), m_indexes({ Frame->Index() }) {
+	m_type = Added ? e_UndoType::FrameAdd : e_UndoType::FrameDel;
+}
+
+CUndoFrame::CUndoFrame(CLayer & Layer, const std::deque<CFrame*>& Frames, bool Added)
+	: m_layer(Layer), m_frames(Frames)
+{
+	m_type = Added ? e_UndoType::FrameAdd : e_UndoType::FrameDel;
+	for (auto frame : m_frames)
+		m_indexes.push_back(frame->Index());
+}
+
+void CUndoFrame::Undo()
+{
+	bool add = Type() == e_UndoType::FrameDel;
+	if (Undone())
+		add = !add;
+
+	auto itframe = m_frames.begin();
+	auto itindex = m_indexes.begin();
+	for (; itframe != m_frames.end(); itframe++, itindex++)
+	{
+		if (add)
+			m_layer.PutBack(*itframe, *itindex);
+		else
+			m_layer.TakeBack(*itframe);
+	}
+	m_wasUndone = !m_wasUndone;
+	CUndoStack::UndoEvent(this);
+}

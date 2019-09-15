@@ -36,7 +36,7 @@ class CProject
 protected:
 	typedef std::deque<CLayer*> LayerList_t;
 
-public:
+private:
 	std::string m_name;
 	QSize m_dimensions;
 	CPalette m_palette;

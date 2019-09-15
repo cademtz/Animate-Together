@@ -29,8 +29,8 @@ void CHistoryPanel::paintEvent(QPaintEvent * Event)
 		size_t y = name.size().height() + 7;
 		for (auto action : proj->Undos().GetActions())
 		{
-			QString text = action->WasUndone() ? "- " : "+ ";
-			paint.drawText(6, y += name.size().height(), text + action->GetTypeStr());
+			QString text = action->Undone() ? "- " : "+ ";
+			paint.drawText(6, y += name.size().height(), text + action->TypeSTr());
 		}
 	}
 }

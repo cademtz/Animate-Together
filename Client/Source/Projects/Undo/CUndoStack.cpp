@@ -20,7 +20,7 @@ bool CUndoStack::UndoLast()
 {
 	for (CUndoAction* action : m_actions)
 	{
-		if (!action->WasUndone())
+		if (!action->Undone())
 		{
 			action->Undo();
 			return true;
@@ -35,13 +35,13 @@ bool CUndoStack::RedoLast()
 		return false;
 
 	std::list<CUndoAction*>::iterator& epic = m_actions.end();
-	if (m_actions.back()->WasUndone())
+	if (m_actions.back()->Undone())
 		epic--;
 	else
 	{
 		for (auto it = ++m_actions.begin(); it != m_actions.end(); it++)
 		{
-			if (!(*it)->WasUndone())
+			if (!(*it)->Undone())
 			{
 				epic = --it;
 				break;
@@ -60,7 +60,7 @@ void CUndoStack::Push(CUndoAction * Action)
 {
 	for (auto it = m_actions.begin(); it != m_actions.end();)
 	{
-		if ((*it)->WasUndone()) // All redos become invalid, so we must remove them
+		if ((*it)->Undone()) // All redos become invalid, so we must remove them
 		{
 			delete *it;
 			if ((it = m_actions.erase(it)) != m_actions.begin())
