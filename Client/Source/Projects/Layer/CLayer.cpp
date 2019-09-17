@@ -72,12 +72,10 @@ bool CLayer::HasFrame(CFrame * Frame)
 
 bool CLayer::SelectFrame(CFrame * Frame, bool Selected)
 {
-	if (!HasFrame(Frame))
-		return false;
-	else if (IsFrameSelected(Frame) == Selected)
-		return true;
+	if (!HasFrame(Frame) && Selected)
+		return false; // Only prevent selection of unowned frames
 
-	if (Selected)
+	if (Selected && !IsFrameSelected(Frame))
 		m_selectedframes.push_back(Frame);
 	else
 	{
@@ -86,11 +84,11 @@ bool CLayer::SelectFrame(CFrame * Frame, bool Selected)
 			if (*it == Frame)
 			{
 				m_selectedframes.erase(it);
-				break;
+				return true;
 			}
 		}
 	}
-	return true;
+	return false;
 }
 
 CRasterFrame * CLayer::ActiveFrame()
@@ -144,27 +142,25 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 		{
 			m_frames.push_back(new CRasterFrame(this, true));
 			added.push_back(m_frames.back());
-			//CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
 		}
 		m_frames.push_back(new CRasterFrame(this, !IsKey));
 		added.push_back(m_frames.back());
-		//CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
 	}
 	else if (!IsKey || m_frames[Index]->State() == CFrame::Hold) // Else, if it's a hold frame
 	{
 		if (IsKey)	// Then replace with a new key frame
 		{
-			CRasterFrame** pos = &m_frames[Index], *old = *pos;
+			/*CRasterFrame** pos = &m_frames[Index], *old = *pos;
 			SelectFrame(old, false);
 			*pos = new CRasterFrame(this);
-			//CFrame::CreateEvent(CFrameEvent(*pos, CFrameEvent::Replace, old));
+			CFrame::CreateEvent(CFrameEvent(*pos, CFrameEvent::Replace, old));*/
+			ReplaceFrame(m_frames[Index], new CRasterFrame(this));
 		}
 		else // Then insert a new hold frame after it
 		{
 			CRasterFrame* frame = new CRasterFrame(this, true);
 			m_frames.insert(m_frames.begin() + Index + 1, frame);
 			added.push_back(frame);
-			//CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Add));
 			Project()->SetActiveFrame(Index + 1);
 		}
 	}
@@ -176,7 +172,6 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 		{
 			m_frames.push_back(new CRasterFrame(this));
 			added.push_back(m_frames.back());
-			//CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
 		}
 		else if (m_frames[Index]->State() == CFrame::Hold) // Else if we hit a hold frame, replace it with a key
 			AddFrame(IsKey, Index);
@@ -226,9 +221,8 @@ void CLayer::RemoveSelected()
 			for (auto pos = ++FramePos(front); pos != m_frames.end() && (*pos)->State() == CFrame::Hold; pos++)
 			{
 				CFrame* frame = *pos;
-				bool selected = IsFrameSelected(frame);
 				
-				SelectFrame(frame, false);
+				bool selected = SelectFrame(frame, false);
 				frames.push_back(frame);
 
 				if (!selected)
@@ -290,7 +284,10 @@ CLayer::FrameList_t::iterator CLayer::FramePos(const CFrame* Frame)
 
 void CLayer::PutBack(CFrame * Frame, size_t Index)
 {
-	m_frames.insert(m_frames.begin() + Index, (CRasterFrame*)Frame);
+	if (Index >= m_frames.size())
+		m_frames.push_back((CRasterFrame*)Frame);
+	else
+		m_frames.insert(m_frames.begin() + Index, (CRasterFrame*)Frame);
 	CFrame::CreateEvent(CFrameEvent(Frame, CFrameEvent::Add));
 }
 

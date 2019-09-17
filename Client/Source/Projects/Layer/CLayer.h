@@ -80,7 +80,7 @@ public:
 	bool HasFrame(CFrame* Frame);
 
 	// - Adds or removes a frame from the selected list
-	// - Skips and returns false if the frame is invalid or isn't owned
+	// - Returns the frame's previous selection state
 	bool SelectFrame(CFrame* Frame, bool Selected = true);
 	inline void ClearSelected() { m_selectedframes.clear(); }
 
@@ -135,7 +135,7 @@ protected:
 	void PutBack(CFrame* Frame, size_t Index);
 	void TakeBack(CFrame* Frame);
 
-	// - Removes a frame directly without calling any events or creating undos
+	// - Removes a frame directly without creating events or unds
 	void _RemoveFrame(size_t Index);
 };
 

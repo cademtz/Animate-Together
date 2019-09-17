@@ -81,7 +81,7 @@ CUndoLayerShift::CUndoLayerShift(CProject& Project, CLayer * Layer) : m_proj(Pro
 
 CUndoFrame::~CUndoFrame()
 {
-	if (Type() != e_UndoType::FrameDel && Undone())
+	if (Type() != e_UndoType::FrameDel || Undone())
 		return;
 	for (auto frame : m_frames)
 		delete frame;
