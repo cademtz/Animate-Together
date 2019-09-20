@@ -19,13 +19,15 @@
 
 class CFrameList;
 class CLayerEvent;
+class CTimeControl;
 
 class CTimeline : public QWidget
 {
 	QHBoxLayout* m_layout;
+	QVBoxLayout* m_timearea;
 	QWidget* m_layers;
 	CFrameList* m_framelist;
-	QFrame* m_divide;
+	CTimeControl* m_timecontrol;
 
 public:
 	CTimeline(QWidget* Parent);

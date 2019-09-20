@@ -6,5 +6,8 @@
         <file>Rectangle.png</file>
         <file>Eyedropper.png</file>
         <file>Lock.png</file>
+        <file>Play.svg</file>
+        <file>BackStep.svg</file>
+        <file>FwdStep.svg</file>
     </qresource>
 </RCC>

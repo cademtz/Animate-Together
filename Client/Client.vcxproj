@@ -198,6 +198,10 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Widgets\TimeControl\CTimeControl.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Widgets\Timeline\CTimeline.cpp">
       <SubType>
       </SubType>
@@ -275,6 +279,10 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="Source\Widgets\MiniPalette\CMiniPalette.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Widgets\TimeControl\CTimeControl.h">
       <SubType>
       </SubType>
     </ClInclude>
