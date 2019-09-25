@@ -23,6 +23,7 @@ const QRectF circ_size(0, 0, 5, 5);
 CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 {
 	setContentsMargins(0, 0, 0, 0);
+	setFrameStyle(QFrame::NoFrame);
 	
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -38,6 +39,7 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 	connect(m_widget, &QGraphicsWidget::widthChanged, this, &CFrameList::UpdateScrub);
 	m_widget->setLayout(m_rows);
 	scene()->addItem(m_widget);
+	scene()->setStyle(style());
 
 	m_scrubbar = new CGraphicsScrubBar(m_widget);
 	m_playhead = new QGraphicsRectItem(QRectF(QPointF(), CGraphicsFrame::m_rect.size() - QSize(1, 1)), m_scrubbar);
@@ -217,6 +219,9 @@ void CFrameList::LayerEvent(CLayerEvent * Event)
 
 void CFrameList::MouseEvent(QMouseEvent * Event)
 {
+	if (CProject* proj = CProject::ActiveProject())
+		proj->Pause();
+
 	if (!Scrub(Event))
 		Select(Event);
 }

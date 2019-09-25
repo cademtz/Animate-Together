@@ -23,7 +23,7 @@
 
 void CCanvas::stepBrush(int Step)
 {
-	BrushScale_t* brush = getBrush();
+	BrushScale* brush = getBrush();
 	if (brush->min + Step >= 1 && brush->min + Step <= 100)
 		brush->min += Step;
 	if (brush->max + Step >= 1 && brush->max + Step <= 100)
@@ -55,37 +55,13 @@ CCanvas::CCanvas(QWidget* Parent)
 	connect(dec, &QShortcut::activated, [this] { stepBrush(-1); });
 	connect(inc, &QShortcut::activated, [this] { stepBrush(1); });
 
-	CLayer::Listen([this](CLayerEvent* e) { UpdateCanvas(); });
+	CLayer::Listen([this](CLayerEvent* e) { LayerEvent(e); });
 	CToolBar::Listen([this](e_tool tool) { setTool(tool); });
 	CPalette::Listen([this](CPaletteEvent* p) { setColor(p->Palette()->First()); });
 	CUndoStack::Listen([this](const CUndoAction* Undo) { UpdateCanvas(); });
 
-	CProject::Listen([this](CProjectEvent* e)
-		{
-			switch (e->Action())
-			{
-			case CProjectEvent::ActiveProject:
-				m_proj = e->Project();
-				update();
-				break;
-			case CProjectEvent::ActiveFrame:
-				UpdateCanvas();
-				break;
-			}
-		});
-	CFrame::Listen([this](CFrameEvent* e)
-		{
-			switch (e->Action())
-			{
-			case CFrameEvent::Replace:
-				if (e->Frame() && e->Frame() == e->Frame()->Layer()->ActiveFrame())
-					UpdateCanvas();
-			case CFrameEvent::Remove:
-				// Very dangerous code. Fix as soon as any sort of undo/redo for frames is possible
-				if (e->OldIndex() == e->Frame()->Layer()->Project()->ActiveFrame())
-					UpdateCanvas();
-			}
-		});
+	CProject::Listen([this](CProjectEvent* e) { ProjectEvent(e); });
+	CFrame::Listen([this](CFrameEvent* e) { FrameEvent(e); });
 
 	updateCursor(1);
 }
@@ -104,10 +80,48 @@ void CCanvas::setTabletDevice(QTabletEvent * event) {
 	updateCursor(event->pressure());
 }
 
+void CCanvas::ProjectEvent(CProjectEvent * Event)
+{
+	switch (Event->Action())
+	{
+	case CProjectEvent::ActiveProject:
+		m_proj = Event->Project();
+		update();
+		break;
+	case CProjectEvent::ActiveFrame:
+		UpdateCanvas();
+		break;
+	case CProjectEvent::Play:
+		setDisabled(true); break;
+	case CProjectEvent::Pause:
+		setDisabled(false); break;
+	}
+}
+
+void CCanvas::LayerEvent(CLayerEvent * Event)
+{
+	UpdateCanvas();
+}
+
+void CCanvas::FrameEvent(CFrameEvent * Event)
+{
+	CFrame* frame = Event->Frame();
+	switch (Event->Action())
+	{
+	case CFrameEvent::Replace:
+		if (frame && frame == frame->Layer()->ActiveFrame())
+			UpdateCanvas();
+	case CFrameEvent::Remove:
+		// Very dangerous code. Fix as soon as any sort of undo/redo for frames is possible
+		if (Event->OldIndex() == frame->Layer()->Project()->ActiveFrame())
+			UpdateCanvas();
+	}
+}
+
 void CCanvas::tabletEvent(QTabletEvent * event)
 {
 	CLayer* layer;
-	if (!m_proj)
+	if (!m_proj || m_proj->IsPlaying())
 		return;
 
 	if (m_tool == e_tool::Eyedrop) // Eyedropper is independent of active layers
@@ -190,45 +204,42 @@ void CCanvas::paintEvent(QPaintEvent * event)
 		if (!(Layer = m_proj->ActiveLayer()) || !Layer->Pixmap())
 			break;
 
-		if (Layer->Pixmap())
+		int l = m_buffer.width(), r = 0, t = m_buffer.height(), b = 0;
+		for (int y = 0; y < m_buffer.height(); ++y) // Find opaque area of buffer
 		{
-			int l = m_buffer.width(), r = 0, t = m_buffer.height(), b = 0;
-			for (int y = 0; y < m_buffer.height(); ++y) // Find opaque area of buffer
+			QRgb *row = (QRgb*)m_buffer.scanLine(y);
+			bool rowFilled = false;
+			for (int x = 0; x < m_buffer.width(); ++x)
 			{
-				QRgb *row = (QRgb*)m_buffer.scanLine(y);
-				bool rowFilled = false;
-				for (int x = 0; x < m_buffer.width(); ++x)
+				if (qAlpha(row[x]))
 				{
-					if (qAlpha(row[x]))
-					{
-						rowFilled = true, r = std::max(r, x);
-						if (l > x) // Only search for new right bound from here
-							l = x, x = r;
-					}
-				}
-				if (rowFilled)
-				{
-					t = std::min(t, y);
-					b = y;
+					rowFilled = true, r = std::max(r, x);
+					if (l > x) // Only search for new right bound from here
+						l = x, x = r;
 				}
 			}
-			r++, b++;
-
-			paint.begin(Layer->Pixmap());
-			switch (m_tool)
+			if (rowFilled)
 			{
-			case e_tool::Brush:
-				m_proj->Undos().Push(new CUndoStroke(*Layer->Pixmap(), l, t, r - l, b - t));
-				paint.drawImage(l, t, m_buffer.copy(l, t, r - l, b - t));
-				break;
-			case e_tool::Eraser:
-				m_proj->Undos().Push(new CUndoErase(*Layer->Pixmap(), l, t, r - l, b - t));
-				paint.setCompositionMode(QPainter::CompositionMode_Source);
-				paint.setClipRegion(QBitmap::fromImage(m_buffer.createAlphaMask()));
-				paint.fillRect(l, t, r - l, b - t, QColor(0, 0, 0, 0));
+				t = std::min(t, y);
+				b = y;
 			}
-			paint.end();
 		}
+		r++, b++;
+
+		paint.begin(Layer->Pixmap());
+		switch (m_tool)
+		{
+		case e_tool::Brush:
+			m_proj->Undos().Push(new CUndoStroke(*Layer->Pixmap(), l, t, r - l, b - t));
+			paint.drawImage(l, t, m_buffer.copy(l, t, r - l, b - t));
+			break;
+		case e_tool::Eraser:
+			m_proj->Undos().Push(new CUndoErase(*Layer->Pixmap(), l, t, r - l, b - t));
+			paint.setCompositionMode(QPainter::CompositionMode_Source);
+			paint.setClipRegion(QBitmap::fromImage(m_buffer.createAlphaMask()));
+			paint.fillRect(l, t, r - l, b - t, QColor(0, 0, 0, 0));
+		}
+		paint.end();
 	}
 	case e_drawmode::update:
 	{
@@ -466,7 +477,7 @@ void CCanvas::TabletRelease(QTabletEvent * Event, CLayer * Layer)
 	UpdateCanvas();
 }
 
-BrushScale_t * CCanvas::getBrush()
+BrushScale * CCanvas::getBrush()
 {
 	return m_tool == e_tool::Eraser ? &m_eraserScale : &m_brushScale;
 }

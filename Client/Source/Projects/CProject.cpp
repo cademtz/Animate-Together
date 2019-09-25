@@ -11,19 +11,15 @@
 #include <qpainter.h>
 
 CProject* CProject::m_activeproj = nullptr;
-std::list<ProjectCallback_t> CProject::m_listeners;
-
-void CProject::ProjectEvent(CProjectEvent::e_action Action)
-{
-	CProjectEvent e(this, Action);
-	for (auto fn : m_listeners)
-		fn(&e);
-}
+CProject::Listeners_t CProject::m_listeners;
 
 CProject::CProject(const std::string& Name, QSize Dimensions) : m_layers(), m_palette(this)
 {
 	SetName(Name);
 	SetDimensions(Dimensions);
+
+	m_timer = new QTimer();
+	m_timer->connect(m_timer, &QTimer::timeout, [this] { TimerEvent(); });
 }
 
 CProject::~CProject()
@@ -31,18 +27,19 @@ CProject::~CProject()
 	for (auto layer : Layers())
 		delete layer;
 	m_layers.clear();
+	delete m_timer;
 }
 
 void CProject::SetActiveProject(CProject * Project)
 {
 	m_activeproj = Project;
-	m_activeproj->ProjectEvent(CProjectEvent::ActiveProject);
+	CreateEvent(CProjectEvent(m_activeproj, CProjectEvent::ActiveProject));
 }
 
 void CProject::SetActiveFrame(size_t Frame)
 {
 	m_activeframe = Frame;
-	ProjectEvent(CProjectEvent::ActiveFrame);
+	CreateEvent(CProjectEvent(m_activeproj, CProjectEvent::ActiveFrame));
 }
 
 void CProject::SetActiveLayer(CLayer * Layer)
@@ -60,6 +57,18 @@ size_t CProject::IndexOf(const CLayer * Layer)
 	if (pos != m_layers.end())
 		return pos - m_layers.begin();
 	return UINT_MAX;
+}
+
+void CProject::Play()
+{
+	m_timer->start(round(1000 / Framerate()));
+	CreateEvent(CProjectEvent(this, CProjectEvent::Play));
+}
+
+void CProject::Pause()
+{
+	m_timer->stop();
+	CreateEvent(CProjectEvent(this, CProjectEvent::Pause));
 }
 
 bool CProject::HasLayer(const CLayer * Layer) const
@@ -227,6 +236,12 @@ CFrame * CProject::LastFrame()
 			greatest = layer;
 	}
 	return greatest->LastFrame();
+}
+
+void CProject::TimerEvent()
+{
+	// Change da world… my final message. Goodb ye.
+	SetActiveFrame((ActiveFrame() + 1) % (LastFrame()->Index() + 1));
 }
 
 void CProject::PutBack(CLayer * Layer, size_t Index)

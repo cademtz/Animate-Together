@@ -15,6 +15,9 @@
 #include <qpen.h>
 #include "Interface/EditBrush/EditBrush.h"
 
+class CProjectEvent;
+class CLayerEvent;
+class CFrameEvent;
 class CProject;
 class CLayer;
 enum class e_tool;
@@ -40,6 +43,10 @@ public:
 	inline CProject* GetProj() const { return m_proj; }
 
 protected:
+	void ProjectEvent(CProjectEvent* Event);
+	void LayerEvent(CLayerEvent* Event);
+	void FrameEvent(CFrameEvent* Event);
+
 	void tabletEvent(QTabletEvent *event) override;
 	void paintEvent(QPaintEvent *event) override;
 	void mousePressEvent(QMouseEvent* Event);
@@ -65,12 +72,12 @@ private:
 	void TabletMove(QTabletEvent* Event, CLayer* Layer);
 	void TabletRelease(QTabletEvent* Event, CLayer* Layer);
 	void stepBrush(int Step);
-	BrushScale_t* getBrush();
+	BrushScale* getBrush();
 
 	CProject* m_proj = 0;
 
 	e_tool m_tool;
-	BrushScale_t m_brushScale, m_eraserScale;
+	BrushScale m_brushScale, m_eraserScale;
 	QColor m_color;
 	QBrush m_brush;
 	QPen m_pen;

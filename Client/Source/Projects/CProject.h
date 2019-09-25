@@ -16,10 +16,12 @@
 
 #include <deque>
 #include <list>
+#include <qtimer.h>
 #include <functional>
 #include "Layer/CLayer.h"
 #include "Undo/CUndoStack.h"
 #include "Palette/CPalette.h"
+#include "Events/CEventHandler.h"
 
 enum class e_export
 {
@@ -29,9 +31,7 @@ enum class e_export
 
 class CFrame;
 
-typedef std::function<void(CProjectEvent*)> ProjectCallback_t;
-
-class CProject
+class CProject : public CEventHandler<CProjectEvent>
 {
 protected:
 	typedef std::deque<CLayer*> LayerList_t;
@@ -45,12 +45,10 @@ private:
 	CLayer* m_activelayer = 0;
 	CUndoStack m_undo;
 
-	size_t m_framerate, m_activeframe = 0;
+	size_t m_framerate = 24, m_activeframe = 0;
+	QTimer* m_timer;
 
 	static CProject* m_activeproj;
-
-	static std::list<ProjectCallback_t> m_listeners;
-	void ProjectEvent(CProjectEvent::e_action Action);
 
 public:
 	CProject(const std::string& Name, QSize Dimensions);
@@ -84,6 +82,8 @@ public:
 	inline size_t ActiveFrame() const { return m_activeframe; }
 	void SetActiveFrame(size_t Frame);
 
+	inline bool IsPlaying() const { return m_timer->isActive(); }
+
 	// - Returns an ordered list of the project's layers
 	inline LayerList_t& Layers() { return m_layers; }
 
@@ -104,6 +104,13 @@ public:
 
 	// - Returns the undo stack
 	inline CUndoStack& Undos() { return m_undo; }
+
+
+	// ========== Project functions ========== //
+
+
+	void Play();
+	void Pause();
 
 
 	// ========== Layer functions ========== //
@@ -141,23 +148,16 @@ public:
 	// - Exports the project as the type specified
 	void Export(e_export Type);
 
-
 	// - Returns the foremost frame from the end of the animation
 	// - Result will be null if no frames exist
 	CFrame* LastFrame();
-
-
-	// ========== Event functions ========== //
-
-
-	// - Adds a pointer to your function to the listener list
-	// - Listeners are called when the active project is changed
-	static inline void Listen(ProjectCallback_t Func) { m_listeners.push_back(Func); }
 
 protected:
 
 	// ========== Internal functions ========== //
 
+
+	void TimerEvent();
 
 	friend class CUndoLayerDel;
 	friend class CUndoLayerAdd;

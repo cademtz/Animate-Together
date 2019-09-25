@@ -9,5 +9,6 @@
         <file>Play.svg</file>
         <file>BackStep.svg</file>
         <file>FwdStep.svg</file>
+        <file>Pause.svg</file>
     </qresource>
 </RCC>

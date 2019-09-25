@@ -3,14 +3,14 @@
 
 EditBrush* EditBrush::inst = 0;
 
-bool EditBrush::Open(const QPoint& Pos, BrushScale_t* Scale)
+bool EditBrush::Open(const QPoint& Pos, BrushScale* Scale)
 {
 	if (!inst)
 		inst = new EditBrush(Pos, Scale);
 	return inst;
 }
 
-EditBrush::EditBrush(const QPoint& Pos, BrushScale_t* Scale, QWidget *parent)
+EditBrush::EditBrush(const QPoint& Pos, BrushScale* Scale, QWidget *parent)
 	: QWidget(parent), m_pScale(Scale)
 {
 	ui.setupUi(this);

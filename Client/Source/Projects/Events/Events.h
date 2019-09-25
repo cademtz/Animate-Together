@@ -86,7 +86,7 @@ public:
 	inline size_t OldIndex() const { return m_oldindex; }
 };
 
-// Sent when the active project has changed
+// Sent when a project updates, or the active project is changed
 
 class CProjectEvent : public CCustomEvent
 {
@@ -96,6 +96,8 @@ public:
 		null = 0,
 		ActiveProject,	// - The active project changed
 		ActiveFrame,	// - The active frame index changed
+		Play,
+		Pause,
 	};
 
 private:

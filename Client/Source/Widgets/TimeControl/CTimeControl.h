@@ -15,13 +15,20 @@
 #include <qpushbutton.h>
 #include <qlayout.h>
 
+class CProjectEvent;
+
 class CTimeControl : public QWidget
 {
 	QBoxLayout* m_layout;
 	QPushButton* m_play, * m_bkstep, * m_fwdstep;
+	QIcon m_svgplay, m_svgpause;
 
 public:
 	CTimeControl(QWidget* Parent = 0);
+
+private:
+	void ButtonEvent(QPushButton* Btn);
+	void ProjectEvent(CProjectEvent* Event);
 };
 
 #endif // CTimeControl_H
