@@ -232,6 +232,66 @@ void CProject::Export(e_export Type)
 	}
 }
 
+void CProject::Export(bool SingleFrame, bool Flatten)
+{
+	auto& layers = Layers();
+	if (!layers.size())
+		return;
+
+	if (SingleFrame && Flatten) // Only one image file necessary
+	{
+		QFileDialog dlg(0, "Save images as...");
+		dlg.setFileMode(QFileDialog::AnyFile);
+		dlg.setAcceptMode(QFileDialog::AcceptSave);
+		dlg.setNameFilters({
+			"Portable Network Graphics (*.png)",
+			"Joint Photographic Experts Group (*.jpg)",
+			"Tagged Image File Format (*.tiff)",
+			"Windows Bitmap	(*.bmp)" });
+
+		if (!dlg.exec() || dlg.selectedFiles().length() < 1)
+			return;
+		Preview().save(dlg.selectedFiles()[0]);
+		return;
+	}
+
+	QString dir = QFileDialog::getExistingDirectory(0, "Save images as...");
+	if (dir.isEmpty())
+		return;
+	dir += '\\';
+
+	size_t start = SingleFrame ? ActiveFrame() : 0, end = SingleFrame ? ActiveFrame() : LastFrame()->Index();
+	for (size_t i = start; i <= end; i++)
+	{
+		std::string prefix = Name() + '_', suffix = std::to_string(i) + ".png";
+		if (Flatten)
+			Preview(i).save(dir + QString::fromStdString(prefix + suffix), "png");
+		else
+		{
+			for (auto layer : Layers())
+				if (layer->IsVisible() && layer->Pixmap())
+					layer->Pixmap()->save(dir + QString::fromStdString(prefix + layer->Name() + '_' + suffix), "png");
+		}
+	}
+}
+
+QImage CProject::Preview(size_t Frame)
+{
+	if (Frame == UINT_MAX)
+		Frame = ActiveFrame();
+
+	QImage img = QImage(Dimensions(), QImage::Format_ARGB32);
+	img.fill(Qt::transparent);
+
+	QPainter paint(&img);
+	for (auto it = Layers().rbegin(); it != Layers().rend(); it++)
+	{
+		if ((*it)->IsVisible() && (*it)->Pixmap(Frame))
+			paint.drawPixmap(0, 0, *(*it)->Pixmap(Frame));
+	}
+	return img;
+}
+
 CFrame * CProject::LastFrame()
 {
 	CLayer* greatest = nullptr;

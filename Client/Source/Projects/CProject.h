@@ -85,25 +85,20 @@ public:
 
 	inline bool IsPlaying() const { return m_timer->isActive(); }
 
-	// - Returns an ordered list of the project's layers
 	inline LayerList_t& Layers() { return m_layers; }
 
-	// - Returns a pointer to the active layer
-	// - Return is nullptr if no layers or active layer exists
+	// - Returns a pointer to the active layer, or null if none are active
 	inline CLayer* ActiveLayer() const { return m_activelayer; }
 
 	// - Sets the active layer if it belongs to the project
 	void SetActiveLayer(CLayer* Layer);
 
-	// - Returns all selected layers
-	// - Returns an empty array When nothing is selected
 	inline const LayerList_t& SelectedLayers() const { return m_selectedLayers; }
 
 	// - Gets the layer's index in the list
 	// - Returns UINT_MAX if the list does not contain 'Layer'
 	size_t IndexOf(const CLayer* Layer);
 
-	// - Returns the undo stack
 	inline CUndoStack& Undos() { return m_undo; }
 
 
@@ -113,6 +108,13 @@ public:
 	void Play();
 	void Pause();
 
+	// - Just rewriting it don't mind me
+	void Export(bool SingleFrame, bool Flatten);
+
+	// - Returns an image of all the layers in the specified frame combined
+	// - 'Frame' defaults to active
+	QImage Preview(size_t Frame = UINT_MAX);
+
 
 	// ========== Layer functions ========== //
 
@@ -120,19 +122,16 @@ public:
 	// - Returns true if the layer exists in the project
 	bool HasLayer(const CLayer* Layer) const;
 
-	// - Returns true if the layer is selected
 	bool IsLayerSelected(const CLayer* Layer);
 
 	// - Adds or removes a layer from the selected list
 	// - Skips and returns false if the layer is invalid or isn't owned
 	bool SelectLayer(CLayer* Layer, bool Selected = true);
 
-	// - Adds a new layer at a max of 256
-	// - Returns nullptr on failure, otherwise the new layer is given
+	// - Returns null on failure, otherwise a new layer is added and returned
 	CLayer* AddLayer(const std::string& Name, bool Private = false, bool Visible = true);
 
-	// - Inserts a new layer at a max of 256
-	// - Returns nullptr on failure, otherwise the new layer is given
+	// - Returns null on failure, otherwise a new layer is inerted and returned
 	CLayer* InsertLayer(size_t Index, const std::string& Name, bool Private = false, bool Visible = true);
 
 	// - Adds a copy of any layer to the project

@@ -13,6 +13,9 @@ public:
 	// - Opens a new export options window for specified project
 	static void Open(CProject* Project);
 
+protected:
+	void Confirm();
+
 private:
 	CExport(CProject* Project);
 	~CExport() { }

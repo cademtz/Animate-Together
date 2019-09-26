@@ -98,18 +98,23 @@ CRasterFrame * CLayer::ActiveFrame()
 	return m_frames[Project()->ActiveFrame()];
 }
 
-QPixmap * CLayer::Pixmap()
+QPixmap * CLayer::Pixmap(size_t Frame)
 {
-	if (CRasterFrame* frame = ActiveFrame())
+	CRasterFrame* frame = 0;
+	if (Frame == UINT_MAX)
+		frame = ActiveFrame();
+	else if (Frame < Frames().size())
+		frame = Frames()[Frame];
+
+	if (!frame)
+		return 0;
+
+	if (frame->Pixmap()->isNull())
 	{
-		if (frame->Pixmap()->isNull())
-		{
-			*frame->Pixmap() = QPixmap(m_dimensions);
-			frame->Pixmap()->fill(Qt::transparent);
-		}
-		return frame->Pixmap();
+		*frame->Pixmap() = QPixmap(m_dimensions);
+		frame->Pixmap()->fill(Qt::transparent);
 	}
-	return nullptr;
+	return frame->Pixmap();
 }
 
 size_t CLayer::IndexOf(const CFrame * Frame)

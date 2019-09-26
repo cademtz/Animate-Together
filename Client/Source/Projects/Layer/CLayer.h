@@ -88,9 +88,9 @@ public:
 	// - Returns null if no frame is active
 	CRasterFrame* ActiveFrame();	
 
-	// - Gets the active frame's pixmap
+	// - Gets the specified frame's pixmap. Defaults to active frame.
 	// - Returns null if no frame is active
-	QPixmap* Pixmap();
+	QPixmap* Pixmap(size_t Frame = UINT_MAX);
 
 	// - Gets the frame's index in the frame list
 	// - Returns UINT_MAX if the list does not contain 'Frame'

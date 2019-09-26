@@ -102,13 +102,11 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 		*file = new QMenu("File", m_menubar), *edit = new QMenu("Edit", m_menubar), *layer = new QMenu("Layer", m_menubar),
 		*window = new QMenu("Window", m_menubar);
 	QAction
-		*newproj = new QAction("New", this), *save = new QAction("Save as...", this), *exp = new QAction("Export layers", this),
-		/**exp_as = new QAction("Export as..."),*/ *undo = new QAction("Undo", this), *redo = new QAction("Redo", this), *fill = new QAction("Fill", this),
+		*newproj = new QAction("New", this), /**save = new QAction("Save as...", this),*/ *exp = new QAction("Export as..."),
+		*undo = new QAction("Undo", this), *redo = new QAction("Redo", this), *fill = new QAction("Fill", this),
 		*history = new QAction("History", this), *layers = new QAction("Layers", this), *l_copy = new QAction("Duplicate", this);
 
-	connect(save, &QAction::triggered, [] { SaveProject(e_export::flat); });
-	connect(exp, &QAction::triggered, [] { SaveProject(e_export::layers); });
-	//connect(exp_as, &QAction::triggered, [] { ExportAs(); });
+	connect(exp, &QAction::triggered, [] { ExportAs(); });
 	connect(fill, &QAction::triggered, [] { if (CLayer* layer = MainWindow::Get().ActiveLayer()) layer->Fill(); });
 	connect(undo, &QAction::triggered, &MainWindow::Undo);
 	connect(redo, &QAction::triggered, &MainWindow::Redo);
@@ -118,12 +116,12 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 	connect(l_copy, &QAction::triggered, [] { if (CLayer* layer = MainWindow::Get().ActiveLayer()) layer->Project()->Duplicate(layer); });
 
 	fill->setShortcut(Qt::CTRL + Qt::Key_F);
-	save->setShortcut(Qt::CTRL + Qt::Key_S);
+	exp->setShortcut(Qt::CTRL + Qt::Key_S);
 	undo->setShortcut(Qt::CTRL + Qt::Key_Z);
 	redo->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
 
-	file->addActions({ newproj, save, exp/*, exp_as*/ });
-	file->insertSeparator(save);
+	file->addActions({ newproj, exp });
+	file->insertSeparator(newproj);
 	edit->addActions({ undo, redo });
 	layer->addActions({ fill, l_copy });
 	window->addActions({ history, layers });

@@ -14,7 +14,11 @@ bool CreateProject::Open()
 
 void CreateProject::OnCreate()
 {
-	CProject* project = new CProject(ui.line_name->text().toStdString(), QSize(ui.spin_width->value(), ui.spin_height->value()));
+	QString name = ui.line_name->text();
+	if (name.isEmpty())
+		name = ui.line_name->placeholderText();
+
+	CProject* project = new CProject(name.toStdString(), QSize(ui.spin_width->value(), ui.spin_height->value()));
 
 	// Should have more customization in project settings, but for now these defaults will do.
 	project->AddLayer("Background")->Fill(Qt::white);
