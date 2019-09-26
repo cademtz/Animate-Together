@@ -36,10 +36,17 @@ void CProject::SetActiveProject(CProject * Project)
 	CreateEvent(CProjectEvent(m_activeproj, CProjectEvent::ActiveProject));
 }
 
+void CProject::SetFramerate(size_t Framerate)
+{
+	m_framerate = Framerate;
+	m_timer->setInterval(round(1000.f / Framerate));
+	CreateEvent(CProjectEvent(this, CProjectEvent::Framerate));
+}
+
 void CProject::SetActiveFrame(size_t Frame)
 {
 	m_activeframe = Frame;
-	CreateEvent(CProjectEvent(m_activeproj, CProjectEvent::ActiveFrame));
+	CreateEvent(CProjectEvent(this, CProjectEvent::ActiveFrame));
 }
 
 void CProject::SetActiveLayer(CLayer * Layer)
@@ -61,7 +68,7 @@ size_t CProject::IndexOf(const CLayer * Layer)
 
 void CProject::Play()
 {
-	m_timer->start(round(1000 / Framerate()));
+	m_timer->start(round(1000.f / Framerate()));
 	CreateEvent(CProjectEvent(this, CProjectEvent::Play));
 }
 
@@ -162,17 +169,15 @@ bool CProject::ShiftLayer(CLayer * Layer, size_t Index)
 {
 	if (!HasLayer(Layer))
 		return false;
-	if (Index > Layers().size())
-		Index = Layers().size();
 
 	size_t prev = IndexOf(Layer);
 	m_layers.insert(m_layers.begin() + Index, Layer);
 	m_layers.erase(m_layers.begin() + (Index < prev ? prev + 1 : prev));
-	CLayer::CreateEvent(CLayerEvent(Layer, CLayerEvent::Moved, prev));
+	if (IndexOf(Layer) != prev)
+		CLayer::CreateEvent(CLayerEvent(Layer, CLayerEvent::Moved, prev));
 	return true;
 }
 
-#include "Interface/MainWindow/MainWindow.h"
 void CProject::Export(e_export Type)
 {
 	auto& layers = Layers();

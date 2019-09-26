@@ -58,13 +58,10 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 	centerOn(0, 0);
 
 	QShortcut* addframe = new QShortcut(Qt::Key_F7, this), * addhold = new QShortcut(Qt::Key_F5, this),
-		* decframe = new QShortcut(Qt::Key_Comma, this), * incframe = new QShortcut(Qt::Key_Period, this),
 		* delframe = new QShortcut(Qt::Key_Delete, this);
 
 	connect(addframe, &QShortcut::activated, [this, addframe] { ShortcutEvent(addframe); });
 	connect(addhold, &QShortcut::activated, [this, addhold] { ShortcutEvent(addhold); });
-	connect(decframe, &QShortcut::activated, [this, decframe] { ShortcutEvent(decframe); });
-	connect(incframe, &QShortcut::activated, [this, incframe] { ShortcutEvent(incframe); });
 	connect(delframe, &QShortcut::activated, [this, delframe] { ShortcutEvent(delframe); });
 
 	CProject::Listen([this](CProjectEvent* Event) { ProjectEvent(Event); });
@@ -362,23 +359,6 @@ void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
 	case Qt::Key_F5:
 		if (CLayer* layer = proj->ActiveLayer())
 			layer->AddFrame(key[0] == Qt::Key_F7);
-		break;
-	case Qt::Key_Comma:
-	case Qt::Key_Period:
-		/*if (Shift is pressed...)
-		{
-			if (key[0] == Qt::Key_Comma)
-				proj->SetActiveFrame(0);
-			else
-				proj->SetActiveFrame(proj->LastFrame()->Index())
-		}
-		else*/
-		{
-			int step = key[0] == Qt::Key_Comma ? -1 : 1;
-			size_t frame = proj->ActiveFrame() + step;
-			if (frame >= 0 && frame <= proj->LastFrame()->Index())
-				proj->SetActiveFrame(frame);
-		}
 		break;
 	case Qt::Key_Delete:
 		for (auto layer : proj->Layers())

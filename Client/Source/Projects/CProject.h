@@ -26,7 +26,8 @@
 enum class e_export
 {
 	flat,
-	layers
+	layers,
+	sequence
 };
 
 class CFrame;
@@ -77,7 +78,7 @@ public:
 	inline void SetPalette(const CPalette& Palette) { m_palette = Palette; }
 
 	inline size_t Framerate() const { return m_framerate; }
-	inline void SetFramerate(size_t Framerate) { m_framerate = Framerate; }
+	void SetFramerate(size_t Framerate);
 
 	inline size_t ActiveFrame() const { return m_activeframe; }
 	void SetActiveFrame(size_t Frame);

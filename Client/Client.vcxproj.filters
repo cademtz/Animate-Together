@@ -80,6 +80,9 @@
     <ClCompile Include="Source\Widgets\TimeControl\CTimeControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Interface\Export\CExport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -125,6 +128,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Source\Interface\MainWindow\UI\MainWindow.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Source\Interface\Export\UI\Export.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -222,6 +228,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="Source\Widgets\Canvas\CCanvas.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Source\Interface\Export\CExport.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

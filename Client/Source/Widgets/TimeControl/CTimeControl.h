@@ -14,6 +14,7 @@
 #include <qwidget.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
+#include <qspinbox.h>
 
 class CProjectEvent;
 
@@ -21,6 +22,7 @@ class CTimeControl : public QWidget
 {
 	QBoxLayout* m_layout;
 	QPushButton* m_play, * m_bkstep, * m_fwdstep;
+	QSpinBox* m_fps;
 	QIcon m_svgplay, m_svgpause;
 
 public:
@@ -29,6 +31,8 @@ public:
 private:
 	void ButtonEvent(QPushButton* Btn);
 	void ProjectEvent(CProjectEvent* Event);
+
+	void ChangeFramerate();
 };
 
 #endif // CTimeControl_H

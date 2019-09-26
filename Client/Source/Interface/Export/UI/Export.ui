@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Export</class>
+ <widget class="QWidget" name="Export">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>311</width>
+    <height>121</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Export project</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#Export {
+	background-color: rgb(40, 40, 40);
+}
+QLabel {
+	color: rgb(225, 225, 225);
+	font: 12px &quot;Verdana&quot;;
+}
+QCheckBox {
+	color: rgb(225, 225, 225);
+	background-color: rgb(40, 40, 40);
+	font: bold 11px &quot;Tahoma&quot;;
+}
+QPushButton, QLineEdit, QSpinBox {
+	border: none;
+	background-color: rgb(30, 30, 30);
+	color: rgb(200, 200, 200);
+}
+QPushButton:hover, QLineEdit:focus, QSpinBox:focus {
+	border-color: rgb(0, 128, 255);
+	color: rgb(255, 255, 255);
+}
+QPushButton:hover:pressed {
+	background-color: rgb(25, 25, 25);
+}
+QComboBox {
+	border: 1px solid #4B4B4B;
+	background-color: #2C2C2C;
+	color: #C8C8C8;
+}
+QComboBox:item {
+	background-color: #1B1B1B;
+}
+QComboBox:item:selected {
+	background-color: #0080FF;
+}</string>
+  </property>
+  <widget class="QPushButton" name="btn_export">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>90</y>
+     <width>91</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>75</width>
+     <height>23</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(0, 128, 255);
+color: rgb(225, 225, 225);</string>
+   </property>
+   <property name="text">
+    <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_cancel">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>90</y>
+     <width>91</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>75</width>
+     <height>23</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>291</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Format</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="cmb_export"/>
+    </item>
+    <item row="1" column="1">
+     <widget class="QComboBox" name="cmb_format"/>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Export</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

@@ -17,12 +17,18 @@
 
 #include "Interface/CreateProject/CreateProject.h"
 #include "Interface/MainWindow/MainWindow.h"
+#include "Interface/Export/CExport.h"
 #include "Projects/CProject.h"
 
 void CTitleBar::SaveProject(e_export Type)
 {
 	if (CProject* proj = CProject::ActiveProject())
 		proj->Export(Type);
+}
+inline void ExportAs()
+{
+	if (CProject* proj = CProject::ActiveProject())
+		CExport::Open(proj);
 }
 
 CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
@@ -77,19 +83,19 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 
 	m_menubar->setStyleSheet(
 		"QMenuBar {"
-		"color: rgb(175, 175, 175);"
-		"selection-background-color: rgb(28, 28, 28);"
-		"selection-border: 1px solid white;"
+			"color: rgb(175, 175, 175);"
+			"selection-background-color: rgb(28, 28, 28);"
+			"selection-border: 1px solid white;"
 		"}"
 		"QMenu {"
-		"color: rgb(220, 220, 220);"
-		"background-color: rgb(28, 28, 28);"
-		"selection-background-color: rgb(50, 50, 50);"
-		"border: 1px solid rgb(50, 50, 50);"
+			"color: rgb(220, 220, 220);"
+			"background-color: rgb(28, 28, 28);"
+			"selection-background-color: rgb(50, 50, 50);"
+			"border: 1px solid rgb(50, 50, 50);"
 		"}"
 		"QMenuBar:selected, QMenu:hover {"
-		"background-color: rgb(55, 55, 55);"
-		"color: rgb(255, 255, 255);"
+			"background-color: rgb(55, 55, 55);"
+			"color: rgb(255, 255, 255);"
 		"}");
 
 	QMenu
@@ -97,11 +103,12 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 		*window = new QMenu("Window", m_menubar);
 	QAction
 		*newproj = new QAction("New", this), *save = new QAction("Save as...", this), *exp = new QAction("Export layers", this),
-		*undo = new QAction("Undo", this), *redo = new QAction("Redo", this), *fill = new QAction("Fill", this), *history = new QAction("History", this),
-		*layers = new QAction("Layers", this), *l_copy = new QAction("Duplicate", this);
+		/**exp_as = new QAction("Export as..."),*/ *undo = new QAction("Undo", this), *redo = new QAction("Redo", this), *fill = new QAction("Fill", this),
+		*history = new QAction("History", this), *layers = new QAction("Layers", this), *l_copy = new QAction("Duplicate", this);
 
 	connect(save, &QAction::triggered, [] { SaveProject(e_export::flat); });
 	connect(exp, &QAction::triggered, [] { SaveProject(e_export::layers); });
+	//connect(exp_as, &QAction::triggered, [] { ExportAs(); });
 	connect(fill, &QAction::triggered, [] { if (CLayer* layer = MainWindow::Get().ActiveLayer()) layer->Fill(); });
 	connect(undo, &QAction::triggered, &MainWindow::Undo);
 	connect(redo, &QAction::triggered, &MainWindow::Redo);
@@ -115,7 +122,7 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 	undo->setShortcut(Qt::CTRL + Qt::Key_Z);
 	redo->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
 
-	file->addActions({ newproj, save, exp });
+	file->addActions({ newproj, save, exp/*, exp_as*/ });
 	file->insertSeparator(save);
 	edit->addActions({ undo, redo });
 	layer->addActions({ fill, l_copy });

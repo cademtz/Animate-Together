@@ -98,6 +98,7 @@ public:
 		ActiveFrame,	// - The active frame index changed
 		Play,
 		Pause,
+		Framerate,
 	};
 
 private:

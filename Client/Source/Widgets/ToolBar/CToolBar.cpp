@@ -18,10 +18,7 @@ class CTool : public QPushButton
 public:
 	CTool(QWidget* Parent, e_tool Type, const char* Icon) : QPushButton(Parent), m_type(Type)
 	{
-		setStyleSheet("\
-			QPushButton { border: none; background-color: rgb(30, 30, 30); } \
-			QPushButton:hover { background-color: rgb(60, 60, 60); } \
-			QPushButton:checked { background-color: rgb(25, 25, 25); border: 1px solid rgb(75, 75, 75); }");
+		setObjectName("CTool");
 		setIcon(QIcon(Icon));
 		setIconSize(icon().availableSizes()[0]);
 		setFixedSize(25, 25);
@@ -39,7 +36,13 @@ protected:
 
 CToolBar::CToolBar(QWidget * Parent) : QWidget(Parent)
 {
-	setStyleSheet(".QWidget { background-color: rgb(30, 30, 30); }");
+	setObjectName("CToolBar");
+	setStyleSheet(
+		"#CToolBar { background-color: rgb(30, 30, 30); }"
+		"#CTool { border: none; background-color: rgb(30, 30, 30); }"
+		"#CTool:hover { background-color: rgb(60, 60, 60); }"
+		"#CTool:checked { background-color: rgb(25, 25, 25); border: 1px solid rgb(75, 75, 75); }");
+
 	setFixedHeight(35);
 
 	layout = new QGridLayout(this);
