@@ -6,8 +6,26 @@
  */
 
 #include "CTimeControl.h"
+#include <qframe.h>
 #include <qshortcut.h>
+
 #include "Projects/CProject.h"
+#include "Projects/OnionSkin/COnionSkin.h"
+
+// Just for now, I promise. It'll be cleaned up in the future ... :|
+class CDivider : public QFrame
+{
+public:
+	CDivider(QWidget* Parent, bool Vertical = true) : QFrame(Parent)
+	{
+		setFrameShape(Vertical ? QFrame::VLine : QFrame::HLine);
+		setLineWidth(2);
+		if (Vertical)
+			setFixedWidth(10);
+		else
+			setFixedHeight(10);
+	}
+};
 
 CTimeControl::CTimeControl(QWidget * Parent) : QWidget(Parent)
 {
@@ -21,13 +39,14 @@ CTimeControl::CTimeControl(QWidget * Parent) : QWidget(Parent)
 	m_svgplay = QIcon(":/Icons/Play.svg");
 	m_svgpause = QIcon(":/Icons/Pause.svg");
 
-	m_play = new QPushButton(this), m_bkstep = new QPushButton(this), m_fwdstep = new QPushButton(this);
+	m_play = new QPushButton(this), m_bkstep = new QPushButton(this), m_fwdstep = new QPushButton(this), m_appleskin = new QPushButton(this);
 	m_fps = new QSpinBox(this);
 
 	QSize btnsize(20, 20), iconsize = btnsize / 2;
 	m_play->setFixedSize(btnsize);
 	m_bkstep->setFixedSize(btnsize);
 	m_fwdstep->setFixedSize(btnsize);
+	m_appleskin->setFixedSize(btnsize);
 	m_fps->setFixedHeight(btnsize.height());
 
 	m_play->setIcon(m_svgplay);
@@ -36,6 +55,9 @@ CTimeControl::CTimeControl(QWidget * Parent) : QWidget(Parent)
 	m_play->setIconSize(iconsize);
 	m_fwdstep->setIconSize(iconsize);
 	m_bkstep->setIconSize(iconsize);
+
+	m_appleskin->setText("O");
+	m_appleskin->setCheckable(true);
 
 	m_fps->setMinimum(1);
 	m_fps->setMaximum(120);
@@ -59,12 +81,16 @@ CTimeControl::CTimeControl(QWidget * Parent) : QWidget(Parent)
 		"QSpinBox {"
 			"color: #C8C8C8;"
 			"border: none;"
-		"}");
+		"}"
+		"QFrame { color: #202020; }");
 			
+	m_layout->addWidget(m_fps);
+	m_layout->addWidget(new CDivider(this));
 	m_layout->addWidget(m_bkstep);
 	m_layout->addWidget(m_play);
 	m_layout->addWidget(m_fwdstep);
-	m_layout->addWidget(m_fps);
+	m_layout->addWidget(new CDivider(this));
+	m_layout->addWidget(m_appleskin);
 
 	m_play->setShortcut(Qt::Key_Return);
 	m_bkstep->setAutoRepeat(true);
@@ -72,7 +98,7 @@ CTimeControl::CTimeControl(QWidget * Parent) : QWidget(Parent)
 	m_bkstep->setAutoRepeatInterval(30);
 	m_fwdstep->setAutoRepeatInterval(30);
 
-	// Qt's auto repeat for shortcuts is too slow and has no setting (That I know of). Normal shortcuts will do.
+	// Qt's auto repeat for button shortcuts is too slow and has no setting (That I know of). Normal shortcuts will do.
 	QShortcut* decframe = new QShortcut(Qt::Key_Comma, this), *incframe = new QShortcut(Qt::Key_Period, this);
 	connect(decframe, &QShortcut::activated, [this] { ButtonEvent(m_bkstep); });
 	connect(incframe, &QShortcut::activated, [this] { ButtonEvent(m_fwdstep); });
@@ -81,6 +107,7 @@ CTimeControl::CTimeControl(QWidget * Parent) : QWidget(Parent)
 	connect(m_bkstep, &QPushButton::pressed, [this] { ButtonEvent(m_bkstep); });
 	connect(m_fwdstep, &QPushButton::pressed, [this] { ButtonEvent(m_fwdstep); });
 	connect(m_fps, QOverload<int>::of(&QSpinBox::valueChanged), [this] { ChangeFramerate(); });
+	connect(m_appleskin, &QPushButton::toggled, [this](bool checked) { COnionSkin::Enable(checked); });
 
 	CProject::Listen([this](CProjectEvent* e) { ProjectEvent(e); });
 }

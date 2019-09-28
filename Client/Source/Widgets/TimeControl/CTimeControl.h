@@ -21,7 +21,7 @@ class CProjectEvent;
 class CTimeControl : public QWidget
 {
 	QBoxLayout* m_layout;
-	QPushButton* m_play, * m_bkstep, * m_fwdstep;
+	QPushButton* m_play, * m_bkstep, * m_fwdstep, * m_appleskin;
 	QSpinBox* m_fps;
 	QIcon m_svgplay, m_svgpause;
 

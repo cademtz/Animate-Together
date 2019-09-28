@@ -108,7 +108,6 @@ public:
 	void Play();
 	void Pause();
 
-	// - Just rewriting it don't mind me
 	void Export(bool SingleFrame, bool Flatten);
 
 	// - Returns an image of all the layers in the specified frame combined
@@ -144,9 +143,6 @@ public:
 	// - Shifts the layer to specified index anywhere from 0 to the list size
 	// - Only works with layers within the project and returns true on success
 	bool ShiftLayer(CLayer* Layer, size_t Index);
-
-	// - Exports the project as the type specified
-	void Export(e_export Type);
 
 	// - Returns the foremost frame from the end of the animation
 	// - Result will be null if no frames exist

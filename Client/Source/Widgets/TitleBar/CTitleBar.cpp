@@ -20,11 +20,6 @@
 #include "Interface/Export/CExport.h"
 #include "Projects/CProject.h"
 
-void CTitleBar::SaveProject(e_export Type)
-{
-	if (CProject* proj = CProject::ActiveProject())
-		proj->Export(Type);
-}
 inline void ExportAs()
 {
 	if (CProject* proj = CProject::ActiveProject())
@@ -102,7 +97,7 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 		*file = new QMenu("File", m_menubar), *edit = new QMenu("Edit", m_menubar), *layer = new QMenu("Layer", m_menubar),
 		*window = new QMenu("Window", m_menubar);
 	QAction
-		*newproj = new QAction("New", this), /**save = new QAction("Save as...", this),*/ *exp = new QAction("Export as..."),
+		*newproj = new QAction("New", this), /**save = new QAction("Save", this),*/ *exp = new QAction("Export as..."),
 		*undo = new QAction("Undo", this), *redo = new QAction("Redo", this), *fill = new QAction("Fill", this),
 		*history = new QAction("History", this), *layers = new QAction("Layers", this), *l_copy = new QAction("Duplicate", this);
 
@@ -121,7 +116,7 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 	redo->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
 
 	file->addActions({ newproj, exp });
-	file->insertSeparator(newproj);
+	file->insertSeparator(exp);
 	edit->addActions({ undo, redo });
 	layer->addActions({ fill, l_copy });
 	window->addActions({ history, layers });

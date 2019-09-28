@@ -32,8 +32,6 @@ class CTitleBar : public QWidget
 	QMenuBar* m_menubar;
 	QSize m_oldsize;
 
-	static void SaveProject(e_export Type);
-
 public:
 	CTitleBar(QMainWindow* Window, QColor Background = (QRgb)0);
 

@@ -178,60 +178,6 @@ bool CProject::ShiftLayer(CLayer * Layer, size_t Index)
 	return true;
 }
 
-void CProject::Export(e_export Type)
-{
-	auto& layers = Layers();
-	if (!layers.size())
-		return;
-
-	QFileDialog dlg = QFileDialog(nullptr, "Save image as...");
-	dlg.setFileMode(QFileDialog::AnyFile);
-	dlg.setAcceptMode(QFileDialog::AcceptSave);
-	dlg.setNameFilters({
-		"Portable Network Graphics (*.png)",
-		"Joint Photographic Experts Group (*.jpg)",
-		"Tagged Image File Format (*.tiff)",
-		"Windows Bitmap	(*.bmp)" });
-
-	std::string file;
-	if (dlg.exec() && dlg.selectedFiles().length())
-		file = dlg.selectedFiles()[0].toStdString();
-	else
-		return;
-
-	switch (Type)
-	{
-	case e_export::flat:
-	{
-		QImage img = QImage(Dimensions(), QImage::Format::Format_ARGB32);
-		img.fill(Qt::GlobalColor::transparent);
-		QPainter paint(&img);
-		for (auto it = layers.rbegin(); it != layers.rend(); it++)
-		{
-			if ((*it)->IsVisible())
-				paint.drawPixmap(0, 0, *(*it)->Pixmap());
-		}
-		paint.end();
-		img.save(QString::fromStdString(file));
-		break;
-	}
-	case e_export::layers:
-	{
-		std::string path, name, type;
-		size_t pos;
-		if ((pos = file.find_last_of('/')) != std::string::npos)
-			path = file.substr(0, pos + 1);
-		if ((pos = file.find_last_of('.')) != std::string::npos)
-			type = file.substr(pos + 1);
-		name = file.substr(path.length(), file.length() - type.length() - path.length() - 1);
-		
-		for (auto layer : layers)
-			layer->Pixmap()->save(QString::fromStdString(path + name + " - " + layer->Name() + '.' +  type), "png");
-		break;
-	}
-	}
-}
-
 void CProject::Export(bool SingleFrame, bool Flatten)
 {
 	auto& layers = Layers();

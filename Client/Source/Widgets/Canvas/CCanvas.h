@@ -57,13 +57,14 @@ protected:
 private:
 	enum class e_drawmode
 	{
-		up,
+		none,
 		down,
 		released,
 		update
 	};
 
 	void paintPixmap(QPainter &painter, QTabletEvent *event);
+	void SkinTheOnion(QPainter &Paint, CLayer *Layer);
 	qreal pressureToWidth(qreal pressure);
 	void updateBrush(const QTabletEvent *event);
 	void updateCursor(qreal Pressure);

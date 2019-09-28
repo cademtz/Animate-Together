@@ -83,6 +83,12 @@
     <ClCompile Include="Source\Interface\Export\CExport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Projects\OnionSkin\COnionSkin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Interface\Prefs\CPrefs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -131,6 +137,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Source\Interface\Export\UI\Export.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Source\Interface\Prefs\UI\Prefs.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -210,6 +219,9 @@
     <ClInclude Include="Source\Widgets\TimeControl\CTimeControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Projects\OnionSkin\COnionSkin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Source\Interface\ColorPicker\ColorPicker.h">
@@ -231,6 +243,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="Source\Interface\Export\CExport.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Source\Interface\Prefs\CPrefs.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

@@ -16,9 +16,10 @@
 
 #include "Interface/MainWindow/MainWindow.h"
 #include "Interface/EditBrush/EditBrush.h"
+#include "Projects/OnionSkin/COnionSkin.h"
+#include "Projects/CProject.h"
 #include "Widgets/MiniPalette/CMiniPalette.h"
 #include "Widgets/ToolBar/CToolBar.h"
-#include "Projects/CProject.h"
 #include "Brushes/Brushes.h"
 
 void CCanvas::stepBrush(int Step)
@@ -39,7 +40,7 @@ CCanvas::CCanvas(QWidget* Parent)
 	, m_brushScale({ 2, 5 })
 	, m_eraserScale({ 1, 10 })
 	, m_pen(m_brush, 1.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin)
-	, m_drawmode(e_drawmode::up)
+	, m_drawmode(e_drawmode::none)
 	, m_scroll(0, 0)
 	, m_dragging(false)
 {
@@ -68,7 +69,7 @@ CCanvas::CCanvas(QWidget* Parent)
 
 void CCanvas::UpdateCanvas()
 {
-	if (m_drawmode == e_drawmode::up)
+	if (m_drawmode == e_drawmode::none)
 		m_drawmode = e_drawmode::update;
 	update(QRect(m_scroll, m_pixcanvas.size()));
 }
@@ -88,9 +89,9 @@ void CCanvas::ProjectEvent(CProjectEvent * Event)
 		m_proj = Event->Project();
 		update();
 		break;
+	case CProjectEvent::OnionSkin:
 	case CProjectEvent::ActiveFrame:
-		UpdateCanvas();
-		break;
+		UpdateCanvas(); break;
 	case CProjectEvent::Play:
 		setDisabled(true); break;
 	case CProjectEvent::Pause:
@@ -176,13 +177,17 @@ void CCanvas::paintEvent(QPaintEvent * event)
 			if (!(*it)->IsVisible())
 				continue;
 			bool showBuffer = *it == m_proj->ActiveLayer();
-			if (showBuffer && m_tool == e_tool::Eraser)
+			if (showBuffer)
 			{
-				QImage mask = m_buffer.createAlphaMask();
-				mask.invertPixels();
-				QRegion reg(QBitmap::fromImage(mask));
-				reg.translate(m_scroll);
-				paint.setClipRegion(reg);
+				SkinTheOnion(paint, *it);
+				if (m_tool == e_tool::Eraser)
+				{
+					QImage mask = m_buffer.createAlphaMask();
+					mask.invertPixels();
+					QRegion reg(QBitmap::fromImage(mask));
+					reg.translate(m_scroll);
+					paint.setClipRegion(reg);
+				}
 			}
 			if ((*it)->Pixmap())
 				paint.drawPixmap(m_scroll, *(*it)->Pixmap());
@@ -199,7 +204,7 @@ void CCanvas::paintEvent(QPaintEvent * event)
 	}
 	case e_drawmode::released: // BRUH
 	{
-		m_drawmode = e_drawmode::up;
+		m_drawmode = e_drawmode::none;
 		CLayer* Layer;
 		if (!(Layer = m_proj->ActiveLayer()) || !Layer->Pixmap())
 			break;
@@ -243,7 +248,7 @@ void CCanvas::paintEvent(QPaintEvent * event)
 	}
 	case e_drawmode::update:
 	{
-		m_drawmode = e_drawmode::up;
+		m_drawmode = e_drawmode::none;
 
 		// Create the final image to optimize redrawing while there's no change
 		if (m_pixcanvas.size() != m_proj->Dimensions())
@@ -253,12 +258,16 @@ void CCanvas::paintEvent(QPaintEvent * event)
 		paint.begin(&m_pixcanvas);
 		const std::deque<CLayer*>& layers = m_proj->Layers();
 		for (auto it = layers.rbegin(); it != layers.rend(); it++)
+		{
+			if (*it == m_proj->ActiveLayer() && (*it)->IsVisible())
+				SkinTheOnion(paint, *it);
 			if ((*it)->IsVisible() && (*it)->Pixmap())
 				paint.drawPixmap(0, 0, *(*it)->Pixmap());
+		}
 		paint.end();
 		m_imgcanvas = m_pixcanvas.toImage();
 	}
-	case e_drawmode::up:
+	case e_drawmode::none:
 	{
 		paint.begin(this);
 		paint.drawPixmap(m_scroll, m_pixcanvas);
@@ -354,6 +363,26 @@ void CCanvas::paintPixmap(QPainter & painter, QTabletEvent * event)
 	}
 }
 
+void CCanvas::SkinTheOnion(QPainter & Paint, CLayer * Layer)
+{
+	if (!COnionSkin::Enabled() || m_proj->IsPlaying())
+		return;
+
+	qreal old = Paint.opacity();
+	Paint.setOpacity(0.3);
+
+	QPixmap* last = 0, *active = Layer->Pixmap();
+	for (int frame = (int)m_proj->ActiveFrame() - COnionSkin::Back(); (int)frame <= (int)m_proj->ActiveFrame() + COnionSkin::Forward(); frame++)
+	{
+		QPixmap* p = 0;
+		if (frame < 0 || !(p = Layer->Pixmap(frame)) || last == p || p == active)
+			continue;
+		last = p;
+		Paint.drawPixmap(m_scroll, *p);
+	}
+	Paint.setOpacity(old);
+}
+
 qreal CCanvas::pressureToWidth(qreal pressure) {
 	return m_tool == e_tool::Eraser ? m_eraserScale.getSize(pressure) : m_brushScale.getSize(pressure);
 }
@@ -423,7 +452,7 @@ void CCanvas::updateCursor(qreal Pressure)
 
 void CCanvas::TabletPress(QTabletEvent * Event, CLayer * Layer)
 {
-	if (!Layer->Pixmap() || m_drawmode != e_drawmode::up)
+	if (!Layer->Pixmap() || m_drawmode != e_drawmode::none)
 		return;
 
 	m_drawmode = e_drawmode::down;

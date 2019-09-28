@@ -99,6 +99,7 @@ public:
 		Play,
 		Pause,
 		Framerate,
+		OnionSkin,
 	};
 
 private:
