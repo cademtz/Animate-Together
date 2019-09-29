@@ -75,7 +75,9 @@ bool CLayer::SelectFrame(CFrame * Frame, bool Selected)
 	if (!HasFrame(Frame) && Selected)
 		return false; // Only prevent selection of unowned frames
 
-	if (Selected && !IsFrameSelected(Frame))
+	bool result = IsFrameSelected(Frame);
+
+	if (Selected && !result)
 		m_selectedframes.push_back(Frame);
 	else
 	{
@@ -84,11 +86,21 @@ bool CLayer::SelectFrame(CFrame * Frame, bool Selected)
 			if (*it == Frame)
 			{
 				m_selectedframes.erase(it);
-				return true;
+				break;
 			}
 		}
 	}
-	return false;
+	LayerEvent(CLayerEvent::Selection);
+	return result;
+}
+
+void CLayer::ClearSelected()
+{
+	if (!m_selectedframes.size())
+		return;
+
+	m_selectedframes.clear();
+	LayerEvent(CLayerEvent::Selection);
 }
 
 CRasterFrame * CLayer::ActiveFrame()

@@ -6,7 +6,9 @@
  */
 
 #include "CGraphicsFrame.h"
+#include <qmenu.h>
 #include <qpainter.h>
+#include <qgraphicssceneevent.h>
 #include "Projects/CProject.h"
 
 const QRectF CGraphicsFrame::m_rect = QRectF(0, 0, 8, 18);
@@ -76,4 +78,29 @@ void CGraphicsFrame::setGeometry(const QRectF & geom)
 	prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(geom);
 	setPos(geom.topLeft());
+}
+
+void CGraphicsFrame::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
+{
+	QMenu menu;
+	QAction* del = menu.addAction("Delete");//, * copy = menu.addAction("Copy"), * paste = menu.addAction("Paste");
+
+	if (Frame())
+	{
+		if (!Frame()->IsSelected())
+		{
+			Frame()->Project()->DeselectFrames();
+			Frame()->Select();
+		}
+	}
+	else
+	{
+		del->setDisabled(true);
+		//copy->setDisabled(true);
+		//paste->setDisabled(true);
+	}
+
+	QAction *action = menu.exec(event->screenPos());
+	if (action == del)
+		Frame()->Project()->RemoveSelectedFrames();
 }

@@ -148,6 +148,19 @@ public:
 	// - Result will be null if no frames exist
 	CFrame* LastFrame();
 
+
+	// ========== Frame functions ========== //
+
+
+	inline void DeselectFrames() {
+		for (auto layer : Layers())
+			layer->ClearSelected();
+	}
+	inline void RemoveSelectedFrames() {
+		for (auto layer : Layers())
+			layer->RemoveSelected();
+	}
+
 protected:
 
 	// ========== Internal functions ========== //

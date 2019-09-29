@@ -52,8 +52,10 @@ public:
 	inline e_state State() const { return m_state; }
 	inline e_type Type() const { return m_type; }
 
-	// - Returns the layer that holds the frame
 	inline CLayer* Layer() { return m_layer; }
+	CProject* Project(); //{ return Layer()->Project(); }
+	void Select(bool Selected = true); //{ Layer()->SelectFrame(this); }
+	bool IsSelected(); //{ return Layer()->IsFrameSelected(this); }
 
 	// - Returns the index in the parent layer's frame list
 	size_t Index();

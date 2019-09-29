@@ -65,7 +65,8 @@ public:
 		Switched,	// - When the active layer changes
 		Hidden,		// - Hidden mode toggled in layer(s)
 		Edit,		// - Layer properties changed (name, private, locked, ...)
-		Moved		// - Order in the list has changed
+		Moved,		// - Order in the list has changed
+		Selection	// - Frame selection changed
 	};
 
 private:

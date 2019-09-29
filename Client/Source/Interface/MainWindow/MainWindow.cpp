@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
 		f.open(QFile::ReadOnly | QFile::Text);
 		QTextStream ts(&f);
 		m_globalstyle = ts.readAll();
+		qApp->setStyleSheet(m_globalstyle);
 	}
 
 	ui.setupUi(this);

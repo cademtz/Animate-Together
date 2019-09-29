@@ -19,6 +19,16 @@ CFrame * CFrame::_Parent() {
 	return Layer()->LastKey(Index());
 }
 
+CProject * CFrame::Project() {
+	return Layer()->Project();
+}
+void CFrame::Select(bool Selected) {
+	Layer()->SelectFrame(this);
+}
+bool CFrame::IsSelected() {
+	return Layer()->IsFrameSelected(this);
+}
+
 size_t CFrame::Index() {
 	if (Layer())
 		return Layer()->IndexOf(this);

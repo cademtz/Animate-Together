@@ -82,7 +82,7 @@ public:
 	// - Adds or removes a frame from the selected list
 	// - Returns the frame's previous selection state
 	bool SelectFrame(CFrame* Frame, bool Selected = true);
-	inline void ClearSelected() { m_selectedframes.clear(); }
+	void ClearSelected();
 
 	// - Gets the active frame
 	// - Returns null if no frame is active

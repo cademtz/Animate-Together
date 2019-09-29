@@ -22,7 +22,6 @@ CLayerPanel::CLayerPanel(QWidget * Parent) : QWidget(Parent)
 {
 	setObjectName("CLayerPanel");
 	setStyleSheet(
-		MainWindow::GetGlobalStyle() +
 		"QWidget#CLayerPanel {"
 			"background: #323232;"
 			"color: rgb(200, 200, 200);"
@@ -33,7 +32,6 @@ CLayerPanel::CLayerPanel(QWidget * Parent) : QWidget(Parent)
 			"color: rgb(200, 200, 200);"
 		"}"
 		"QPushButton:hover {"
-			//"border: 1px solid rgb(50, 50, 50);"
 			"background-color: rgb(66, 66, 66);"
 			"color: rgb(255, 255, 255);"
 		"}"

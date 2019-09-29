@@ -35,6 +35,7 @@ public:
 	QSizeF	sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
 	void	setGeometry(const QRectF &geom);
 	QRectF	boundingRect() const { return m_rect; }
+	void	contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 };
 
 #endif // CGraphicsFrame_H

@@ -26,8 +26,8 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 	setFrameStyle(QFrame::NoFrame);
 	
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	setVerticalScrollBarPolicy(horizontalScrollBarPolicy());
+	//setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	//setVerticalScrollBarPolicy(horizontalScrollBarPolicy());
 	setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
 	setScene(new QGraphicsScene(this));
@@ -109,6 +109,7 @@ void CFrameList::ProjectEvent(CProjectEvent * Event)
 		break;
 	case CProjectEvent::ActiveFrame:
 		m_playhead->setPos(Event->Project()->ActiveFrame() * 8, m_playhead->y());
+		centerOn(m_playhead);
 		break;
 	}
 }
@@ -361,7 +362,6 @@ void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
 			layer->AddFrame(key[0] == Qt::Key_F7);
 		break;
 	case Qt::Key_Delete:
-		for (auto layer : proj->Layers())
-			layer->RemoveSelected();
+		proj->RemoveSelectedFrames();
 	}
 }
