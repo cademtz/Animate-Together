@@ -26,8 +26,6 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 	setFrameStyle(QFrame::NoFrame);
 	
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	//setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	//setVerticalScrollBarPolicy(horizontalScrollBarPolicy());
 	setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
 	setScene(new QGraphicsScene(this));
@@ -109,7 +107,8 @@ void CFrameList::ProjectEvent(CProjectEvent * Event)
 		break;
 	case CProjectEvent::ActiveFrame:
 		m_playhead->setPos(Event->Project()->ActiveFrame() * 8, m_playhead->y());
-		centerOn(m_playhead);
+		if (Event->Project()->IsPlaying())
+			centerOn(m_playhead);
 		break;
 	}
 }
