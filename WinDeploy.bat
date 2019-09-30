@@ -17,7 +17,7 @@ rem ===== Input =====
 set /p SUBDIR=Deploy in subdir: 
 set /p CFG=Build config (x86 or x64): 
 
-if "%CFG%" neq "x86" if "CFG" neq "x64" goto bad_cfg
+if "%CFG%" neq "x86" if "%CFG%" neq "x64" goto bad_cfg
 if "%CFG%" neq "x64" goto deploy
 rem x64 was chosen:
 set VC_REDIST=%VC_REDIST_64%
@@ -26,13 +26,10 @@ set QT_CFG=%QT_CFG_64%
 rem ===== Deploy =====
 :deploy
 cd %SUBDIR%
-echo Using directory: %cd%
-pause
 
 robocopy "%VC_REDIST%" "%cd%"
 copy LICENSE "%cd%\License.txt"
 
-echo %QT_DIR%\%QT_VER%\%QT_CFG%\bin\windeployqt.exe
 %QT_DIR%\%QT_VER%\%QT_CFG%\bin\windeployqt.exe %QT_OPT% "%cd%"
 
 pause
@@ -40,6 +37,6 @@ exit
 
 rem ===== Error =====
 :bad_cfg
-echo "Bad configuration "%CFG", choose "x64" or "x86"
+echo "Bad configuration "%CFG%", choose "x64" or "x86"
 pause
 exit
