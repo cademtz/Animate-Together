@@ -9,6 +9,8 @@ set QT_OPT=--no-system-d3d-compiler --no-opengl-sw
 set VC_REDIST_32=C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x86
 set VC_REDIST_64=C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x64
 
+set OUT_FILE=Animate Together.exe
+
 rem ===== Initial settings =====
 set QT_CFG=%QT_CFG_32%
 set VC_REDIST=%VC_REDIST_32%
@@ -25,12 +27,11 @@ set QT_CFG=%QT_CFG_64%
 
 rem ===== Deploy =====
 :deploy
-cd %SUBDIR%
 
-robocopy "%VC_REDIST%" "%cd%"
-copy LICENSE "%cd%\License.txt"
+robocopy "%VC_REDIST%" "%cd%\%SUBDIR%"
+copy "LICENSE" "%cd%\%SUBDIR%\License.txt"
 
-%QT_DIR%\%QT_VER%\%QT_CFG%\bin\windeployqt.exe %QT_OPT% "%cd%"
+%QT_DIR%\%QT_VER%\%QT_CFG%\bin\windeployqt.exe %QT_OPT% "%cd%\%SUBDIR%\%OUT_FILE%"
 
 pause
 exit
