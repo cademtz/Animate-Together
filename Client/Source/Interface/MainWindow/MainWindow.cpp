@@ -125,7 +125,7 @@ void MainWindow::FillLayer()
 	if (CProject* proj = CProject::ActiveProject())
 		if (CLayer* layer = proj->ActiveLayer())
 			ColorPicker::Open(Qt::GlobalColor::white, [proj, layer](ColorPicker* picker) {
-			proj->Undos().Push(new CUndoLayerFill(*layer->Pixmap(), picker->m_color));
+			proj->Undos().Push(new CUndoFill(*layer->Pixmap(), picker->m_color));
 			layer->Pixmap()->fill(picker->m_color);
 		});
 }

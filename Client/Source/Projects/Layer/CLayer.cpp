@@ -41,7 +41,7 @@ void CLayer::Fill(QColor Color)
 	if (!Pixmap())
 		return;
 
-	m_proj->Undos().Push(new CUndoLayerFill(*Pixmap(), Color));
+	m_proj->Undos().Push(new CUndoFill(*Pixmap(), Color));
 	Pixmap()->fill(Color);
 }
 void CLayer::Fill()
@@ -105,7 +105,7 @@ void CLayer::ClearSelected()
 
 CRasterFrame * CLayer::ActiveFrame()
 {
-	if (m_frames.empty() || Project()->ActiveFrame() > m_frames.size() - 1)
+	if (m_frames.empty() || Project()->ActiveFrame() >= m_frames.size())
 		return 0;
 	return m_frames[Project()->ActiveFrame()];
 }
@@ -139,14 +139,62 @@ size_t CLayer::IndexOf(const CFrame * Frame)
 
 void CLayer::AddFrame(bool IsKey, size_t Index)
 {
-	if (Index == UINT_MAX)
+	if (Index == UINT_MAX) // Leave it to default action
+	{
+		if (m_selectedframes.size())
+		{
+			if (IsKey)
+			{
+				// Temporary solution. TO DO: Use index list instead of pointers for m_selectedframes
+				while (true)
+				{
+					CFrame* hold = 0;
+					for (auto frame : m_selectedframes)
+					{
+						if (frame->State() == CFrame::Hold)
+						{
+							hold = frame;
+							break;
+						}
+					}
+					if (!hold)
+						break; // No more hold frames left
+
+					size_t index = IndexOf(hold);
+					ReplaceFrame(hold, new CRasterFrame(this, false));
+					Project()->Undos().Push(new CUndoFrameReplace(*this, hold, index));
+				}
+			}
+			else
+			{
+				// Find the first frame, and use that as our index
+				size_t lastindex = UINT_MAX;
+				for (auto frame : m_selectedframes)
+				{
+					size_t index = IndexOf(frame);
+					if (index < lastindex)
+						lastindex = index;
+				}
+
+				std::deque<CFrame*> frames;
+				for (size_t i = 0; i < m_selectedframes.size(); i++)
+				{
+					CRasterFrame * frame = new CRasterFrame(this, true);
+					m_frames.insert(m_frames.begin() + lastindex + 1, frame);
+					frames.push_back(frame);
+					CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Add));
+				}
+				Project()->Undos().Push(new CUndoFrame(*this, frames, true));
+			}
+			return;
+		}
 		Index = Project()->ActiveFrame();
+	}
 
 	std::deque<CFrame*> added;
 	if (!m_frames.size())
 	{
 		m_frames.push_back(new CRasterFrame(this)); // The first frame must always be a key frame
-		//CFrame::CreateEvent(CFrameEvent(m_frames.back(), CFrameEvent::Add));
 		if (!Index)
 			return;
 		added.push_back(m_frames.front());
@@ -166,13 +214,7 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 	else if (!IsKey || m_frames[Index]->State() == CFrame::Hold) // Else, if it's a hold frame
 	{
 		if (IsKey)	// Then replace with a new key frame
-		{
-			/*CRasterFrame** pos = &m_frames[Index], *old = *pos;
-			SelectFrame(old, false);
-			*pos = new CRasterFrame(this);
-			CFrame::CreateEvent(CFrameEvent(*pos, CFrameEvent::Replace, old));*/
 			ReplaceFrame(m_frames[Index], new CRasterFrame(this));
-		}
 		else // Then insert a new hold frame after it
 		{
 			CRasterFrame* frame = new CRasterFrame(this, true);
@@ -209,7 +251,11 @@ CFrame * CLayer::ReplaceFrame(size_t Index, CFrame * New)
 	CFrame* old = m_frames[Index];
 
 	New->SetLayer(this);
-	SelectFrame(New, IsFrameSelected(old));
+	if (IsFrameSelected(old))
+	{
+		SelectFrame(New, true);
+		SelectFrame(old, false);
+	}
 
 	m_frames[Index] = (CRasterFrame*)New;
 	CFrame::CreateEvent(CFrameEvent(New, CFrameEvent::Replace, old, Index));

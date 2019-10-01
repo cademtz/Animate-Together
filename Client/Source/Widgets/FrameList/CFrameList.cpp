@@ -18,8 +18,6 @@
 #include "Graphics/GraphicsFrame/CGraphicsFrame.h"
 #include "Graphics/GraphicsScrubBar/CGraphicsScrubBar.h"
 
-const QRectF circ_size(0, 0, 5, 5);
-
 CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 {
 	setContentsMargins(0, 0, 0, 0);
@@ -344,7 +342,6 @@ bool CFrameList::Select(QMouseEvent * Event)
 	return true;
 }
 
-#include <qapplication.h>
 void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
 {
 	CProject* proj = CProject::ActiveProject();
@@ -355,11 +352,36 @@ void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
 	switch (key[0])
 	{
 	case Qt::Key_F7:
+		if (CLayer* layer = proj->ActiveLayer())
+			layer->AddFrame(true);
+		break;
 	case Qt::Key_F6:
 	case Qt::Key_F5:
-		if (CLayer* layer = proj->ActiveLayer())
-			layer->AddFrame(key[0] == Qt::Key_F7);
+	{
+		bool selection = false;
+		for (auto layer : proj->Layers())
+		{
+			if (layer->SelectedFrames().size())
+			{
+				selection = true;
+				break;
+			}
+		}
+
+		if (selection)
+		{
+			if (CLayer* layer = proj->ActiveLayer())
+				layer->AddFrame(false);
+		}
+		else
+		{
+			size_t index = proj->ActiveFrame();
+			for (auto layer : proj->Layers())
+				if (layer->Frames().size() > index)
+					layer->AddFrame(false, index);
+		}
 		break;
+	}
 	case Qt::Key_Delete:
 		proj->RemoveSelectedFrames();
 	}

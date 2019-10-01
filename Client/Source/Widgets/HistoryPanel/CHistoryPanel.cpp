@@ -30,7 +30,7 @@ void CHistoryPanel::paintEvent(QPaintEvent * Event)
 		for (auto action : proj->Undos().GetActions())
 		{
 			QString text = action->Undone() ? "- " : "+ ";
-			paint.drawText(6, y += name.size().height(), text + action->TypeSTr());
+			paint.drawText(6, y += name.size().height(), text + action->TypeStr());
 		}
 	}
 }

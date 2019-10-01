@@ -74,7 +74,7 @@ public:
 	// ========== Frame functions ========== //
 
 	inline const FrameList_t& Frames() const { return m_frames; }
-	inline std::deque<CFrame*>& SelectedFrames() { return m_selectedframes; }
+	inline const std::deque<CFrame*>& SelectedFrames() { return m_selectedframes; }
 
 	bool IsFrameSelected(CFrame* Frame);
 	bool HasFrame(CFrame* Frame);
@@ -135,7 +135,7 @@ protected:
 	void PutBack(CFrame* Frame, size_t Index);
 	void TakeBack(CFrame* Frame);
 
-	// - Removes a frame directly without creating events or unds
+	// - Removes a frame directly without creating events or undos
 	void _RemoveFrame(size_t Index);
 };
 
