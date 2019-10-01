@@ -145,6 +145,7 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 		{
 			if (IsKey)
 			{
+				CCompoundAction* action = new CCompoundAction("Keyframe fill");
 				// Temporary solution. TO DO: Use index list instead of pointers for m_selectedframes
 				while (true)
 				{
@@ -162,8 +163,9 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 
 					size_t index = IndexOf(hold);
 					ReplaceFrame(hold, new CRasterFrame(this, false));
-					Project()->Undos().Push(new CUndoFrameReplace(*this, hold, index));
+					action->Push(new CUndoFrameReplace(*this, hold, index));
 				}
+				m_proj->Undos().Push(action);
 			}
 			else
 			{

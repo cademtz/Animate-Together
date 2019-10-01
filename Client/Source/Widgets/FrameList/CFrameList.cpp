@@ -368,6 +368,7 @@ void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
 			}
 		}
 
+		proj->Undos().Compound(true, "Frame add");
 		if (selection)
 		{
 			if (CLayer* layer = proj->ActiveLayer())
@@ -380,6 +381,7 @@ void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
 				if (layer->Frames().size() > index)
 					layer->AddFrame(false, index);
 		}
+		proj->Undos().Compound(false);
 		break;
 	}
 	case Qt::Key_Delete:

@@ -78,7 +78,7 @@ class CCompoundAction : public CUndoAction
 	const char* m_disguise;
 	std::deque<CUndoAction*> m_actions;
 
-protected:
+public:
 	// - Creates a single undo from list 'Actions', which will be undone and redone in order
 	// - 'Disguise' sets the name returned from 'TypeStr'. If left default, it will choose the action most listed
 	CCompoundAction(const std::deque<CUndoAction*>& Actions, const char* Disguise = 0);
@@ -89,6 +89,7 @@ protected:
 	const char* TypeStr() const { return m_disguise; }
 
 	void Push(CUndoAction* Action);
+	const std::deque<CUndoAction*>& Actions() const { return m_actions; }
 };
 
 class CUndoStroke : public CUndoAction

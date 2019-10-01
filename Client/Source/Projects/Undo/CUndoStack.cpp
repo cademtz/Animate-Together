@@ -73,8 +73,33 @@ void CUndoStack::Push(CUndoAction * Action)
 		delete m_actions.back();
 		m_actions.pop_back();
 	}
-	m_actions.push_front(Action);
+
+	if (m_compound)
+	{
+		CCompoundAction* comp = (CCompoundAction*)m_actions.front();
+		comp->Push(Action);
+	}
+	else
+		m_actions.push_front(Action);
+
 	CUndoStack::UndoEvent(Action);
+}
+
+void CUndoStack::Compound(bool Enabled, const char * Disguise)
+{
+	if (m_compound)
+	{
+		CCompoundAction* comp = (CCompoundAction*)m_actions.front();
+		if (!comp->Actions().size()) // Enabled previously and nothing compounded
+		{
+			delete comp;
+			m_actions.pop_front();
+		}
+	}
+
+	if (Enabled)
+		m_actions.push_front(new CCompoundAction(Disguise));
+	m_compound = Enabled;
 }
 
 void CUndoStack::UndoEvent(const CUndoAction* Undo)

@@ -25,19 +25,22 @@ class CUndoStack
 	// - List contains all reversible user actions
 	// - New actions appear in front
 	std::list<CUndoAction*> m_actions;
+	bool m_compound = false;
+
 	static std::list<UndoEvent_t> m_listeners;
 
 public:
 	~CUndoStack();
 
-	// - Returns true if an undo was available
 	bool UndoLast();
-
-	// - Returns true if a redo was available
 	bool RedoLast();
 
 	// - Adds an undoable action
 	void Push(CUndoAction* Action);
+
+	// - Enabled:	If true, always creates a new compound action for adding following actions to.
+	// - Disguise:	Set a custom name for the action. Useful for naming special user actions
+	void Compound(bool Enabled, const char* Disguise = 0);
 
 	// - Returns a list of all the actions
 	inline const std::list<CUndoAction*>& GetActions() const { return m_actions; }
