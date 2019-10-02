@@ -56,8 +56,8 @@ size_t CLayer::Index() {
 
 bool CLayer::IsFrameSelected(CFrame * Frame)
 {
-	for (auto frame : m_selectedframes)
-		if (frame == Frame)
+	for (auto index : m_selectedframes)
+		if (m_frames[index] == Frame)
 			return true;
 	return false;
 }
@@ -77,13 +77,14 @@ bool CLayer::SelectFrame(CFrame * Frame, bool Selected)
 
 	bool result = IsFrameSelected(Frame);
 
+	int index = IndexOf(Frame);
 	if (Selected && !result)
-		m_selectedframes.push_back(Frame);
+		m_selectedframes.push_back(index);
 	else
 	{
 		for (auto it = m_selectedframes.begin(); it != m_selectedframes.end(); it++)
 		{
-			if (*it == Frame)
+			if (*it == index)
 			{
 				m_selectedframes.erase(it);
 				break;
@@ -150,11 +151,11 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 				while (true)
 				{
 					CFrame* hold = 0;
-					for (auto frame : m_selectedframes)
+					for (auto index : m_selectedframes)
 					{
-						if (frame->State() == CFrame::Hold)
+						if (index < m_frames.size() && m_frames[index]->State() == CFrame::Hold)
 						{
-							hold = frame;
+							hold = m_frames[index];
 							break;
 						}
 					}
@@ -171,12 +172,9 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 			{
 				// Find the first frame, and use that as our index
 				size_t lastindex = UINT_MAX;
-				for (auto frame : m_selectedframes)
-				{
-					size_t index = IndexOf(frame);
+				for (auto index : m_selectedframes)
 					if (index < lastindex)
 						lastindex = index;
-				}
 
 				std::deque<CFrame*> frames;
 				for (size_t i = 0; i < m_selectedframes.size(); i++)
@@ -280,10 +278,22 @@ void CLayer::RemoveSelected()
 	std::deque<CFrame*> frames;
 	while (m_selectedframes.size())
 	{
-		CFrame* front = m_selectedframes.front();
-		if (front->State() != CFrame::Hold && IndexOf(front) < m_frames.size() - 1)
+		CFrame* next = 0;
+		int index = -1;
+		for (auto i : m_selectedframes)
 		{
-			for (auto pos = ++FramePos(front); pos != m_frames.end() && (*pos)->State() == CFrame::Hold; pos++)
+			if (i <= m_frames.size() - 1)
+			{
+				next = m_frames[i], index = i;
+				break;
+			}
+		}
+		if (!next)
+			break; // No valid frames selected
+
+		if (next->State() != CFrame::Hold)
+		{
+			for (auto pos = ++FramePos(next); pos != m_frames.end() && (*pos)->State() == CFrame::Hold; pos++)
 			{
 				CFrame* frame = *pos;
 				
@@ -292,15 +302,15 @@ void CLayer::RemoveSelected()
 
 				if (!selected)
 				{
-					SelectFrame(front, false);
+					SelectFrame(next, false);
 					break;
 				}
 			}
-			if (!IsFrameSelected(front))
+			if (!IsFrameSelected(next))
 				continue;
 		}
-		SelectFrame(front, false);
-		frames.push_back(front);
+		SelectFrame(next, false);
+		frames.push_back(next);
 	}
 
 	if (!frames.size())
@@ -310,7 +320,7 @@ void CLayer::RemoveSelected()
 	for (auto frame : frames)
 	{
 		size_t index = IndexOf(frame);
-		_RemoveFrame(index);
+		_RemoveFrame(frame);
 		CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Remove, 0, index));
 	}
 }

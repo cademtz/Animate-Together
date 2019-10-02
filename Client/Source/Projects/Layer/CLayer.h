@@ -33,7 +33,8 @@ private:
 
 	std::string m_name;
 	FrameList_t m_frames;
-	std::deque<CFrame*> m_selectedframes;
+	//std::deque<CFrame*> m_selectedframes;
+	std::deque<int> m_selectedframes;
 
 	QSize m_dimensions;
 	bool m_visible = true, m_private = false;
@@ -74,7 +75,8 @@ public:
 	// ========== Frame functions ========== //
 
 	inline const FrameList_t& Frames() const { return m_frames; }
-	inline const std::deque<CFrame*>& SelectedFrames() { return m_selectedframes; }
+	//inline const std::deque<CFrame*>& SelectedFrames() { return m_selectedframes; }
+	inline const std::deque<int>& SelectedFrames() { return m_selectedframes; }
 
 	bool IsFrameSelected(CFrame* Frame);
 	bool HasFrame(CFrame* Frame);
@@ -137,6 +139,7 @@ protected:
 
 	// - Removes a frame directly without creating events or undos
 	void _RemoveFrame(size_t Index);
+	inline void _RemoveFrame(CFrame* Frame) { _RemoveFrame(IndexOf(Frame)); }
 };
 
 #endif // CLayer_H
