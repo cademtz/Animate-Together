@@ -30,33 +30,56 @@ void CGraphicsFrame::SelectFrame(bool Select)
 void CGraphicsFrame::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
 	painter->setClipRect(m_rect);
+	if (!m_frame)
+	{
+		painter->setPen(QPen(QColor(64, 64, 64), 2));
+		painter->drawRect(m_rect);
+		return;
+	}
 
-	bool filled = Frame()->State() != CFrame::Hold;
-
+	// lol
+	bool filled = !m_frame->IsEmpty(), left = Connected(Qt::LeftEdge), right = Connected(Qt::RightEdge);
 	painter->fillRect(m_rect, filled ? QColor(100, 100, 100) : QColor(75, 75, 75));
-
+	
 	if (filled)
 	{
-		painter->setPen(QPen(QColor(118, 118, 118)));
-		painter->drawRect(m_rect.x(), m_rect.y() + 1, m_rect.width() - 2, m_rect.height() - 2);
+		QRectF area(m_rect.topLeft(), m_rect.size() - QSize(2, 2));
+		painter->setPen(QPen(QColor(117, 117, 117)));
+		painter->drawLine(area.topLeft(), area.topRight());
+		painter->drawLine(area.bottomLeft(), area.bottomRight());
+
+		if (!left)
+			painter->drawLine(area.topLeft(), area.bottomLeft());
+		if (!right)
+			painter->drawLine(area.topRight(), area.bottomRight());
 	}
 
 	painter->setPen(Qt::black);
 
-	switch (Frame()->State())
+	if (m_frame->IsKey())
 	{
-	case CFrame::Key:
-	case CFrame::Empty:
 		painter->setBrush(filled ? Qt::black : Qt::transparent);
-		painter->drawEllipse(m_rect.x() + 1, m_rect.y() + 10, 4, 4);
-		break;
-	case CFrame::Hold:
-		painter->drawRect(m_rect.x() + 1, m_rect.y() + 8, 4, 7);
+		painter->drawEllipse(m_rect.x() + 1, m_rect.y() + 9, 4, 4);
+	}
+	else if (!right)
+			painter->drawRect(m_rect.x() + 1, m_rect.y() + 7, 4, 7);
+
+	QRectF area(m_rect.topLeft(), m_rect.size() - QSize(1, 1));
+	painter->setPen(QPen(QColor(43, 43, 43)));
+	if (right)
+	{
+		painter->setPen(QPen(QColor(43, 43, 43, 64)));
+		QRegion other(m_rect.x(), m_rect.y() + 2, m_rect.width(), m_rect.height() - 5);
+		painter->setClipRegion(painter->clipRegion().subtracted(other));
 	}
 
+	painter->drawLine(area.topRight(), area.bottomRight());
 	painter->setPen(QPen(QColor(43, 43, 43)));
-	painter->setBrush(Frame()->Layer()->IsFrameSelected(Frame()) ? QColor(64, 128, 255, 128) : Qt::transparent);
-	painter->drawRect(m_rect.x() - 1, m_rect.y(), m_rect.width(), m_rect.height());
+	painter->setClipRect(m_rect);
+	painter->drawLine(area.bottomLeft(), area.bottomRight());
+
+	if (m_frame->IsSelected())
+		painter->fillRect(m_rect, QColor(64, 128, 255, 128));
 }
 
 QSizeF CGraphicsFrame::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
@@ -103,4 +126,19 @@ void CGraphicsFrame::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 	QAction *action = menu.exec(event->screenPos());
 	if (action == del)
 		Frame()->Project()->RemoveSelectedFrames();
+}
+
+bool CGraphicsFrame::Connected(Qt::Edge Edge)
+{
+	if (!m_frame)
+		return false;
+	else if (Edge == Qt::LeftEdge)
+		return !m_frame->IsKey();
+
+	auto& frames = m_frame->Layer()->Frames();
+	int index = m_frame->Index();
+	if (index + 1 < frames.size() && !frames[index + 1]->IsKey())
+		return true;
+
+	return false;
 }

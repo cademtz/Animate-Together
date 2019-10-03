@@ -122,7 +122,7 @@ public:
 	inline void LayerEvent(CLayerEvent::e_action Action) { CreateEvent(CLayerEvent(this, Action)); }
 
 protected:
-
+	friend class CUndoFrameReplace;
 
 	// ========== Internal functions ========== //
 
@@ -138,6 +138,10 @@ protected:
 	// - Removes a frame directly without creating events or undos
 	void _RemoveFrame(size_t Index);
 	inline void _RemoveFrame(CFrame* Frame) { _RemoveFrame(IndexOf(Frame)); }
+
+	// - Replaces frame at 'Index' with 'Frame' without creating undos
+	// - Returns the old frame
+	CFrame* _ReplaceFrame(int Index, CFrame* New);
 };
 
 #endif // CLayer_H

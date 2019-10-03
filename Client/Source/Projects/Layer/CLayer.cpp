@@ -150,21 +150,20 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 				// Temporary solution. TO DO: Use index list instead of pointers for m_selectedframes
 				while (true)
 				{
-					CFrame* hold = 0;
-					for (auto index : m_selectedframes)
+					int index = -1;
+					for (auto i : m_selectedframes)
 					{
-						if (index < m_frames.size() && m_frames[index]->State() == CFrame::Hold)
+						if (i < m_frames.size() && !m_frames[i]->IsKey())
 						{
-							hold = m_frames[index];
+							index = i;
 							break;
 						}
 					}
-					if (!hold)
+					if (index == -1)
 						break; // No more hold frames left
 
-					size_t index = IndexOf(hold);
-					ReplaceFrame(hold, new CRasterFrame(this, false));
-					action->Push(new CUndoFrameReplace(*this, hold, index));
+					_ReplaceFrame(index, new CRasterFrame(this, false));
+					action->Push(new CUndoFrameReplace(*this, m_frames[index], index));
 				}
 				m_proj->Undos().Push(action);
 			}
@@ -211,7 +210,7 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 		m_frames.push_back(new CRasterFrame(this, !IsKey));
 		added.push_back(m_frames.back());
 	}
-	else if (!IsKey || m_frames[Index]->State() == CFrame::Hold) // Else, if it's a hold frame
+	else if (!IsKey || !m_frames[Index]->IsKey()) // Else, if it's a hold frame
 	{
 		if (IsKey)	// Then replace with a new key frame
 			ReplaceFrame(m_frames[Index], new CRasterFrame(this));
@@ -232,7 +231,7 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 			m_frames.push_back(new CRasterFrame(this));
 			added.push_back(m_frames.back());
 		}
-		else if (m_frames[Index]->State() == CFrame::Hold) // Else if we hit a hold frame, replace it with a key
+		else if (!m_frames[Index]->IsKey()) // Else if we hit a hold frame, replace it with a key
 			AddFrame(IsKey, Index);
 
 		Project()->SetActiveFrame(Index);
@@ -258,6 +257,7 @@ CFrame * CLayer::ReplaceFrame(size_t Index, CFrame * New)
 	}
 
 	m_frames[Index] = (CRasterFrame*)New;
+	m_proj->Undos().Push(new CUndoFrameReplace(*this, old, Index));
 	CFrame::CreateEvent(CFrameEvent(New, CFrameEvent::Replace, old, Index));
 	return old;
 }
@@ -265,7 +265,7 @@ CFrame * CLayer::ReplaceFrame(size_t Index, CFrame * New)
 void CLayer::RemoveFrame(size_t Index)
 {
 	CFrame* frame = m_frames[Index];
-	if (frame->State() != CFrame::Hold && Index < m_frames.size() - 1 && m_frames[Index + 1]->State() == CFrame::Hold)
+	if (frame->IsKey() && Index < m_frames.size() - 1 && !m_frames[Index + 1]->IsKey())
 		++Index; // Delete the key's hold frame instead so all other holds keep the same key
 
 	Project()->Undos().Push(new CUndoFrame(*this, frame, false));
@@ -291,9 +291,9 @@ void CLayer::RemoveSelected()
 		if (!next)
 			break; // No valid frames selected
 
-		if (next->State() != CFrame::Hold)
+		if (next->IsKey())
 		{
-			for (auto pos = ++FramePos(next); pos != m_frames.end() && (*pos)->State() == CFrame::Hold; pos++)
+			for (auto pos = ++FramePos(next); pos != m_frames.end() && !(*pos)->IsKey(); pos++)
 			{
 				CFrame* frame = *pos;
 				
@@ -338,7 +338,7 @@ CFrame * CLayer::LastKey(size_t Index)
 		return 0;
 
 	for (auto it = m_frames.begin() + Index; it != m_frames.begin(); it--)
-		if ((*it)->State() != CFrame::Hold)
+		if ((*it)->IsKey())
 			return *it;
 	return m_frames.front();
 }
@@ -380,4 +380,20 @@ void CLayer::_RemoveFrame(size_t Index)
 	CFrame* frame = m_frames[Index];
 	SelectFrame(frame, false);
 	m_frames.erase(FramePos(Index));
+}
+
+CFrame* CLayer::_ReplaceFrame(int Index, CFrame * New)
+{
+	CFrame* old = m_frames[Index];
+
+	New->SetLayer(this);
+	if (IsFrameSelected(old))
+	{
+		SelectFrame(New, true);
+		SelectFrame(old, false);
+	}
+
+	m_frames[Index] = (CRasterFrame*)New;
+	CFrame::CreateEvent(CFrameEvent(New, CFrameEvent::Replace, old, Index));
+	return old;
 }

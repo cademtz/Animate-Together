@@ -10,9 +10,8 @@
 
 CFrame::Listeners_t CFrame::m_listeners;
 
-CFrame::CFrame(CLayer * Layer, e_type Type, e_state State)
-	: m_layer(Layer), m_type(Type), m_state(State)
-{
+CFrame::CFrame(CLayer * Layer, e_type Type, bool Hold)
+	: m_layer(Layer), m_type(Type), m_key(!Hold) {
 }
 
 CFrame * CFrame::_Parent() {

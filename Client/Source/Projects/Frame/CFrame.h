@@ -26,19 +26,13 @@ public:
 		Vector,
 		Stk
 	};
-	enum e_state
-	{
-		Empty,	// - A keyframe with no contents
-		Key,	// - A keyframe with contents
-		Hold	// - Simply holds an existing keyframe
-	};
 
 protected:
 	e_type m_type;
-	e_state m_state;
+	bool m_key;
 	CLayer* m_layer = 0;
 
-	CFrame(CLayer* Layer, e_type Type, e_state State);
+	CFrame(CLayer* Layer, e_type Type, bool Hold);
 
 	CFrame* _Parent();
 
@@ -48,14 +42,15 @@ protected:
 public:
 
 	virtual ~CFrame() { }
+	virtual bool IsEmpty() = 0;
 
-	inline e_state State() const { return m_state; }
+	inline bool IsKey() const { return m_key; }
 	inline e_type Type() const { return m_type; }
 
 	inline CLayer* Layer() { return m_layer; }
-	CProject* Project(); //{ return Layer()->Project(); }
-	void Select(bool Selected = true); //{ Layer()->SelectFrame(this); }
-	bool IsSelected(); //{ return Layer()->IsFrameSelected(this); }
+	CProject* Project();
+	void Select(bool Selected = true);
+	bool IsSelected();
 
 	// - Returns the index in the parent layer's frame list
 	size_t Index();
@@ -64,9 +59,6 @@ public:
 	// - Result may be null if the current state does not require a parent (e.g. Key, Empty)
 	template<typename T = CFrame>
 	inline T* Parent() { return (T*)_Parent(); }
-
-	// - Updates the state to Empty or Key, indicating whether it display any image
-	void SetIsEmpty(bool IsEmpty) { m_state = IsEmpty ? Empty : Key; }
 };
 
 #endif // CFrame_H

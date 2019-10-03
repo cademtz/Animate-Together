@@ -179,7 +179,7 @@ void CUndoFrame::Undo()
 
 void CUndoFrameReplace::Undo()
 {
-	m_old = m_layer.ReplaceFrame(m_index, m_old);
+	m_old = m_layer._ReplaceFrame(m_index, m_old);
 	m_undone = !m_undone;
 	CUndoStack::UndoEvent(this);
 }

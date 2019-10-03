@@ -20,11 +20,21 @@ class CRasterFrame : public CFrame
 	QPoint m_pos;
 
 public:
-	CRasterFrame(CLayer* Layer, bool IsHold = false) : CFrame(Layer, Raster, IsHold ? Hold : Empty) { }
+	CRasterFrame(CLayer* Layer, bool Hold = false) : CFrame(Layer, Raster, Hold) { }
 	CRasterFrame(CRasterFrame& Frame, CLayer* Layer) : CRasterFrame(Frame) { m_layer = Layer; }
 
-	inline QPixmap* Pixmap() { return State() == Hold ? Parent<CRasterFrame>()->Pixmap() : &m_pixmap; }
-	inline QPoint Pos() { return State() == Hold ? Parent<CRasterFrame>()->Pos() : m_pos; }
+	inline QPixmap* Pixmap() { return IsKey() ? &m_pixmap : Parent<CRasterFrame>()->Pixmap(); }
+	inline QPoint Pos() { return IsKey() ? m_pos : Parent<CRasterFrame>()->Pos(); }
+
+	// - Incorrect on raster due to good performance being near impossible in multiplayer
+	bool IsEmpty()
+	{
+		if (!IsKey())
+			return Parent()->IsEmpty();
+		if (m_pixmap.isNull())
+			return false;
+		return false;
+	}
 };
 
 
