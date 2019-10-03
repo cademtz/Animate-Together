@@ -131,12 +131,26 @@ void CFrameList::FrameEvent(CFrameEvent * Event)
 	}
 	case CFrameEvent::Remove:
 		if (auto frame = (CGraphicsFrame*)row->itemAt(Event->OldIndex()))
-			delete frame;
+		{
+			if (Event->Frame()->Layer()->Frames().size())
+				delete frame;
+			else
+				frame->setVisible(false); // To prevent the layout from automatically collapsing
+		}
 		break;
 	case CFrameEvent::Add:
 	{
 		if (!(m_rows->count() - 1))
 			break;
+		if (auto first = (CGraphicsFrame*)row->itemAt(0))
+		{
+			if (!first->isVisible())
+			{
+				first->SetFrame(Event->Frame());
+				first->setVisible(true);
+				break;
+			}
+		}
 		auto frame = new CGraphicsFrame(Event->Frame(), row);
 		if (index >= row->count())
 			row->addItem(frame);
@@ -378,7 +392,7 @@ void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
 		{
 			size_t index = proj->ActiveFrame();
 			for (auto layer : proj->Layers())
-				if (layer->Frames().size() > index)
+				if (!index || layer->Frames().size() > index)
 					layer->AddFrame(false, index);
 		}
 		proj->Undos().Compound(false);
