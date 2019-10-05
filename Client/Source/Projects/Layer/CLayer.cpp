@@ -191,30 +191,16 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 					if (index == -1)
 						break; // No more non-key frames left
 
-					//_ReplaceFrame(index, new CRasterFrame(this, false));
 					AddFrame(true, index);
-					//action->Push(new CUndoFrameReplace(*this, m_frames[index], index));
 				}
-				//m_proj->Undos().Push(action);
 				m_proj->Undos().Compound(false);
 			}
 			else
 			{
-				// Find the first frame, and use that as our index
-				size_t lastindex = UINT_MAX;
+				m_proj->Undos().Compound(true, "Add frame");
 				for (auto index : m_selectedframes)
-					if (index < lastindex)
-						lastindex = index;
-
-				std::deque<CFrame*> frames;
-				for (size_t i = 0; i < m_selectedframes.size(); i++)
-				{
-					CRasterFrame * frame = new CRasterFrame(this, true);
-					m_frames.insert(m_frames.begin() + lastindex + 1, frame);
-					frames.push_back(frame);
-					CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Add));
-				}
-				Project()->Undos().Push(new CUndoFrame(*this, frames, true));
+					AddFrame(false, index);
+				m_proj->Undos().Compound(false);
 			}
 			return;
 		}

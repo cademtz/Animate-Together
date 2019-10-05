@@ -16,20 +16,6 @@
 #include <deque>
 #include <qpixmap.h>
 
-/*constexpr const char* str_UndoType[] =
-{
-	"Null",
-	"Compound",
-	"Stroke",
-	"Erase",
-	"LayerDel",
-	"LayerAdd",
-	"LayerFill",
-	"LayerShift",
-	"FrameDel",
-	"FrameAdd"
-};*/
-
 class CUndoAction
 {
 public:

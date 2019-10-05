@@ -127,8 +127,9 @@ void CFrameList::FrameEvent(CFrameEvent * Event)
 	{
 	case CFrameEvent::Replace:
 	{
-		//if (auto frame = (CGraphicsFrame*)row->itemAt(index))
-			//frame->SetFrame(Event->Frame());
+		for (int i = -1; i <= 1; i++)
+			if (auto frame = (CGraphicsFrame*)row->itemAt(index + i))
+				frame->update();
 		break;
 	}
 	case CFrameEvent::Remove:
@@ -144,15 +145,7 @@ void CFrameList::FrameEvent(CFrameEvent * Event)
 	{
 		if (!(m_rows->count() - 1))
 			break;
-		/*if (auto first = (CGraphicsFrame*)row->itemAt(0))
-		{
-			if (!first->isVisible())
-			{
-				first->SetFrame(Event->Frame());
-				first->setVisible(true);
-				break;
-			}
-		}*/
+
 		auto frame = new CGraphicsFrame();
 		if (index >= row->count())
 			row->addItem(frame);
@@ -217,15 +210,7 @@ void CFrameList::LayerEvent(CLayerEvent * Event)
 		else
 			m_rows->insertItem(index + 1, row);
 
-		for (auto frame : Event->Layer()->Frames())
-		{
-			auto gframe = new CGraphicsFrame();
-			row->addItem(gframe);
-			scene()->addItem(gframe);
-		}
-
-		int last = Event->Project()->LastFrame()->Index();
-		for (int i = 0; i < last + PAD_FRAMES; i++) // Add frame padding
+		for (int i = 0; i < Event->Layer()->Frames().size() + PAD_FRAMES; i++)
 		{
 			auto gframe = new CGraphicsFrame();
 			row->addItem(gframe);
@@ -286,9 +271,10 @@ bool CFrameList::Scrub(QMouseEvent * Event)
 
 bool CFrameList::Select(QMouseEvent * Event)
 {
+	QPointF pos = mapToScene(Event->pos());
 	m_boxselect.setSize(QSize(
-		Event->pos().x() - m_boxselect.left(),
-		Event->pos().y() - m_boxselect.top()));
+		pos.x() - m_boxselect.left(),
+		pos.y() - m_boxselect.top()));
 
 	if (Event->type() == QEvent::MouseButtonRelease && m_selecting)
 	{
@@ -303,7 +289,7 @@ bool CFrameList::Select(QMouseEvent * Event)
 		{
 			while (p.x() <= end.x())
 			{
-				QGraphicsItem* item = itemAt(p);
+				QGraphicsItem* item = scene()->itemAt(p, transform());
 				if (item && item->type() == (int)e_graphicstype::Frame)
 				{
 					CGraphicsFrame* frame = (CGraphicsFrame*)item;
@@ -323,15 +309,15 @@ bool CFrameList::Select(QMouseEvent * Event)
 			for (auto layer : proj->Layers())
 				layer->ClearSelected();
 
-		if (!m_widget->rect().contains(Event->pos()))
+		/*if (!m_widget->rect().contains(pos))
 		{
 			update();
 			return false;
-		}
+		}*/
 
 		m_selecting = true;
 
-		m_boxselect.setTopLeft(Event->pos());
+		m_boxselect.setTopLeft(pos.toPoint());
 		m_boxselect.setSize(QSize());
 		m_boxoverlay->setRect(m_boxselect);
 		scene()->addItem(m_boxoverlay);
@@ -344,10 +330,8 @@ bool CFrameList::Select(QMouseEvent * Event)
 		_rect.setHeight(1);
 	if (!_rect.width())
 		_rect.setWidth(1);
-	QRectF rect = mapToScene(_rect).boundingRect();
+	QRectF rect = _rect;
 
-	if (rect.right() > m_widget->geometry().right())
-		rect.setRight(m_widget->geometry().right());
 	if (rect.top() < m_widget->geometry().top())
 		rect.setTop(m_widget->geometry().top());
 	if (rect.left() < m_widget->geometry().left())
@@ -382,29 +366,23 @@ void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
 	case Qt::Key_F6:
 	case Qt::Key_F5:
 	{
+		proj->Undos().Compound(true, "Frame add");
 		bool selection = false;
 		for (auto layer : proj->Layers())
 		{
 			if (layer->SelectedFrames().size())
 			{
 				selection = true;
-				break;
+				layer->AddFrame(false);
 			}
 		}
-
-		proj->Undos().Compound(true, "Frame add");
 		if (selection)
-		{
-			if (CLayer* layer = proj->ActiveLayer())
-				layer->AddFrame(false);
-		}
-		else
-		{
-			size_t index = proj->ActiveFrame();
-			for (auto layer : proj->Layers())
-				if (!index || layer->Frames().size() > index)
-					layer->AddFrame(false, index);
-		}
+			break;
+
+		int active = proj->ActiveFrame();
+		for (auto layer : proj->Layers())
+			if (!active || layer->Frames().size() > active)
+				layer->AddFrame(false, active);
 		proj->Undos().Compound(false);
 		break;
 	}

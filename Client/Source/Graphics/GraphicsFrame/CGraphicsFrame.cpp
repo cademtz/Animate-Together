@@ -19,7 +19,7 @@ CFrame * CGraphicsFrame::Frame()
 	if (CLayer* layer = Layer())
 	{
 		int index = Index();
-		if (index > 0 && index < layer->Frames().size())
+		if (index >= 0 && index < layer->Frames().size())
 			return layer->Frames()[index];
 	}
 	return 0;
@@ -27,7 +27,8 @@ CFrame * CGraphicsFrame::Frame()
 
 void CGraphicsFrame::SelectFrame(bool Select)
 {
-	Layer()->SelectFrame(Index(), Select);
+	if (CLayer* layer = Layer())
+		layer->SelectFrame(Index(), Select);
 	update();
 }
 
@@ -37,26 +38,31 @@ void CGraphicsFrame::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 	CFrame* frame = Frame();
 	if (!frame)
 	{
+		if (IsSelected())
+			painter->fillRect(m_rect, QColor(64, 128, 255));
+
 		painter->setPen(QPen(QColor(64, 64, 64), 2));
-		painter->drawRect(m_rect);
+		painter->drawRect(QRectF(m_rect.topLeft(), m_rect.size() + QSize(0, -1)));
 		return;
 	}
 
-	// lol
 	bool filled = !frame->IsEmpty(), left = Connected(Qt::LeftEdge), right = Connected(Qt::RightEdge);
 	painter->fillRect(m_rect, filled ? QColor(100, 100, 100) : QColor(75, 75, 75));
 	
 	if (filled)
 	{
 		QRectF area(m_rect.topLeft(), m_rect.size() - QSize(2, 2));
+
 		painter->setPen(QPen(QColor(117, 117, 117)));
 		painter->drawLine(area.topLeft(), area.topRight());
-		painter->drawLine(area.bottomLeft(), area.bottomRight());
-
 		if (!left)
 			painter->drawLine(area.topLeft(), area.bottomLeft());
+
+		painter->setPen(QPen(QColor(108, 108, 108)));
 		if (!right)
 			painter->drawLine(area.topRight(), area.bottomRight());
+		painter->drawLine(area.bottomLeft(), area.bottomRight());
+
 	}
 
 	painter->setPen(Qt::black);
@@ -170,11 +176,12 @@ CLayer * CGraphicsFrame::Layer()
 	if (!l_layer)
 		return 0;
 
-	auto l_layerlist = (QGraphicsLinearLayout)l_layer->parentLayoutItem();
+	auto l_layerlist = (QGraphicsLinearLayout*)l_layer->parentLayoutItem();
 
-	for (int i = 0; i < l_layerlist.count(); i++)
-		if (l_layerlist.itemAt(i) == l_layer)
-			return proj->Layers()[i + 1]; // + 1 hardcoded for now because of terrible layout decisions
+	int count = l_layerlist->count();
+	for (int i = 1; i < count; i++)
+		if (l_layerlist->itemAt(i) == l_layer)
+			return proj->Layers()[i - 1]; // - 1 hardcoded for now because of terrible layout decisions
 
 	return 0;
 }
