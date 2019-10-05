@@ -62,6 +62,14 @@ bool CLayer::IsFrameSelected(CFrame * Frame)
 	return false;
 }
 
+bool CLayer::IsFrameSelected(int Index)
+{
+	for (auto index : m_selectedframes)
+		if (index == Index)
+			return true;
+	return false;
+}
+
 bool CLayer::HasFrame(CFrame * Frame)
 {
 	for (auto frame : m_frames)
@@ -85,6 +93,27 @@ bool CLayer::SelectFrame(CFrame * Frame, bool Selected)
 		for (auto it = m_selectedframes.begin(); it != m_selectedframes.end(); it++)
 		{
 			if (*it == index)
+			{
+				m_selectedframes.erase(it);
+				break;
+			}
+		}
+	}
+	LayerEvent(CLayerEvent::Selection);
+	return result;
+}
+
+bool CLayer::SelectFrame(int Index, bool Selected)
+{
+	bool result = IsFrameSelected(Index);
+
+	if (Selected && !result)
+		m_selectedframes.push_back(Index);
+	else
+	{
+		for (auto it = m_selectedframes.begin(); it != m_selectedframes.end(); it++)
+		{
+			if (*it == Index)
 			{
 				m_selectedframes.erase(it);
 				break;
@@ -146,26 +175,28 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 		{
 			if (IsKey)
 			{
-				CCompoundAction* action = new CCompoundAction("Keyframe fill");
-				// Temporary solution. TO DO: Use index list instead of pointers for m_selectedframes
+				//CCompoundAction* action = new CCompoundAction("Keyframe fill");
+				m_proj->Undos().Compound(true, "Keyframe fill");
 				while (true)
 				{
 					int index = -1;
 					for (auto i : m_selectedframes)
 					{
-						if (i < m_frames.size() && !m_frames[i]->IsKey())
+						if (i >= m_frames.size() || !m_frames[i]->IsKey())
 						{
 							index = i;
 							break;
 						}
 					}
 					if (index == -1)
-						break; // No more hold frames left
+						break; // No more non-key frames left
 
-					_ReplaceFrame(index, new CRasterFrame(this, false));
-					action->Push(new CUndoFrameReplace(*this, m_frames[index], index));
+					//_ReplaceFrame(index, new CRasterFrame(this, false));
+					AddFrame(true, index);
+					//action->Push(new CUndoFrameReplace(*this, m_frames[index], index));
 				}
-				m_proj->Undos().Push(action);
+				//m_proj->Undos().Push(action);
+				m_proj->Undos().Compound(false);
 			}
 			else
 			{

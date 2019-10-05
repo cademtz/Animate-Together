@@ -18,6 +18,8 @@
 #include "Graphics/GraphicsFrame/CGraphicsFrame.h"
 #include "Graphics/GraphicsScrubBar/CGraphicsScrubBar.h"
 
+#define PAD_FRAMES 100
+
 CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 {
 	setContentsMargins(0, 0, 0, 0);
@@ -67,9 +69,9 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 
 void CFrameList::UpdateScrub()
 {
-	m_rows->updateGeometry();
 	if (m_scrubbar)
-		m_scrubbar->SetWidth(m_rows->contentsRect().width());
+		if (CProject* proj = CProject::ActiveProject())
+			m_scrubbar->SetWidth((proj->LastFrame()->Index() + 1) * 8);
 	if (m_playline && m_playhead)
 	{
 		m_playline->setLine(
@@ -125,8 +127,8 @@ void CFrameList::FrameEvent(CFrameEvent * Event)
 	{
 	case CFrameEvent::Replace:
 	{
-		if (auto frame = (CGraphicsFrame*)row->itemAt(index))
-			frame->SetFrame(Event->Frame());
+		//if (auto frame = (CGraphicsFrame*)row->itemAt(index))
+			//frame->SetFrame(Event->Frame());
 		break;
 	}
 	case CFrameEvent::Remove:
@@ -142,7 +144,7 @@ void CFrameList::FrameEvent(CFrameEvent * Event)
 	{
 		if (!(m_rows->count() - 1))
 			break;
-		if (auto first = (CGraphicsFrame*)row->itemAt(0))
+		/*if (auto first = (CGraphicsFrame*)row->itemAt(0))
 		{
 			if (!first->isVisible())
 			{
@@ -150,8 +152,8 @@ void CFrameList::FrameEvent(CFrameEvent * Event)
 				first->setVisible(true);
 				break;
 			}
-		}
-		auto frame = new CGraphicsFrame(Event->Frame(), row);
+		}*/
+		auto frame = new CGraphicsFrame();
 		if (index >= row->count())
 			row->addItem(frame);
 		else
@@ -217,7 +219,15 @@ void CFrameList::LayerEvent(CLayerEvent * Event)
 
 		for (auto frame : Event->Layer()->Frames())
 		{
-			auto gframe = new CGraphicsFrame(frame, row);
+			auto gframe = new CGraphicsFrame();
+			row->addItem(gframe);
+			scene()->addItem(gframe);
+		}
+
+		int last = Event->Project()->LastFrame()->Index();
+		for (int i = 0; i < last + PAD_FRAMES; i++) // Add frame padding
+		{
+			auto gframe = new CGraphicsFrame();
 			row->addItem(gframe);
 			scene()->addItem(gframe);
 		}

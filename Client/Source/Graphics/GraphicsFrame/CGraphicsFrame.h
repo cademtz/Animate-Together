@@ -18,15 +18,10 @@
 
 class CGraphicsFrame : public QGraphicsLayoutItem, public QGraphicsItem
 {
-	CFrame* m_frame;
-
 public:
 	static const QRectF m_rect;
 
-	CGraphicsFrame(CFrame* Frame, QGraphicsLayoutItem* Parent = 0) : QGraphicsLayoutItem(Parent), m_frame(Frame) { }
-
-	inline CFrame* Frame() const { return m_frame; }
-	void SetFrame(CFrame* Frame);
+	CFrame* Frame();
 
 	void SelectFrame(bool Select = true);
 
@@ -40,6 +35,10 @@ public:
 private:
 	// - Returns when to display a connection to the right and / or left frame
 	bool Connected(Qt::Edge Edge);
+	bool IsSelected();
+
+	CLayer* Layer();
+	int Index();
 };
 
 #endif // CGraphicsFrame_H

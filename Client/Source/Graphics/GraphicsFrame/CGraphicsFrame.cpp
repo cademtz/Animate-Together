@@ -9,28 +9,33 @@
 #include <qmenu.h>
 #include <qpainter.h>
 #include <qgraphicssceneevent.h>
+#include <qgraphicslinearlayout.h>
 #include "Projects/CProject.h"
 
 const QRectF CGraphicsFrame::m_rect = QRectF(0, 0, 8, 18);
 
-void CGraphicsFrame::SetFrame(CFrame * Frame)
+CFrame * CGraphicsFrame::Frame()
 {
-	if (Frame == m_frame)
-		return;
-	m_frame = Frame;
-	update();
+	if (CLayer* layer = Layer())
+	{
+		int index = Index();
+		if (index > 0 && index < layer->Frames().size())
+			return layer->Frames()[index];
+	}
+	return 0;
 }
 
 void CGraphicsFrame::SelectFrame(bool Select)
 {
-	Frame()->Layer()->SelectFrame(Frame(), Select);
+	Layer()->SelectFrame(Index(), Select);
 	update();
 }
 
 void CGraphicsFrame::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
 	painter->setClipRect(m_rect);
-	if (!m_frame)
+	CFrame* frame = Frame();
+	if (!frame)
 	{
 		painter->setPen(QPen(QColor(64, 64, 64), 2));
 		painter->drawRect(m_rect);
@@ -38,7 +43,7 @@ void CGraphicsFrame::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 	}
 
 	// lol
-	bool filled = !m_frame->IsEmpty(), left = Connected(Qt::LeftEdge), right = Connected(Qt::RightEdge);
+	bool filled = !frame->IsEmpty(), left = Connected(Qt::LeftEdge), right = Connected(Qt::RightEdge);
 	painter->fillRect(m_rect, filled ? QColor(100, 100, 100) : QColor(75, 75, 75));
 	
 	if (filled)
@@ -56,7 +61,7 @@ void CGraphicsFrame::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 
 	painter->setPen(Qt::black);
 
-	if (m_frame->IsKey())
+	if (frame->IsKey())
 	{
 		painter->setBrush(filled ? Qt::black : Qt::transparent);
 		painter->drawEllipse(m_rect.x() + 1, m_rect.y() + 9, 4, 4);
@@ -78,7 +83,7 @@ void CGraphicsFrame::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
 	painter->setClipRect(m_rect);
 	painter->drawLine(area.bottomLeft(), area.bottomRight());
 
-	if (m_frame->IsSelected())
+	if (IsSelected())
 		painter->fillRect(m_rect, QColor(64, 128, 255, 128));
 }
 
@@ -105,15 +110,19 @@ void CGraphicsFrame::setGeometry(const QRectF & geom)
 
 void CGraphicsFrame::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
+	if (!parentLayoutItem())
+		return;
+
 	QMenu menu;
 	QAction* del = menu.addAction("Delete");//, * copy = menu.addAction("Copy"), * paste = menu.addAction("Paste");
 
-	if (Frame())
+	CFrame* frame = Frame();
+	if (frame)
 	{
-		if (!Frame()->IsSelected())
+		if (!frame->IsSelected())
 		{
-			Frame()->Project()->DeselectFrames();
-			Frame()->Select();
+			frame->Project()->DeselectFrames();
+			frame->Select();
 		}
 	}
 	else
@@ -125,20 +134,65 @@ void CGraphicsFrame::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 
 	QAction *action = menu.exec(event->screenPos());
 	if (action == del)
-		Frame()->Project()->RemoveSelectedFrames();
+		frame->Layer()->Project()->RemoveSelectedFrames();
 }
 
 bool CGraphicsFrame::Connected(Qt::Edge Edge)
 {
-	if (!m_frame)
+	CFrame* frame = Frame();
+	if (!frame)
 		return false;
 	else if (Edge == Qt::LeftEdge)
-		return !m_frame->IsKey();
+		return !frame->IsKey();
 
-	auto& frames = m_frame->Layer()->Frames();
-	int index = m_frame->Index();
+	auto& frames = frame->Layer()->Frames();
+	int index = frame->Index();
 	if (index + 1 < frames.size() && !frames[index + 1]->IsKey())
 		return true;
 
 	return false;
+}
+
+bool CGraphicsFrame::IsSelected()
+{
+	if (CLayer* layer = Layer())
+		return layer->IsFrameSelected(Index());
+	return false;
+}
+
+CLayer * CGraphicsFrame::Layer()
+{
+	CProject* proj;
+	if (!(proj = CProject::ActiveProject()))
+		return 0;
+
+	auto l_layer = (QGraphicsLinearLayout*)parentLayoutItem();
+	if (!l_layer)
+		return 0;
+
+	auto l_layerlist = (QGraphicsLinearLayout)l_layer->parentLayoutItem();
+
+	for (int i = 0; i < l_layerlist.count(); i++)
+		if (l_layerlist.itemAt(i) == l_layer)
+			return proj->Layers()[i + 1]; // + 1 hardcoded for now because of terrible layout decisions
+
+	return 0;
+}
+
+int CGraphicsFrame::Index()
+{
+	CProject* proj;
+	if (!(proj = CProject::ActiveProject()))
+		return 0;
+
+	auto l_layer = (QGraphicsLinearLayout*)parentLayoutItem();
+	if (!l_layer)
+		return 0;
+
+	for (int i = 0; i < l_layer->count(); i++)
+	{
+		if (l_layer->itemAt(i) == this)
+			return i;
+	}
+	return -1;
 }

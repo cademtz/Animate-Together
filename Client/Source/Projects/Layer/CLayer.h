@@ -77,11 +77,13 @@ public:
 	inline const std::deque<int>& SelectedFrames() { return m_selectedframes; }
 
 	bool IsFrameSelected(CFrame* Frame);
+	bool IsFrameSelected(int Index);
 	bool HasFrame(CFrame* Frame);
 
 	// - Adds or removes a frame from the selected list
 	// - Returns the frame's previous selection state
 	bool SelectFrame(CFrame* Frame, bool Selected = true);
+	bool SelectFrame(int Index, bool Selected = true);
 	void ClearSelected();
 
 	// - Gets the active frame
