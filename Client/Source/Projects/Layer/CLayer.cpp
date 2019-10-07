@@ -57,7 +57,7 @@ size_t CLayer::Index() {
 bool CLayer::IsFrameSelected(CFrame * Frame)
 {
 	for (auto index : m_selectedframes)
-		if (m_frames[index] == Frame)
+		if (index < m_frames.size() && m_frames[index] == Frame)
 			return true;
 	return false;
 }
@@ -298,7 +298,7 @@ void CLayer::RemoveSelected()
 		int index = -1;
 		for (auto i : m_selectedframes)
 		{
-			if (i <= m_frames.size() - 1)
+			if (i < m_frames.size())
 			{
 				next = m_frames[i], index = i;
 				break;
@@ -335,7 +335,7 @@ void CLayer::RemoveSelected()
 	Project()->Undos().Push(new CUndoFrame(*this, frames, false));
 	for (auto frame : frames)
 	{
-		size_t index = IndexOf(frame);
+		int index = IndexOf(frame);
 		_RemoveFrame(frame);
 		CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Remove, 0, index));
 	}
