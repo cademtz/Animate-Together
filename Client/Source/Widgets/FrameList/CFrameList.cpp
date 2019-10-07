@@ -242,7 +242,7 @@ bool CFrameList::Scrub(QMouseEvent * Event)
 	switch (Event->type())
 	{
 	case QEvent::MouseButtonPress:
-		if (m_scrubbar->boundingRect().contains(p)) // itemAt fails at weird times, so we just check if it's within our scrub bar
+		if (p.y() >= m_scrubbar->y() && p.y() <= m_scrubbar->boundingRect().bottom())
 			drag = true;
 		break;
 	case QEvent::MouseButtonRelease:
@@ -252,6 +252,14 @@ bool CFrameList::Scrub(QMouseEvent * Event)
 
 	if (drag)
 	{
+		if (p.x() > m_scrubbar->boundingRect().right()) // Clamp to last frame
+		{
+			int index = proj->LastFrame()->Index();
+			if (index != proj->ActiveFrame())
+				proj->SetActiveFrame(index);
+			return true;
+		}
+
 		QPoint newpos((p.x() / 8) * 8, m_playhead->y());
 		if (newpos.x() < 0)
 			newpos.setX(0);
@@ -308,12 +316,6 @@ bool CFrameList::Select(QMouseEvent * Event)
 		if (CProject* proj = CProject::ActiveProject())
 			for (auto layer : proj->Layers())
 				layer->ClearSelected();
-
-		/*if (!m_widget->rect().contains(pos))
-		{
-			update();
-			return false;
-		}*/
 
 		m_selecting = true;
 
