@@ -13,12 +13,12 @@
 
 CLayer::Listeners_t CLayer::m_listeners;
 
-CLayer::CLayer(CProject* Parent, const std::string & Name, QSize Dimensions, bool Private, bool Visible)
-	: m_proj(Parent), m_name(Name), m_dimensions(Dimensions), m_private(Private), m_visible(Visible)
+CLayer::CLayer(CProject* Parent, const std::string & Name, int Frames, bool Private, bool Visible)
+	: m_proj(Parent), m_name(Name), m_dimensions(Parent->Dimensions()), m_private(Private), m_visible(Visible)
 {
-	m_frames.push_back(new CRasterFrame(this)); // Initialize frames internally, no events
-	for (size_t i = 1; i <= m_proj->ActiveFrame(); i++)
-		m_frames.push_back(new CRasterFrame(this, m_frames.front()));
+	int end = Frames == -1 ? m_proj->ActiveFrame() : Frames;
+	for (size_t i = 0; i <= end; i++)
+		m_frames.push_back(new CRasterFrame(this, m_frames.size()));
 }
 
 CLayer::CLayer(const CLayer & Layer, CProject * Project) : CLayer(Layer)
@@ -175,7 +175,6 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 		{
 			if (IsKey)
 			{
-				//CCompoundAction* action = new CCompoundAction("Keyframe fill");
 				m_proj->Undos().Compound(true, "Keyframe fill");
 				while (true)
 				{

@@ -38,6 +38,8 @@ void CProject::SetActiveProject(CProject * Project)
 
 void CProject::SetFramerate(size_t Framerate)
 {
+	if (Framerate == m_framerate)
+		return;
 	m_framerate = Framerate;
 	m_timer->setInterval(round(1000.f / Framerate));
 	CreateEvent(CProjectEvent(this, CProjectEvent::Framerate));
@@ -45,6 +47,8 @@ void CProject::SetFramerate(size_t Framerate)
 
 void CProject::SetActiveFrame(size_t Frame)
 {
+	if (m_activeframe == Frame)
+		return;
 	m_activeframe = Frame;
 	CreateEvent(CProjectEvent(this, CProjectEvent::ActiveFrame));
 }
@@ -117,7 +121,7 @@ CLayer * CProject::AddLayer(const std::string & Name, bool Private, bool Visible
 		return 0;
 
 	auto pos = ActivePos();
-	CLayer* layer = new CLayer(this, Name, m_dimensions, Private, Visible);
+	CLayer* layer = new CLayer(this, Name, -1, Private, Visible);
 	pos = m_layers.insert(pos, layer);
 	m_undo.Push(new CUndoLayerAdd(*this, layer, pos - m_layers.begin()));
 	layer->LayerEvent(CLayerEvent::Add);
@@ -129,7 +133,7 @@ CLayer * CProject::InsertLayer(size_t Index, const std::string & Name, bool Priv
 {
 	if (m_layers.size() >= MAX_LAYERS)
 		return 0;
-	CLayer* layer = *m_layers.insert(m_layers.begin() + Index, new CLayer(this, Name, Dimensions(), Private, Visible));
+	CLayer* layer = *m_layers.insert(m_layers.begin() + Index, new CLayer(this, Name, -1, Private, Visible));
 	layer->LayerEvent(CLayerEvent::Add);
 	SetActiveLayer(layer);
 	return layer;
@@ -209,16 +213,48 @@ void CProject::Export(bool SingleFrame, bool Flatten)
 	size_t start = SingleFrame ? ActiveFrame() : 0, end = SingleFrame ? ActiveFrame() : LastFrame()->Index();
 	for (size_t i = start; i <= end; i++)
 	{
-		std::string prefix = Name() + '_', suffix = std::to_string(i) + ".png";
+		std::string prefix = '_' + Name() + '_', suffix = std::to_string(i) + ".png";
 		if (Flatten)
 			Preview(i).save(dir + QString::fromStdString(prefix + suffix), "png");
 		else
 		{
-			for (auto layer : Layers())
-				if (layer->IsVisible() && layer->Pixmap())
-					layer->Pixmap()->save(dir + QString::fromStdString(prefix + layer->Name() + '_' + suffix), "png");
+			for (int l = 0; l < m_layers.size(); l++)
+				if (m_layers[l]->IsVisible() && m_layers[l]->Pixmap(i))
+					m_layers[l]->Pixmap(i)->save(dir + QString::fromStdString('L' + std::to_string(l) + prefix + m_layers[l]->Name() + '_' + suffix), "png");
 		}
 	}
+}
+
+void CProject::ImportSequence(int Start)
+{
+	QFileDialog dlg(0, "Select frame sequence");
+	dlg.setFileMode(QFileDialog::FileMode::ExistingFiles);
+	dlg.setAcceptMode(QFileDialog::AcceptOpen);
+	dlg.setNameFilters({
+		"Portable Network Graphics (*.png)",
+		"Joint Photographic Experts Group (*.jpg)",
+		"Tagged Image File Format (*.tiff)",
+		"Windows Bitmap	(*.bmp)" });
+
+	if (!dlg.exec() || dlg.selectedFiles().length() < 1)
+		return;
+
+	dlg.selectedFiles().sort();
+	QString front = dlg.selectedFiles().front();
+	int start = front.lastIndexOf('/') + 1, end = front.lastIndexOf('.');
+	QStringRef name(&front, start, end - start);
+
+	CLayer* layer = new CLayer(this, name.toString().toStdString(), 0);
+	m_layers.push_front(layer);
+	m_undo.Push(new CUndoLayerAdd(*this, layer, IndexOf(layer)));
+	for (int i = 0; i < dlg.selectedFiles().length(); i++)
+	{
+		layer->AddFrame(true, Start + i);
+		QPixmap* pix = layer->Pixmap(layer->Frames().size() - 1);
+		QPainter paint(pix);
+		paint.drawImage(QPointF(0, 0), QImage(dlg.selectedFiles()[i]));
+	}
+	CLayer::CreateEvent(CLayerEvent(layer, CLayerEvent::Add));
 }
 
 QImage CProject::Preview(size_t Frame)
@@ -247,6 +283,17 @@ CFrame * CProject::LastFrame()
 			greatest = layer;
 	}
 	return greatest->LastFrame();
+}
+
+int CProject::EndFrame()
+{
+	int greatest = 0;
+	for (auto layer : Layers())
+	{
+		if (layer->Frames().size() > greatest)
+			greatest = layer->Frames().size() - 1;
+	}
+	return greatest;
 }
 
 void CProject::TimerEvent()

@@ -89,6 +89,12 @@
     <ClCompile Include="Source\Interface\Prefs\CPrefs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Projects\Frame\CRasterFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Interface\Import\CImport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -140,6 +146,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Source\Interface\Prefs\UI\Prefs.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Source\Interface\Import\UI\Import.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
@@ -246,6 +255,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="Source\Interface\Prefs\CPrefs.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Source\Interface\Import\CImport.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

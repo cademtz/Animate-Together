@@ -21,6 +21,15 @@ class QGraphicsLinearLayout;
 
 class CFrameList : public QGraphicsView
 {
+public:
+	CFrameList(QWidget* Parent = nullptr);
+
+protected:
+	void mousePressEvent(QMouseEvent* Event) { MouseEvent(Event); }
+	void mouseReleaseEvent(QMouseEvent* Event) { MouseEvent(Event); }
+	void mouseMoveEvent(QMouseEvent* Event) { MouseEvent(Event); }
+
+private:
 	bool m_selecting = false;
 	QRect m_boxselect;
 
@@ -42,16 +51,7 @@ class CFrameList : public QGraphicsView
 
 	// - Returns true when frame selection is being handled
 	bool Select(QMouseEvent* Event);
-
 	void ShortcutEvent(const QShortcut* Shortcut);
-
-protected:
-	void mousePressEvent(QMouseEvent* Event)	{ MouseEvent(Event); }
-	void mouseReleaseEvent(QMouseEvent* Event)	{ MouseEvent(Event); }
-	void mouseMoveEvent(QMouseEvent* Event)		{ MouseEvent(Event); }
-
-public:
-	CFrameList(QWidget* Parent = nullptr);
 };
 
 #endif // CFrameList_H

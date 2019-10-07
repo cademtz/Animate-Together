@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Import</class>
+ <widget class="QWidget" name="Import">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>291</width>
+    <height>141</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Import frames</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#Import {
+	background-color: rgb(40, 40, 40);
+}
+QLabel {
+	color: rgb(225, 225, 225);
+	font: 12px &quot;Verdana&quot;;
+}
+QCheckBox, QRadioButton {
+	color: rgb(225, 225, 225);
+	background-color: rgb(40, 40, 40);
+	font: bold 11px &quot;Tahoma&quot;;
+}
+QPushButton, QLineEdit, QSpinBox {
+	border: none;
+	background-color: rgb(30, 30, 30);
+	color: rgb(200, 200, 200);
+}
+QPushButton:hover, QLineEdit:focus, QSpinBox:focus {
+	border-color: rgb(0, 128, 255);
+	color: rgb(255, 255, 255);
+}
+QPushButton:hover:pressed {
+	background-color: rgb(25, 25, 25);
+}
+QComboBox {
+	border: 1px solid #4B4B4B;
+	background-color: #2C2C2C;
+	color: #C8C8C8;
+}
+QComboBox:item {
+	background-color: #1B1B1B;
+}
+QComboBox:item:selected {
+	background-color: #0080FF;
+}</string>
+  </property>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>71</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Import at:</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spin_frame">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>80</y>
+     <width>61</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>999999999</number>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_ok">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>110</y>
+     <width>91</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>75</width>
+     <height>23</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(0, 128, 255);
+color: rgb(225, 225, 225);</string>
+   </property>
+   <property name="text">
+    <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_cancel">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>110</y>
+     <width>91</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>75</width>
+     <height>23</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>80</y>
+     <width>51</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Frame</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>10</y>
+     <width>77</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QRadioButton" name="r_start">
+      <property name="text">
+       <string>Start</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="r_current">
+      <property name="text">
+       <string>Current</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="r_end">
+      <property name="text">
+       <string>End</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="r_custom">
+      <property name="text">
+       <string>Custom...</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

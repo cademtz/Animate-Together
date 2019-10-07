@@ -39,7 +39,7 @@ private:
 	bool m_visible = true, m_private = false;
 
 public:
-	CLayer(CProject* Parent, const std::string& Name, QSize Dimensions, bool Private = false, bool Visible = true);
+	CLayer(CProject* Parent, const std::string& Name, int Frames = -1, bool Private = false, bool Visible = true);
 	CLayer(const CLayer& Layer, CProject* Project);
 	~CLayer();
 

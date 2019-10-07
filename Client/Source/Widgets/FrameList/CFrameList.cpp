@@ -71,7 +71,7 @@ void CFrameList::UpdateScrub()
 {
 	if (m_scrubbar)
 		if (CProject* proj = CProject::ActiveProject())
-			m_scrubbar->SetWidth((proj->LastFrame()->Index() + 1) * 8);
+			m_scrubbar->SetWidth((proj->EndFrame() + 1) * 8);
 	if (m_playline && m_playhead)
 	{
 		m_playline->setLine(
@@ -247,11 +247,14 @@ bool CFrameList::Scrub(QMouseEvent * Event)
 		break;
 	case QEvent::MouseButtonRelease:
 		drag = false;
+		update();
 		break;
 	}
 
 	if (drag)
 	{
+		proj->DeselectFrames();
+
 		if (p.x() > m_scrubbar->boundingRect().right()) // Clamp to last frame
 		{
 			int index = proj->LastFrame()->Index();

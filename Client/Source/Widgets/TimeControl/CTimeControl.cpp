@@ -40,13 +40,14 @@ CTimeControl::CTimeControl(QWidget * Parent) : QWidget(Parent)
 	m_svgpause = QIcon(":/Icons/Pause.svg");
 
 	m_play = new QPushButton(this), m_bkstep = new QPushButton(this), m_fwdstep = new QPushButton(this), m_appleskin = new QPushButton(this);
-	m_fps = new QSpinBox(this);
+	m_frame = new QSpinBox(this), m_fps = new QSpinBox(this);
 
 	QSize btnsize(20, 20), iconsize = btnsize / 2;
 	m_play->setFixedSize(btnsize);
 	m_bkstep->setFixedSize(btnsize);
 	m_fwdstep->setFixedSize(btnsize);
 	m_appleskin->setFixedSize(btnsize);
+	m_frame->setFixedHeight(btnsize.height());
 	m_fps->setFixedHeight(btnsize.height());
 
 	m_play->setIcon(m_svgplay);
@@ -59,10 +60,21 @@ CTimeControl::CTimeControl(QWidget * Parent) : QWidget(Parent)
 	m_appleskin->setText("O");
 	m_appleskin->setCheckable(true);
 
+	m_frame->setMinimum(1);
+	m_frame->setMaximum(INT_MAX);
+	m_frame->setFixedWidth(50);
+	m_frame->setButtonSymbols(QSpinBox::NoButtons);
 	m_fps->setMinimum(1);
 	m_fps->setMaximum(120);
 	m_fps->setSuffix(" fps");
-	m_fps->setButtonSymbols(QSpinBox::ButtonSymbols::NoButtons);
+	m_fps->setButtonSymbols(QSpinBox::NoButtons);
+
+	m_play->setToolTip("Play");
+	m_bkstep->setToolTip("Previous frame");
+	m_fwdstep->setToolTip("Next frame");
+	m_appleskin->setToolTip("Onion skin");
+	m_frame->setToolTip("Current frame");
+	m_fps->setToolTip("Framerate");
 	
 	setStyleSheet(
 		"QPushButton {"
@@ -84,6 +96,7 @@ CTimeControl::CTimeControl(QWidget * Parent) : QWidget(Parent)
 		"}"
 		"QFrame { color: #202020; }");
 			
+	m_layout->addWidget(m_frame);
 	m_layout->addWidget(m_fps);
 	m_layout->addWidget(new CDivider(this));
 	m_layout->addWidget(m_bkstep);
@@ -106,6 +119,7 @@ CTimeControl::CTimeControl(QWidget * Parent) : QWidget(Parent)
 	connect(m_play, &QPushButton::pressed, [this] { ButtonEvent(m_play); });
 	connect(m_bkstep, &QPushButton::pressed, [this] { ButtonEvent(m_bkstep); });
 	connect(m_fwdstep, &QPushButton::pressed, [this] { ButtonEvent(m_fwdstep); });
+	connect(m_frame, QOverload<int>::of(&QSpinBox::valueChanged), [this] { ChangeFrame(); });
 	connect(m_fps, QOverload<int>::of(&QSpinBox::valueChanged), [this] { ChangeFramerate(); });
 	connect(m_appleskin, &QPushButton::toggled, [this](bool checked) { COnionSkin::Enable(checked); });
 
@@ -131,7 +145,8 @@ void CTimeControl::ButtonEvent(QPushButton * Btn)
 
 void CTimeControl::ProjectEvent(CProjectEvent * Event)
 {
-	if (!Event->Project() || Event->Project() != CProject::ActiveProject())
+	CProject* proj = CProject::ActiveProject();
+	if (!Event->Project() || Event->Project() != proj)
 		return;
 
 	switch (Event->Action())
@@ -143,14 +158,35 @@ void CTimeControl::ProjectEvent(CProjectEvent * Event)
 	case CProjectEvent::ActiveProject:
 	case CProjectEvent::Framerate:
 		m_fps->blockSignals(true);
-		m_fps->setValue(Event->Project()->Framerate());
+		m_fps->setValue(proj->Framerate());
 		m_fps->blockSignals(false);
+		break;
+	case CProjectEvent::ActiveFrame:
+		m_frame->blockSignals(true);
+		m_frame->setValue(proj->ActiveFrame() + 1);
+		m_frame->blockSignals(false);
+		break;
 	}
 }
 
 void CTimeControl::ChangeFramerate()
 {
 	if (CProject* proj = CProject::ActiveProject())
-		if (proj->Framerate() != m_fps->value())
-			proj->SetFramerate(m_fps->value());
+		proj->SetFramerate(m_fps->value());
+}
+
+void CTimeControl::ChangeFrame()
+{
+	if (CProject* proj = CProject::ActiveProject())
+	{
+		int frame = m_frame->value() - 1;
+		if (frame > proj->EndFrame())
+		{
+			frame = proj->EndFrame();
+			m_frame->blockSignals(true);
+			m_frame->setValue(frame);
+			m_frame->blockSignals(false);
+		}
+		proj->SetActiveFrame(frame);
+	}
 }

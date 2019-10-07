@@ -234,6 +234,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Interface\Import\CImport.cpp" />
     <ClCompile Include="Source\Interface\Prefs\CPrefs.cpp" />
     <ClCompile Include="Source\Interface\Export\CExport.cpp" />
     <ClCompile Include="Source\Graphics\GraphicsFrame\CGraphicsFrame.cpp">
@@ -266,6 +267,10 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
+    </ClCompile>
+    <ClCompile Include="Source\Projects\Frame\CRasterFrame.cpp">
+      <SubType>
+      </SubType>
     </ClCompile>
     <ClCompile Include="Source\Projects\OnionSkin\COnionSkin.cpp">
       <SubType>
@@ -345,6 +350,7 @@
     <QtMoc Include="Source\Interface\MainWindow\MainWindow.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtUic Include="Source\Interface\Import\UI\Import.ui" />
     <QtUic Include="Source\Interface\Prefs\UI\Prefs.ui" />
     <QtUic Include="Source\Interface\Export\UI\Export.ui" />
     <QtUic Include="Source\Interface\CreateProject\UI\CreateProject.ui" />
@@ -361,6 +367,12 @@
     <QtMoc Include="Source\Interface\CreateProject\CreateProject.h" />
     <QtMoc Include="Source\Interface\Export\CExport.h" />
     <QtMoc Include="Source\Interface\Prefs\CPrefs.h" />
+    <QtMoc Include="Source\Interface\Import\CImport.h">
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Client\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)Client\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Client\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Client\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
+    </QtMoc>
     <ClInclude Include="Source\Graphics\GraphicsFrame\CGraphicsFrame.h">
       <SubType>
       </SubType>

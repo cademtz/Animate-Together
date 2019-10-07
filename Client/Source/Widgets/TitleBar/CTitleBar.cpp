@@ -18,12 +18,18 @@
 #include "Interface/CreateProject/CreateProject.h"
 #include "Interface/MainWindow/MainWindow.h"
 #include "Interface/Export/CExport.h"
+#include "Interface/Import/CImport.h"
 #include "Projects/CProject.h"
 
 inline void ExportAs()
 {
 	if (CProject* proj = CProject::ActiveProject())
 		CExport::Open(proj);
+}
+inline void ImportSequence()
+{
+	if (CProject* proj = CProject::ActiveProject())
+		CImport::Open(proj);
 }
 
 CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
@@ -34,13 +40,14 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 	setStyleSheet(
 		"QPushButton { border: none; color: rgb(160, 160, 160); }"
 		"QPushButton:hover:!pressed { background-color: rgb(64, 64, 64); }"
-		"QPushButton:hover:pressed { background-color: rgb(20, 110, 230); }");
+		"QPushButton:hover:pressed { background-color: rgb(20, 110, 230); }"
+		"QLabel { color: rgb(150, 150, 150); }");
 
 	m_name = new QLabel("Animate Together", this);
 	m_name->setContentsMargins(9, 0, 3, 0);
-	QPalette pal = m_name->palette();
+	/*QPalette pal = m_name->palette();
 	pal.setBrush(QPalette::Foreground, QColor(150, 150, 150));
-	m_name->setPalette(pal);
+	m_name->setPalette(pal);*/
 	m_name->setFont(QFont("Tahoma", 8));
 
 	m_menubar = new QMenuBar(this);
@@ -98,10 +105,12 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 		*window = new QMenu("Window", m_menubar);
 	QAction
 		*newproj = new QAction("New", this), /**save = new QAction("Save", this),*/ *exp = new QAction("Export as..."),
+		*imp = new QAction("Import image sequence", this),
 		*undo = new QAction("Undo", this), *redo = new QAction("Redo", this), *fill = new QAction("Fill", this),
 		*history = new QAction("History", this), *layers = new QAction("Layers", this), *l_copy = new QAction("Duplicate", this);
 
 	connect(exp, &QAction::triggered, [] { ExportAs(); });
+	connect(imp, &QAction::triggered, [] { ImportSequence(); });
 	connect(fill, &QAction::triggered, [] { if (CLayer* layer = MainWindow::Get().ActiveLayer()) layer->Fill(); });
 	connect(undo, &QAction::triggered, &MainWindow::Undo);
 	connect(redo, &QAction::triggered, &MainWindow::Redo);
@@ -115,8 +124,8 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 	undo->setShortcut(Qt::CTRL + Qt::Key_Z);
 	redo->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
 
-	file->addActions({ newproj, exp });
-	file->insertSeparator(exp);
+	file->addActions({ newproj, exp, imp });
+	file->addSeparator();
 	edit->addActions({ undo, redo });
 	layer->addActions({ fill, l_copy });
 	window->addActions({ history, layers });

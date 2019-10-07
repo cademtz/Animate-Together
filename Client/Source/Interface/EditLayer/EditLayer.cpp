@@ -25,6 +25,13 @@ EditLayer::EditLayer(CProject* Project, CLayer* Layer)
 	setWindowModality(Qt::ApplicationModal);
 	setFixedSize(size());
 
+	if (Layer)
+	{
+		ui.tb_layername->setText(Layer->Name().c_str());
+		ui.cb_hidden->setChecked(!Layer->IsVisible());
+		ui.cb_private->setChecked(Layer->IsPrivate());
+	}
+
 	QShortcut* enter = new QShortcut(Qt::Key_Enter, this), *ret = new QShortcut(Qt::Key_Return, this);
 	connect(enter, &QShortcut::activated, this, &EditLayer::Confirm);
 	connect(ret, &QShortcut::activated, this, &EditLayer::Confirm);
@@ -51,6 +58,7 @@ void EditLayer::closeEvent(QCloseEvent * Event)
 	else if (m_proj->HasLayer(m_layer))
 	{
 		m_layer->SetName(ui.tb_layername->text().isEmpty() ? "Layer " + std::to_string(m_proj->IndexOf(m_layer) + 1) : ui.tb_layername->text().toStdString());
+		m_layer->SetVisible(!ui.cb_hidden->isChecked());
 		m_layer->SetPrivate(ui.cb_private->isChecked());
 		m_layer->LayerEvent(CLayerEvent::Edit);
 	}

@@ -109,6 +109,7 @@ public:
 	void Pause();
 
 	void Export(bool SingleFrame, bool Flatten);
+	void ImportSequence(int Start);
 
 	// - Returns an image of all the layers in the specified frame combined
 	// - 'Frame' defaults to active
@@ -147,6 +148,7 @@ public:
 	// - Returns the foremost frame from the end of the animation
 	// - Result will be null if no frames exist
 	CFrame* LastFrame();
+	int EndFrame();
 
 
 	// ========== Frame functions ========== //
