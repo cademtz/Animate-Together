@@ -378,7 +378,7 @@ void CCanvas::SkinTheOnion(QPainter & Paint, CLayer * Layer)
 		if (frame < 0 || !(p = Layer->Pixmap(frame)) || last == p || p == active)
 			continue;
 		last = p;
-		Paint.drawPixmap(m_scroll, *p);
+		Paint.drawPixmap(QPoint(), *p);
 	}
 	Paint.setOpacity(old);
 }
