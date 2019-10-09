@@ -7,7 +7,7 @@
 
 #include "CUndoStack.h"
 
-std::list<UndoEvent_t> CUndoStack::m_listeners;
+CUndoStack::Listeners_t CUndoStack::m_listeners;
 
 CUndoStack::~CUndoStack()
 {
@@ -87,23 +87,20 @@ void CUndoStack::Push(CUndoAction * Action)
 
 void CUndoStack::Compound(bool Enabled, const char * Disguise)
 {
-	if (m_compound)
+	if (Enabled)
 	{
-		CCompoundAction* comp = (CCompoundAction*)m_actions.front();
-		if (!comp->Actions().size()) // Enabled previously and nothing compounded
-		{
-			delete comp;
-			m_actions.pop_front();
-		}
+		if (!m_compound)
+			m_actions.push_front(new CCompoundAction(Disguise));
 	}
 
-	if (Enabled)
-		m_actions.push_front(new CCompoundAction(Disguise));
-	m_compound = Enabled;
-}
-
-void CUndoStack::UndoEvent(const CUndoAction* Undo)
-{
-	for (auto fn : m_listeners)
-		fn(Undo);
+	m_compound += Enabled ? 1 : -1;
+	if (!m_compound) // All compounding turned off
+	{
+		CCompoundAction* comp = (CCompoundAction*)m_actions.front();
+		if (!comp->Actions().size())
+		{
+			m_actions.pop_front();
+			delete comp; // Don't let empty actions float around
+		}
+	}
 }

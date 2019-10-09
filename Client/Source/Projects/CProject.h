@@ -85,7 +85,7 @@ public:
 
 	inline bool IsPlaying() const { return m_timer->isActive(); }
 
-	inline LayerList_t& Layers() { return m_layers; }
+	inline const LayerList_t& Layers() const { return m_layers; }
 
 	// - Returns a pointer to the active layer, or null if none are active
 	inline CLayer* ActiveLayer() const { return m_activelayer; }
@@ -153,15 +153,12 @@ public:
 
 	// ========== Frame functions ========== //
 
-
+	void RemoveSelectedFrames();
 	inline void DeselectFrames() {
 		for (auto layer : Layers())
 			layer->ClearSelected();
 	}
-	inline void RemoveSelectedFrames() {
-		for (auto layer : Layers())
-			layer->RemoveSelected();
-	}
+
 
 protected:
 

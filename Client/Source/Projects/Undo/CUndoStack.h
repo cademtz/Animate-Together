@@ -17,18 +17,10 @@
 #include <qpixmap.h>
 #include <functional>
 #include "CUndoAction.h"
+#include "Projects/Events/CEventHandler.h"
 
-typedef std::function<void(const CUndoAction*)> UndoEvent_t;
-
-class CUndoStack
+class CUndoStack : public CEventHandler<CUndoAction>
 {
-	// - List contains all reversible user actions
-	// - New actions appear in front
-	std::list<CUndoAction*> m_actions;
-	bool m_compound = false;
-
-	static std::list<UndoEvent_t> m_listeners;
-
 public:
 	~CUndoStack();
 
@@ -45,12 +37,11 @@ public:
 	// - Returns a list of all the actions
 	inline const std::list<CUndoAction*>& GetActions() const { return m_actions; }
 
-	// - Adds a pointer to your function to the listener list
-	// - Listeners are called on undo, redo, and action events
-	static inline void Listen(UndoEvent_t Func) { m_listeners.push_back(Func); }
+	static inline void UndoEvent(CUndoAction* Undo) { CreateEvent(*Undo); }
 
-	// - Calls all event listeners
-	static void UndoEvent(const CUndoAction* Undo);
+private:
+	std::list<CUndoAction*> m_actions;
+	int m_compound = 0;
 };
 
 #endif // CUndoStack_H

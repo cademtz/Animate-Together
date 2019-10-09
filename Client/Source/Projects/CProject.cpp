@@ -296,6 +296,14 @@ int CProject::EndFrame()
 	return greatest;
 }
 
+void CProject::RemoveSelectedFrames()
+{
+	m_undo.Compound(true, "Delete frames");
+	for (auto layer : m_layers)
+		layer->RemoveSelected();
+	m_undo.Compound(false);
+}
+
 void CProject::TimerEvent()
 {
 	// Change da world… my final message. Goodb ye.

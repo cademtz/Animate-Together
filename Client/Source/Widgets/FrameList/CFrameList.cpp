@@ -371,7 +371,7 @@ void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
 	case Qt::Key_F6:
 	case Qt::Key_F5:
 	{
-		proj->Undos().Compound(true, "Frame add");
+		proj->Undos().Compound(true, "Add frames");
 		bool selection = false;
 		for (auto layer : proj->Layers())
 		{
