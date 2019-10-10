@@ -19,8 +19,6 @@
 #include "Graphics/GraphicsScrubBar/CGraphicsScrubBar.h"
 #include "Graphics/LayerLayout/CLayerLayout.h"
 
-#define PAD_FRAMES 100
-
 CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 {
 	setContentsMargins(0, 0, 0, 0);
@@ -90,10 +88,10 @@ void CFrameList::ProjectEvent(CProjectEvent * Event)
 	case CProjectEvent::ActiveProject:
 		while (m_layers->count())
 		{
-			auto item = m_layers->Layer(m_layers->count() - 1);
-			while (item->count())
-				delete item->Frame(item->count() - 1);
-			delete item;
+			auto layer = m_layers->Layer(m_layers->count() - 1);
+			while (layer->count())
+				delete layer->Frame(layer->count() - 1);
+			delete layer;
 		}
 		m_scrubbar->SetWidth();
 
@@ -116,89 +114,12 @@ void CFrameList::ProjectEvent(CProjectEvent * Event)
 
 void CFrameList::FrameEvent(CFrameEvent * Event)
 {
-	if (Event->Frame()->Layer()->Project() != CProject::ActiveProject())
-		return;
-
-	size_t index = Event->Frame()->Index();
-	auto layer = m_layers->Layer(Event->Frame()->Layer()->Index());
-
-	switch (Event->Action())
-	{
-	case CFrameEvent::Replace:
-	{
-		for (int i = -1; i <= 1; i++)
-			if (auto frame = layer->Frame(index))
-				frame->update();
-		break;
-	}
-	case CFrameEvent::Remove:
-		if (auto frame = layer->Frame(Event->OldIndex()))
-			if (Event->Frame()->Layer()->Frames().size())
-				delete frame;
-		break;
-	case CFrameEvent::Add:
-	{
-		auto frame = new CGraphicsFrame();
-		if (index >= layer->count())
-			layer->addItem(frame);
-		else
-			layer->insertItem(index, frame);
-		scene()->addItem(frame);
-		break;
-	}
-	}
+	m_layers->HandleEvent(Event, scene());
 	UpdateScrub();
 }
-
 void CFrameList::LayerEvent(CLayerEvent * Event)
 {
-	if (!Event->Layer() || !Event->Project() ||
-		Event->Layer()->Project() != CProject::ActiveProject())
-		return;
-
-	size_t index = Event->OldIndex(), count = Event->Project()->Layers().size(), newindex = Event->Layer()->Index();
-
-	switch (Event->Action())
-	{
-	case CLayerEvent::Moved:
-	{
-		auto layer = m_layers->Layer(index);
-
-		m_layers->removeItem(layer);
-		if (newindex >= count)
-			m_layers->addItem(layer);
-		else if (newindex > index)
-			m_layers->insertItem(newindex + 1, layer);
-		else if (newindex < index)
-			m_layers->insertItem(newindex, layer);
-		break;
-	}
-	case CLayerEvent::Remove:
-	{
-		auto layer = m_layers->Layer(index);
-
-		while (layer->count())
-			delete layer->Frame(layer->count() - 1);
-		delete layer;
-		break;
-	}
-	case CLayerEvent::Add:
-		int count = m_layers->count();
-		auto layer = new CFrameLayout(m_layers);
-
-		if (index >= count)
-			m_layers->addItem(layer);
-		else
-			m_layers->insertItem(index, layer);
-
-		for (int i = 0; i < Event->Layer()->Frames().size() + PAD_FRAMES; i++)
-		{
-			auto gframe = new CGraphicsFrame();
-			layer->addItem(gframe);
-			scene()->addItem(gframe);
-		}
-		break;
-	}
+	m_layers->HandleEvent(Event, scene());
 	UpdateScrub();
 }
 

@@ -211,7 +211,10 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 	{
 		m_frames.push_back(new CRasterFrame(this)); // The first frame must always be a key frame
 		if (!Index)
-			return CFrame::CreateEvent(CFrameEvent(m_frames.front(), CFrameEvent::Add));;
+		{
+			m_proj->Undos().Push(new CUndoFrame(*this, m_frames.front(), true));
+			return CFrame::CreateEvent(CFrameEvent(m_frames.front(), CFrameEvent::Add));
+		}
 		added.push_back(m_frames.front());
 	}
 

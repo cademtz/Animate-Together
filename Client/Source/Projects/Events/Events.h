@@ -18,9 +18,9 @@ class CProject;
 class CCustomEvent
 {
 public:
-	enum class e_type
+	enum e_type
 	{
-		null = 0,
+		Null = 0,
 		PaletteEvent,
 		LayerEvent,
 		ProjectEvent,
@@ -28,7 +28,7 @@ public:
 	};
 
 protected:
-	e_type m_type = e_type::null;
+	e_type m_type;
 
 public:
 	CCustomEvent(e_type Type) : m_type(Type) { }

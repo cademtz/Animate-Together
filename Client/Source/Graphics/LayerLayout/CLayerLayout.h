@@ -15,6 +15,9 @@
 #include "Graphics/GraphicsTypes.h"
 #include "Graphics/FrameLayout/CFrameLayout.h"
 
+class CCustomEvent;
+class QGraphicsScene;
+
 class CLayerLayout : public QGraphicsLinearLayout
 {
 public:
@@ -22,8 +25,9 @@ public:
 
 	CFrameLayout* Layer(int Index) { return (CFrameLayout*)itemAt(Index); }
 	int IndexOf(CFrameLayout* Layer);
-
 	int type() { return (int)e_graphicstype::LayerLayout; }
+
+	void HandleEvent(CCustomEvent* Event, QGraphicsScene* Scene);
 };
 
 #endif // CLayerLayout_H

@@ -16,6 +16,8 @@
 #include "Graphics/GraphicsFrame/CGraphicsFrame.h"
 
 class CLayerLayout;
+class CFrameEvent;
+class QGraphicsScene;
 
 class CFrameLayout : public QGraphicsLinearLayout
 {
@@ -27,6 +29,7 @@ public:
 	int IndexOf(CGraphicsFrame* Frame);
 	int Index();
 
+	void HandleFrameEvent(CFrameEvent* Event, QGraphicsScene* Scene);
 
 	int type() { return (int)e_graphicstype::FrameLayout; }
 };
