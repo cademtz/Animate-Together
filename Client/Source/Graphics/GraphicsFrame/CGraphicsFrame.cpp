@@ -11,6 +11,7 @@
 #include <qgraphicssceneevent.h>
 #include <qgraphicslinearlayout.h>
 #include "Projects/CProject.h"
+#include "Graphics/LayerLayout/CLayerLayout.h"
 
 const QRectF CGraphicsFrame::m_rect = QRectF(0, 0, 8, 18);
 
@@ -172,16 +173,10 @@ CLayer * CGraphicsFrame::Layer()
 	if (!(proj = CProject::ActiveProject()))
 		return 0;
 
-	auto l_layer = (QGraphicsLinearLayout*)parentLayoutItem();
+	auto l_layer = Parent();
 	if (!l_layer)
 		return 0;
-
-	auto l_layerlist = (QGraphicsLinearLayout*)l_layer->parentLayoutItem();
-
-	int count = l_layerlist->count();
-	for (int i = 1; i < count; i++)
-		if (l_layerlist->itemAt(i) == l_layer)
-			return proj->Layers()[i - 1]; // - 1 hardcoded for now because of terrible layout decisions
+	return proj->Layers()[l_layer->Index()];
 
 	return 0;
 }
@@ -192,14 +187,15 @@ int CGraphicsFrame::Index()
 	if (!(proj = CProject::ActiveProject()))
 		return 0;
 
-	auto l_layer = (QGraphicsLinearLayout*)parentLayoutItem();
+	/*auto l_layer = (QGraphicsLinearLayout*)parentLayoutItem();
 	if (!l_layer)
-		return 0;
+		return 0;*/
 
-	for (int i = 0; i < l_layer->count(); i++)
+	/*for (int i = 0; i < l_layer->count(); i++)
 	{
 		if (l_layer->itemAt(i) == this)
 			return i;
 	}
-	return -1;
+	return -1;*/
+	return Parent()->IndexOf(this);
 }

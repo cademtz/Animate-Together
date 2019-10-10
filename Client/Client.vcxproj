@@ -234,6 +234,14 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Graphics\FrameLayout\CFrameLayout.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\LayerLayout\CLayerLayout.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Interface\Import\CImport.cpp" />
     <ClCompile Include="Source\Interface\Prefs\CPrefs.cpp" />
     <ClCompile Include="Source\Interface\Export\CExport.cpp" />
@@ -373,6 +381,10 @@
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Client\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Client\Source;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
     </QtMoc>
+    <ClInclude Include="Source\Graphics\FrameLayout\CFrameLayout.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Source\Graphics\GraphicsFrame\CGraphicsFrame.h">
       <SubType>
       </SubType>
@@ -382,6 +394,10 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="Source\Graphics\GraphicsTypes.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\LayerLayout\CLayerLayout.h">
       <SubType>
       </SubType>
     </ClInclude>

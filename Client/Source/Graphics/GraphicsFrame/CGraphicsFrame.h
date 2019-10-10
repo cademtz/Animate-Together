@@ -16,6 +16,8 @@
 #include <qgraphicswidget.h>
 #include "Projects/Frame/CFrame.h"
 
+class CFrameLayout;
+
 class CGraphicsFrame : public QGraphicsLayoutItem, public QGraphicsItem
 {
 public:
@@ -24,6 +26,7 @@ public:
 	CFrame* Frame();
 
 	void SelectFrame(bool Select = true);
+	inline CFrameLayout* Parent() { return (CFrameLayout*)parentLayoutItem(); }
 
 	int		type() const { return (int)e_graphicstype::Frame; }
 	void	paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

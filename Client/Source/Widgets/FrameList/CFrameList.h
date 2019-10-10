@@ -15,6 +15,7 @@
 
 class CFrameEvent;
 class CLayerEvent;
+class CLayerLayout;
 class CProjectEvent;
 class CGraphicsScrubBar;
 class QGraphicsLinearLayout;
@@ -39,6 +40,7 @@ private:
 
 	QGraphicsWidget* m_widget;
 	QGraphicsLinearLayout* m_rows;
+	CLayerLayout* m_layers;
 
 	void UpdateScrub();
 	void ProjectEvent(CProjectEvent* Event);

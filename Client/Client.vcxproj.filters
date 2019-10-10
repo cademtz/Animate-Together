@@ -95,6 +95,12 @@
     <ClCompile Include="Source\Interface\Import\CImport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Graphics\LayerLayout\CLayerLayout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\FrameLayout\CFrameLayout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -222,13 +228,19 @@
     <ClInclude Include="Source\Graphics\GraphicsScrubBar\CGraphicsScrubBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graphics\GraphicsTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Widgets\TimeControl\CTimeControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Projects\OnionSkin\COnionSkin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\FrameLayout\CFrameLayout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\LayerLayout\CLayerLayout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\GraphicsTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

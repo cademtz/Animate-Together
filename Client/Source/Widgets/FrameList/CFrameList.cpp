@@ -17,6 +17,7 @@
 #include "Projects/Events/Events.h"
 #include "Graphics/GraphicsFrame/CGraphicsFrame.h"
 #include "Graphics/GraphicsScrubBar/CGraphicsScrubBar.h"
+#include "Graphics/LayerLayout/CLayerLayout.h"
 
 #define PAD_FRAMES 100
 
@@ -42,6 +43,7 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 	m_scrubbar = new CGraphicsScrubBar(m_widget);
 	m_playhead = new QGraphicsRectItem(QRectF(QPointF(), CGraphicsFrame::m_rect.size() - QSize(1, 1)), m_scrubbar);
 	m_playline = new QGraphicsLineItem(m_playhead);
+	m_layers = new CLayerLayout();
 	m_boxoverlay = new QGraphicsRectItem();
 
 	m_playhead->setBrush(QColor(180, 0, 0, 128));
@@ -51,6 +53,7 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 	m_boxoverlay->setPen(QColor(0, 128, 255));
 
 	m_rows->addItem(m_scrubbar);
+	m_rows->addItem(m_layers);
 	scene()->addItem(m_scrubbar);
 	UpdateScrub();
 	centerOn(0, 0);
@@ -85,12 +88,11 @@ void CFrameList::ProjectEvent(CProjectEvent * Event)
 	switch (Event->Action())
 	{
 	case CProjectEvent::ActiveProject:
-
-		while (m_rows->count() > 1) // Don't delete first item, which is the scrub bar
+		while (m_layers->count())
 		{
-			auto item = (QGraphicsLinearLayout*)m_rows->itemAt(m_rows->count() - 1);
+			auto item = m_layers->Layer(m_layers->count() - 1);
 			while (item->count())
-				delete item->itemAt(item->count() - 1);
+				delete item->Frame(item->count() - 1);
 			delete item;
 		}
 		m_scrubbar->SetWidth();
@@ -98,7 +100,6 @@ void CFrameList::ProjectEvent(CProjectEvent * Event)
 		if (!Event->Project())
 			return;
 
-		// For now it will just send a load of Layer Add events to get them all in
 		for (auto layer : Event->Project()->Layers())
 		{
 			CLayerEvent e(layer, CLayerEvent::Add);
@@ -119,38 +120,29 @@ void CFrameList::FrameEvent(CFrameEvent * Event)
 		return;
 
 	size_t index = Event->Frame()->Index();
-	auto row = (QGraphicsLinearLayout*)m_rows->itemAt(Event->Frame()->Layer()->Index() + 1);
-	if (!row)
-		return;
+	auto layer = m_layers->Layer(Event->Frame()->Layer()->Index());
 
 	switch (Event->Action())
 	{
 	case CFrameEvent::Replace:
 	{
 		for (int i = -1; i <= 1; i++)
-			if (auto frame = (CGraphicsFrame*)row->itemAt(index + i))
+			if (auto frame = layer->Frame(index))
 				frame->update();
 		break;
 	}
 	case CFrameEvent::Remove:
-		if (auto frame = (CGraphicsFrame*)row->itemAt(Event->OldIndex()))
-		{
+		if (auto frame = layer->Frame(Event->OldIndex()))
 			if (Event->Frame()->Layer()->Frames().size())
 				delete frame;
-			else
-				frame->setVisible(false); // To prevent the layout from automatically collapsing
-		}
 		break;
 	case CFrameEvent::Add:
 	{
-		if (!(m_rows->count() - 1))
-			break;
-
 		auto frame = new CGraphicsFrame();
-		if (index >= row->count())
-			row->addItem(frame);
+		if (index >= layer->count())
+			layer->addItem(frame);
 		else
-			row->insertItem(index, frame);
+			layer->insertItem(index, frame);
 		scene()->addItem(frame);
 		break;
 	}
@@ -170,50 +162,39 @@ void CFrameList::LayerEvent(CLayerEvent * Event)
 	{
 	case CLayerEvent::Moved:
 	{
-		if (index + 1 >= m_rows->count())
-			break;
-		auto row = (QGraphicsLinearLayout*)m_rows->itemAt(index + 1);
-		if (!row)
-			break;
+		auto layer = m_layers->Layer(index);
 
-		m_rows->removeItem(row);
-		if (newindex >= count - 1)
-			m_rows->addItem(row);
+		m_layers->removeItem(layer);
+		if (newindex >= count)
+			m_layers->addItem(layer);
 		else if (newindex > index)
-			m_rows->insertItem(newindex + 2, row);
+			m_layers->insertItem(newindex + 1, layer);
 		else if (newindex < index)
-			m_rows->insertItem(newindex + 1, row);
+			m_layers->insertItem(newindex, layer);
 		break;
 	}
 	case CLayerEvent::Remove:
 	{
-		if (index + 1 >= m_rows->count())
-			break;
-		auto row = (QGraphicsLinearLayout*)m_rows->itemAt(index + 1);
-		if (!row)
-			break;
+		auto layer = m_layers->Layer(index);
 
-		while (row->count())
-			delete row->itemAt(row->count() - 1);
-		delete row;
+		while (layer->count())
+			delete layer->Frame(layer->count() - 1);
+		delete layer;
 		break;
 	}
 	case CLayerEvent::Add:
-		int count = m_rows->count();
-		auto row = new QGraphicsLinearLayout(Qt::Horizontal);
-		row->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-		row->setSpacing(0);
-		row->setContentsMargins(0, 0, 0, 0);
+		int count = m_layers->count();
+		auto layer = new CFrameLayout(m_layers);
 
-		if (index >= count - 1)
-			m_rows->addItem(row);
+		if (index >= count)
+			m_layers->addItem(layer);
 		else
-			m_rows->insertItem(index + 1, row);
+			m_layers->insertItem(index, layer);
 
 		for (int i = 0; i < Event->Layer()->Frames().size() + PAD_FRAMES; i++)
 		{
 			auto gframe = new CGraphicsFrame();
-			row->addItem(gframe);
+			layer->addItem(gframe);
 			scene()->addItem(gframe);
 		}
 		break;
@@ -381,13 +362,13 @@ void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
 				layer->AddFrame(false);
 			}
 		}
-		if (selection)
-			break;
-
-		int active = proj->ActiveFrame();
-		for (auto layer : proj->Layers())
-			if (!active || layer->Frames().size() > active)
-				layer->AddFrame(false, active);
+		if (!selection)
+		{
+			int active = proj->ActiveFrame();
+			for (auto layer : proj->Layers())
+				if (!active || layer->Frames().size() > active)
+					layer->AddFrame(false, active);
+		}
 		proj->Undos().Compound(false);
 		break;
 	}
