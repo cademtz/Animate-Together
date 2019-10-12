@@ -31,6 +31,14 @@ protected:
 	void mouseMoveEvent(QMouseEvent* Event) { MouseEvent(Event); }
 
 private:
+	enum class e_drag
+	{
+		None = 0,
+		Clicked,
+		Dragging
+	};
+
+	e_drag m_drag;
 	bool m_selecting = false;
 	QRect m_boxselect;
 
@@ -47,13 +55,12 @@ private:
 	void FrameEvent(CFrameEvent* Event);
 	void LayerEvent(CLayerEvent* Event);
 	void MouseEvent(QMouseEvent* Event);
-
-	// - Returns true when scrubbing is being handled
-	bool Scrub(QMouseEvent* Event);
-
-	// - Returns true when frame selection is being handled
-	bool Select(QMouseEvent* Event);
 	void ShortcutEvent(const QShortcut* Shortcut);
+
+	bool Scrub(QMouseEvent* Event);
+	bool Drag(QMouseEvent* Event);
+	bool Select(QMouseEvent* Event);
+
 };
 
 #endif // CFrameList_H

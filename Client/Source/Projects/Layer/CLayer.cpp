@@ -83,32 +83,32 @@ bool CLayer::SelectFrame(CFrame * Frame, bool Selected)
 	if (!HasFrame(Frame) && Selected)
 		return false; // Only prevent selection of unowned frames
 
-	bool result = IsFrameSelected(Frame);
-
-	int index = IndexOf(Frame);
-	if (Selected && !result)
-		m_selectedframes.push_back(index);
-	else
-	{
-		for (auto it = m_selectedframes.begin(); it != m_selectedframes.end(); it++)
-		{
-			if (*it == index)
-			{
-				m_selectedframes.erase(it);
-				break;
-			}
-		}
-	}
-	LayerEvent(CLayerEvent::Selection);
-	return result;
+	return SelectFrame(IndexOf(Frame), Selected);
 }
 
 bool CLayer::SelectFrame(int Index, bool Selected)
 {
 	bool result = IsFrameSelected(Index);
+	if (result == Selected)
+		return result;
 
-	if (Selected && !result)
-		m_selectedframes.push_back(Index);
+	if (Selected)
+	{
+		// Insert frame from least to greatest
+		if (m_selectedframes.size() && Index < m_selectedframes.back())
+		{
+			for (auto it = m_selectedframes.begin(); it != m_selectedframes.end(); it++)
+			{
+				if (*it > Index)
+				{
+					m_selectedframes.insert(it, Index);
+					break;
+				}
+			}
+		}
+		else
+			m_selectedframes.push_back(Index);
+	}
 	else
 	{
 		for (auto it = m_selectedframes.begin(); it != m_selectedframes.end(); it++)

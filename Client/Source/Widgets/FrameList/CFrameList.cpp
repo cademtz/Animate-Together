@@ -49,6 +49,8 @@ CFrameList::CFrameList(QWidget * Parent) : QGraphicsView(Parent)
 	m_playline->setPen(m_playhead->pen());
 	m_boxoverlay->setBrush(QColor(64, 128, 255, 128));
 	m_boxoverlay->setPen(QColor(0, 128, 255));
+	m_boxoverlay->setVisible(false);
+	scene()->addItem(m_boxoverlay);
 
 	m_rows->addItem(m_scrubbar);
 	m_rows->addItem(m_layers);
@@ -129,7 +131,49 @@ void CFrameList::MouseEvent(QMouseEvent * Event)
 		proj->Pause();
 
 	if (!Scrub(Event))
-		Select(Event);
+		//if (!Drag(Event))
+			Select(Event);
+}
+
+void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
+{
+	CProject* proj = CProject::ActiveProject();
+	if (!proj)
+		return;
+
+	QKeySequence key = Shortcut->key();
+	switch (key[0])
+	{
+	case Qt::Key_F7:
+		if (CLayer* layer = proj->ActiveLayer())
+			layer->AddFrame(true);
+		break;
+	case Qt::Key_F6:
+	case Qt::Key_F5:
+	{
+		proj->Undos().Compound(true, "Add frames");
+		bool selection = false;
+		for (auto layer : proj->Layers())
+		{
+			if (layer->SelectedFrames().size())
+			{
+				selection = true;
+				layer->AddFrame(false);
+			}
+		}
+		if (!selection)
+		{
+			int active = proj->ActiveFrame();
+			for (auto layer : proj->Layers())
+				if (!active || layer->Frames().size() > active)
+					layer->AddFrame(false, active);
+		}
+		proj->Undos().Compound(false);
+		break;
+	}
+	case Qt::Key_Delete:
+		proj->RemoveSelectedFrames();
+	}
 }
 
 bool CFrameList::Scrub(QMouseEvent * Event)
@@ -182,6 +226,63 @@ bool CFrameList::Scrub(QMouseEvent * Event)
 	return false;
 }
 
+bool CFrameList::Drag(QMouseEvent * Event)
+{
+	CProject* proj;
+	if (!(proj = CProject::ActiveProject()))
+	{
+		m_drag = e_drag::None;
+		return false;
+	}
+
+	switch (Event->type())
+	{
+	case QEvent::MouseButtonPress:
+		if (m_drag == e_drag::None)
+		{
+			if (Event->button() != Qt::LeftButton)
+				break;
+
+			QGraphicsItem* item = itemAt(Event->pos());
+			if (!item || item->type() != (int)e_graphicstype::Frame)
+				break;
+
+			if (((CGraphicsFrame*)item)->IsSelected())
+			{
+				// Check if selection is square
+				int startlayer = -1;
+				for (int l = 0; l < m_layers->count(); l++)
+				{
+					CLayer* layer = proj->Layers()[l];
+					if (startlayer == -1)
+					{
+						if (layer->SelectedFrames()[0]);
+					}
+				}
+				m_drag = e_drag::Clicked;
+				m_boxoverlay->setZValue(1);
+				m_boxoverlay->setVisible(true);
+			}
+		}
+		break;
+	case QEvent::MouseButtonRelease:
+		if (m_drag != e_drag::None)
+			m_boxoverlay->setVisible(false);
+		m_drag = e_drag::None;
+		break;
+	case QEvent::MouseMove:
+		if (m_drag == e_drag::Clicked)
+			m_drag = e_drag::Dragging;
+		if (m_drag == e_drag::Dragging)
+		{
+			
+		}
+	}
+
+
+	return m_drag == e_drag::Dragging;
+}
+
 bool CFrameList::Select(QMouseEvent * Event)
 {
 	QPointF pos = mapToScene(Event->pos());
@@ -192,7 +293,7 @@ bool CFrameList::Select(QMouseEvent * Event)
 	if (Event->type() == QEvent::MouseButtonRelease && m_selecting)
 	{
 		m_selecting = false;
-		scene()->removeItem(m_boxoverlay);
+		m_boxoverlay->setVisible(false);
 
 		QRect rect = m_boxoverlay->rect().normalized().toRect();
 		rect.moveTopLeft(rect.topLeft() + QPoint(2, 0));
@@ -216,7 +317,7 @@ bool CFrameList::Select(QMouseEvent * Event)
 
 		return false;
 	}
-	else if (Event->type() == QEvent::MouseButtonPress && Event->button() == Qt::MouseButton::LeftButton && !m_selecting)
+	else if (Event->type() == QEvent::MouseButtonPress && Event->button() == Qt::LeftButton && !m_selecting)
 	{
 		if (CProject* proj = CProject::ActiveProject())
 			for (auto layer : proj->Layers())
@@ -227,7 +328,8 @@ bool CFrameList::Select(QMouseEvent * Event)
 		m_boxselect.setTopLeft(pos.toPoint());
 		m_boxselect.setSize(QSize());
 		m_boxoverlay->setRect(m_boxselect);
-		scene()->addItem(m_boxoverlay);
+		m_boxoverlay->setZValue(1);
+		m_boxoverlay->setVisible(true);
 	}
 	else if (!m_selecting)
 		return false;
@@ -237,8 +339,8 @@ bool CFrameList::Select(QMouseEvent * Event)
 		_rect.setHeight(1);
 	if (!_rect.width())
 		_rect.setWidth(1);
-	QRectF rect = _rect;
 
+	QRectF rect = _rect;
 	if (rect.top() < m_widget->geometry().top())
 		rect.setTop(m_widget->geometry().top());
 	if (rect.left() < m_widget->geometry().left())
@@ -255,45 +357,4 @@ bool CFrameList::Select(QMouseEvent * Event)
 	m_boxoverlay->setRect(rect.normalized());
 
 	return true;
-}
-
-void CFrameList::ShortcutEvent(const QShortcut * Shortcut)
-{
-	CProject* proj = CProject::ActiveProject();
-	if (!proj)
-		return;
-
-	QKeySequence key = Shortcut->key();
-	switch (key[0])
-	{
-	case Qt::Key_F7:
-		if (CLayer* layer = proj->ActiveLayer())
-			layer->AddFrame(true);
-		break;
-	case Qt::Key_F6:
-	case Qt::Key_F5:
-	{
-		proj->Undos().Compound(true, "Add frames");
-		bool selection = false;
-		for (auto layer : proj->Layers())
-		{
-			if (layer->SelectedFrames().size())
-			{
-				selection = true;
-				layer->AddFrame(false);
-			}
-		}
-		if (!selection)
-		{
-			int active = proj->ActiveFrame();
-			for (auto layer : proj->Layers())
-				if (!active || layer->Frames().size() > active)
-					layer->AddFrame(false, active);
-		}
-		proj->Undos().Compound(false);
-		break;
-	}
-	case Qt::Key_Delete:
-		proj->RemoveSelectedFrames();
-	}
 }

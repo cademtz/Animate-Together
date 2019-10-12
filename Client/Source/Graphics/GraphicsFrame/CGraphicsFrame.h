@@ -35,13 +35,13 @@ public:
 	QRectF	boundingRect() const { return m_rect; }
 	void	contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
+	bool IsSelected();
+	CLayer* Layer();
+	int Index();
+
 private:
 	// - Returns when to display a connection to the right and / or left frame
 	bool Connected(Qt::Edge Edge);
-	bool IsSelected();
-
-	CLayer* Layer();
-	int Index();
 };
 
 #endif // CGraphicsFrame_H
