@@ -247,18 +247,31 @@ bool CFrameList::Drag(QMouseEvent * Event)
 			if (!item || item->type() != (int)e_graphicstype::Frame)
 				break;
 
-			if (((CGraphicsFrame*)item)->IsSelected())
+			auto gframe = (CGraphicsFrame*)item;
+			if (((CGraphicsFrame*)gframe)->IsSelected())
 			{
-				// Check if selection is square
-				int startlayer = -1;
-				for (int l = 0; l < m_layers->count(); l++)
+				// Get all connected selected frames
+				CLayer* startlayer = gframe->Layer(), *endlayer = startlayer;
+				int startframe = gframe->Index(), endframe = startframe;
+				for (int i = startframe; i >= 0; i--) // Find last connected frame
+				{
+					if (!startlayer->IsFrameSelected(i))
+						break;
+					startframe = i;
+				}
+				for (int i = endframe; i < startlayer->SelectedFrames().size(); i++) // Last connected frame
+				{
+					if (!startlayer->IsFrameSelected(i))
+						break;
+					endframe = i;
+				}
+
+				for (int l = startlayer->Index() - 1; l >= 0; l--) // Find last layer with same selected range
 				{
 					CLayer* layer = proj->Layers()[l];
-					if (startlayer == -1)
-					{
-						if (layer->SelectedFrames()[0]);
-					}
+
 				}
+
 				m_drag = e_drag::Clicked;
 				m_boxoverlay->setZValue(1);
 				m_boxoverlay->setVisible(true);
