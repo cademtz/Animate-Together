@@ -131,7 +131,7 @@ void CFrameList::MouseEvent(QMouseEvent * Event)
 		proj->Pause();
 
 	if (!Scrub(Event))
-		//if (!Drag(Event))
+		if (!Drag(Event))
 			Select(Event);
 }
 
@@ -248,34 +248,73 @@ bool CFrameList::Drag(QMouseEvent * Event)
 				break;
 
 			auto gframe = (CGraphicsFrame*)item;
-			if (((CGraphicsFrame*)gframe)->IsSelected())
+			if (!((CGraphicsFrame*)gframe)->IsSelected())
+				break;
+
+			m_dragpoint = gframe->pos();
+
+			// Get all connected selected frames
+			CLayer* startlayer = gframe->Layer(), *endlayer = startlayer;
+			int startframe = gframe->Index(), endframe = startframe;
+			for (int i = startframe; i >= 0; i--) // Find last connected frame
 			{
-				// Get all connected selected frames
-				CLayer* startlayer = gframe->Layer(), *endlayer = startlayer;
-				int startframe = gframe->Index(), endframe = startframe;
-				for (int i = startframe; i >= 0; i--) // Find last connected frame
-				{
-					if (!startlayer->IsFrameSelected(i))
-						break;
-					startframe = i;
-				}
-				for (int i = endframe; i < startlayer->SelectedFrames().size(); i++) // Last connected frame
-				{
-					if (!startlayer->IsFrameSelected(i))
-						break;
-					endframe = i;
-				}
-
-				for (int l = startlayer->Index() - 1; l >= 0; l--) // Find last layer with same selected range
-				{
-					CLayer* layer = proj->Layers()[l];
-
-				}
-
-				m_drag = e_drag::Clicked;
-				m_boxoverlay->setZValue(1);
-				m_boxoverlay->setVisible(true);
+				if (!startlayer->IsFrameSelected(i))
+					break;
+				startframe = i;
 			}
+			for (int i = endframe; i - endframe < startlayer->SelectedFrames().size(); i++) // Last connected frame
+			{
+				if (!startlayer->IsFrameSelected(i))
+					break;
+				endframe = i;
+			}
+
+			for (int l = startlayer->Index() - 1; l >= 0; l--) // Find first layer with same selected range
+			{
+				CLayer* layer = proj->Layers()[l];
+				bool end = false;
+				for (int f = startframe; f <= endframe; f++)
+				{
+					if (!layer->IsFrameSelected(f))
+					{
+						end = true;
+						break;
+					}
+				}
+				if (end)
+					break;
+				startlayer = layer;
+			}
+			for (int l = endlayer->Index() + 1; l < proj->Layers().size(); l++) // Last layer
+			{
+				CLayer* layer = proj->Layers()[l];
+				bool end = false;
+				for (int f = startframe; f <= endframe; f++)
+				{
+					if (!layer->IsFrameSelected(f))
+					{
+						end = true;
+						break;
+					}
+				}
+				if (end)
+					break;
+				endlayer = layer;
+			}
+
+			CFrameLayout* frames = m_layers->Layer(startlayer->Index());
+			CGraphicsFrame* frame = frames->Frame(startframe);
+			QPointF pos = frame->pos();
+
+			frames = (CFrameLayout*)m_layers->itemAt(endlayer->Index());
+			frame = (CGraphicsFrame*)frames->itemAt(endframe);
+			QPointF end = frame->pos() + frame->m_rect.bottomRight();
+
+			m_boxoverlay->setRect(QRectF(pos, end));
+
+			m_drag = e_drag::Clicked;
+			m_boxoverlay->setZValue(1);
+			m_boxoverlay->setVisible(true);
 		}
 		break;
 	case QEvent::MouseButtonRelease:
@@ -288,12 +327,28 @@ bool CFrameList::Drag(QMouseEvent * Event)
 			m_drag = e_drag::Dragging;
 		if (m_drag == e_drag::Dragging)
 		{
-			
+			QPointF pos = mapToScene(Event->pos());
+			pos -= m_dragpoint;
+			if (pos.y() < m_scrubbar->boundingRect().bottom())
+				pos.setY(m_scrubbar->boundingRect().bottom());
+			else
+			{
+				CFrameLayout* last = m_layers->Layer(m_layers->count() - 1);
+				if (pos.y() > last->contentsRect().bottom())
+					pos.setY(last->contentsRect().bottom());
+			}
+			if (pos.x() < m_scrubbar->x())
+				pos.setX(m_scrubbar->x());
+
+			auto item = scene()->itemAt(pos, QTransform());
+			if (item->type() != (int)e_graphicstype::Frame)
+				break;
+			auto frame = (CGraphicsFrame*)item;
+			m_boxoverlay->setPos(frame->pos());
 		}
 	}
 
-
-	return m_drag == e_drag::Dragging;
+	return m_drag != e_drag::None;
 }
 
 bool CFrameList::Select(QMouseEvent * Event)

@@ -38,7 +38,9 @@ private:
 		Dragging
 	};
 
-	e_drag m_drag;
+	e_drag m_drag = e_drag::None;
+	QPointF m_dragpoint;
+
 	bool m_selecting = false;
 	QRect m_boxselect;
 
@@ -60,7 +62,6 @@ private:
 	bool Scrub(QMouseEvent* Event);
 	bool Drag(QMouseEvent* Event);
 	bool Select(QMouseEvent* Event);
-
 };
 
 #endif // CFrameList_H
