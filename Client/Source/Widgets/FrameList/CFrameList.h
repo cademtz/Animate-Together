@@ -39,10 +39,10 @@ private:
 	};
 
 	e_drag m_drag = e_drag::None;
-	QPointF m_dragpoint;
+	QPointF m_dragoffset;
 
 	bool m_selecting = false;
-	QRect m_boxselect;
+	QRectF m_boxselect;
 
 	CGraphicsScrubBar* m_scrubbar;
 	QGraphicsRectItem* m_playhead, * m_boxoverlay;

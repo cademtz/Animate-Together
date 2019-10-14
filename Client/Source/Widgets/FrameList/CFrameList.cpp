@@ -238,11 +238,8 @@ bool CFrameList::Drag(QMouseEvent * Event)
 	switch (Event->type())
 	{
 	case QEvent::MouseButtonPress:
-		if (m_drag == e_drag::None)
+		if (m_drag == e_drag::None && Event->button() == Qt::LeftButton)
 		{
-			if (Event->button() != Qt::LeftButton)
-				break;
-
 			QGraphicsItem* item = itemAt(Event->pos());
 			if (!item || item->type() != (int)e_graphicstype::Frame)
 				break;
@@ -251,7 +248,7 @@ bool CFrameList::Drag(QMouseEvent * Event)
 			if (!((CGraphicsFrame*)gframe)->IsSelected())
 				break;
 
-			m_dragpoint = gframe->pos();
+			m_dragoffset = gframe->pos();
 
 			// Get all connected selected frames
 			CLayer* startlayer = gframe->Layer(), *endlayer = startlayer;
@@ -310,6 +307,7 @@ bool CFrameList::Drag(QMouseEvent * Event)
 			frame = (CGraphicsFrame*)frames->itemAt(endframe);
 			QPointF end = frame->pos() + frame->m_rect.bottomRight();
 
+			m_dragoffset -= pos;
 			m_boxoverlay->setRect(QRectF(pos, end));
 
 			m_drag = e_drag::Clicked;
@@ -328,23 +326,34 @@ bool CFrameList::Drag(QMouseEvent * Event)
 		if (m_drag == e_drag::Dragging)
 		{
 			QPointF pos = mapToScene(Event->pos());
-			pos -= m_dragpoint;
+			pos -= m_dragoffset;
 			if (pos.y() < m_scrubbar->boundingRect().bottom())
 				pos.setY(m_scrubbar->boundingRect().bottom());
 			else
 			{
 				CFrameLayout* last = m_layers->Layer(m_layers->count() - 1);
-				if (pos.y() > last->contentsRect().bottom())
-					pos.setY(last->contentsRect().bottom());
+				CGraphicsFrame* frame = last->Frame(0);
+				int bottom = frame->pos().y() + frame->m_rect.bottom() - m_boxoverlay->rect().height();
+				if (pos.y() > bottom)
+					pos.setY(bottom);
 			}
-			if (pos.x() < m_scrubbar->x())
-				pos.setX(m_scrubbar->x());
+			if (pos.x() < 0)
+				pos.setX(0);
+			// Freaking LAYOUTS NEVER UPDATE unless forced to, which redraws every single element
+			//else if (pos.x() > m_scrubbar->x() - m_boxoverlay->rect().width())
+				//pos.setX(m_scrubbar->x() - m_boxoverlay->rect().width());
 
+			m_boxoverlay->setVisible(false); // Just to stop itemAt from hitting it
 			auto item = scene()->itemAt(pos, QTransform());
-			if (item->type() != (int)e_graphicstype::Frame)
+			m_boxoverlay->setVisible(true);
+			if (!item || item->type() != (int)e_graphicstype::Frame)
 				break;
 			auto frame = (CGraphicsFrame*)item;
-			m_boxoverlay->setPos(frame->pos());
+
+			// Today I learned the GraphicsRect rect() property is completely separate from actual GraphicsItem pos()
+			QRectF rect = m_boxoverlay->rect();
+			rect.moveTopLeft(frame->pos());
+			m_boxoverlay->setRect(rect);
 		}
 	}
 
@@ -354,9 +363,7 @@ bool CFrameList::Drag(QMouseEvent * Event)
 bool CFrameList::Select(QMouseEvent * Event)
 {
 	QPointF pos = mapToScene(Event->pos());
-	m_boxselect.setSize(QSize(
-		pos.x() - m_boxselect.left(),
-		pos.y() - m_boxselect.top()));
+	m_boxselect.setBottomRight(pos);
 
 	if (Event->type() == QEvent::MouseButtonRelease && m_selecting)
 	{
@@ -394,7 +401,6 @@ bool CFrameList::Select(QMouseEvent * Event)
 		m_selecting = true;
 
 		m_boxselect.setTopLeft(pos.toPoint());
-		m_boxselect.setSize(QSize());
 		m_boxoverlay->setRect(m_boxselect);
 		m_boxoverlay->setZValue(1);
 		m_boxoverlay->setVisible(true);
@@ -402,7 +408,7 @@ bool CFrameList::Select(QMouseEvent * Event)
 	else if (!m_selecting)
 		return false;
 	
-	QRect _rect = m_boxselect.normalized();
+	QRectF _rect = m_boxselect.normalized();
 	if (!_rect.height())
 		_rect.setHeight(1);
 	if (!_rect.width())
