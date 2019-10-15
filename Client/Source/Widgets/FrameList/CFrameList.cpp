@@ -226,6 +226,7 @@ bool CFrameList::Scrub(QMouseEvent * Event)
 	return false;
 }
 
+#include <qdebug.h>
 bool CFrameList::Drag(QMouseEvent * Event)
 {
 	CProject* proj;
@@ -307,17 +308,36 @@ bool CFrameList::Drag(QMouseEvent * Event)
 			frame = (CGraphicsFrame*)frames->itemAt(endframe);
 			QPointF end = frame->pos() + frame->m_rect.bottomRight();
 
-			m_dragoffset -= pos;
 			m_boxoverlay->setRect(QRectF(pos, end));
-
-			m_drag = e_drag::Clicked;
 			m_boxoverlay->setZValue(1);
 			m_boxoverlay->setVisible(true);
+
+			m_drag = e_drag::Clicked;
+			m_dragoffset -= pos;
+			m_dragrange = { startlayer->Index(), endlayer->Index(), startframe, endframe };
 		}
 		break;
 	case QEvent::MouseButtonRelease:
 		if (m_drag != e_drag::None)
+		{
 			m_boxoverlay->setVisible(false);
+
+			QGraphicsItem* item = scene()->itemAt(m_boxoverlay->rect().topLeft(), QTransform());
+			if (item->type() == (int)e_graphicstype::Frame)
+			{
+				auto gframe = (CGraphicsFrame*)item;
+				int frame = gframe->Index(), layer = gframe->Layer()->Index(),
+					right = frame - m_dragrange.frame, down = layer - m_dragrange.layer;
+
+				if (right || down) // Selection was moved at all
+				{
+					qInfo() << "\nShift frames Right Down: (" << right << ", " << down << ")\n";
+					/*proj->ShiftFrames(m_dragrange.layer, m_dragrange.endlayer,
+						m_dragrange.frame, m_dragrange.endframe, right, down);*/
+				}
+			}
+		}
+
 		m_drag = e_drag::None;
 		break;
 	case QEvent::MouseMove:

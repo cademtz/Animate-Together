@@ -46,7 +46,8 @@ private:
 	CLayer* m_activelayer = 0;
 	CUndoStack m_undo;
 
-	size_t m_framerate = 24, m_activeframe = 0;
+	size_t m_framerate = 24;
+	int m_activeframe = 0;
 	QTimer* m_timer;
 
 	static CProject* m_activeproj;
@@ -80,8 +81,8 @@ public:
 	inline size_t Framerate() const { return m_framerate; }
 	void SetFramerate(size_t Framerate);
 
-	inline size_t ActiveFrame() const { return m_activeframe; }
-	void SetActiveFrame(size_t Frame);
+	inline int ActiveFrame() const { return m_activeframe; }
+	void SetActiveFrame(int Frame);
 
 	inline bool IsPlaying() const { return m_timer->isActive(); }
 
@@ -96,8 +97,8 @@ public:
 	inline const LayerList_t& SelectedLayers() const { return m_selectedLayers; }
 
 	// - Gets the layer's index in the list
-	// - Returns UINT_MAX if the list does not contain 'Layer'
-	size_t IndexOf(const CLayer* Layer);
+	// - Returns -1 if the list does not contain 'Layer'
+	int IndexOf(const CLayer* Layer);
 
 	inline CUndoStack& Undos() { return m_undo; }
 
@@ -113,7 +114,7 @@ public:
 
 	// - Returns an image of all the layers in the specified frame combined
 	// - 'Frame' defaults to active
-	QImage Preview(size_t Frame = UINT_MAX);
+	QImage Preview(int Frame = -1);
 
 
 	// ========== Layer functions ========== //
@@ -132,7 +133,7 @@ public:
 	CLayer* AddLayer(const std::string& Name, bool Private = false, bool Visible = true);
 
 	// - Returns null on failure, otherwise a new layer is inerted and returned
-	CLayer* InsertLayer(size_t Index, const std::string& Name, bool Private = false, bool Visible = true);
+	CLayer* InsertLayer(int Index, const std::string& Name, bool Private = false, bool Visible = true);
 
 	// - Adds a copy of any layer to the project
 	void Duplicate(CLayer* Layer);
@@ -143,7 +144,7 @@ public:
 
 	// - Shifts the layer to specified index anywhere from 0 to the list size
 	// - Only works with layers within the project and returns true on success
-	bool ShiftLayer(CLayer* Layer, size_t Index);
+	bool ShiftLayer(CLayer* Layer, int Index);
 
 	// - Returns the foremost frame from the end of the animation
 	// - Result will be null if no frames exist
@@ -153,6 +154,9 @@ public:
 
 	// ========== Frame functions ========== //
 
+
+	// - Shifts a square area of frames
+	void ShiftFrames(int LayerStart, int LayerEnd, int FrameStart, int FrameEnd, int Right, int Down);
 	void RemoveSelectedFrames();
 	inline void DeselectFrames() {
 		for (auto layer : Layers())
@@ -171,10 +175,10 @@ protected:
 	friend class CUndoLayerAdd;
 
 	// - Inserts an existing layer back into the list
-	void PutBack(CLayer* Layer, size_t Index);
+	void PutBack(CLayer* Layer, int Index);
 
 	// - Removes an existing layer from the list
-	void TakeBack(size_t Index);
+	void TakeBack(int Index);
 
 	// - Returns a layer's position
 	// - On failure, the end position is returned

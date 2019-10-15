@@ -132,11 +132,11 @@ class CUndoLayerDel : public CUndoAction
 {
 	CProject& m_proj;
 	CLayer* m_layer;
-	size_t m_index;
+	int m_index;
 	
 public:
 	~CUndoLayerDel() { if (!Undone()) delete m_layer; }
-	CUndoLayerDel(CProject& Project, CLayer* Layer, size_t LayerIndex)
+	CUndoLayerDel(CProject& Project, CLayer* Layer, int LayerIndex)
 		: CUndoAction(CUndoAction::LayerDel), m_proj(Project), m_layer(Layer), m_index(LayerIndex) { }
 
 	void Undo();
@@ -150,11 +150,11 @@ class CUndoLayerAdd : public CUndoAction
 {
 	CProject& m_proj;
 	CLayer* m_layer;
-	size_t m_index;
+	int m_index;
 
 public:
 	~CUndoLayerAdd() { if (Undone()) delete m_layer; }
-	CUndoLayerAdd(CProject& Project, CLayer* Layer, size_t LayerIndex)
+	CUndoLayerAdd(CProject& Project, CLayer* Layer, int LayerIndex)
 		: CUndoAction(CUndoAction::LayerAdd), m_proj(Project), m_layer(Layer), m_index(LayerIndex) { }
 
 	void Undo();
@@ -181,7 +181,7 @@ class CUndoLayerShift : public CUndoAction
 {
 	CProject& m_proj;
 	CLayer* m_layer;
-	size_t m_previndex;
+	int m_previndex;
 
 public:
 	CUndoLayerShift(CProject& Project, CLayer* Layer);
@@ -195,7 +195,7 @@ class CUndoFrame : public CUndoAction
 {
 	CLayer& m_layer;
 	std::deque<CFrame*> m_frames;
-	std::list<size_t> m_indexes;
+	std::list<int> m_indexes;
 
 public:
 	CUndoFrame(CLayer& Layer, CFrame* Frame, bool Added);
@@ -210,10 +210,10 @@ class CUndoFrameReplace : public CUndoAction
 {
 	CLayer& m_layer;
 	CFrame* m_old;
-	size_t m_index;
+	int m_index;
 
 public:
-	CUndoFrameReplace(CLayer& Layer, CFrame* OldFrame, size_t Index)
+	CUndoFrameReplace(CLayer& Layer, CFrame* OldFrame, int Index)
 		: CUndoAction(UndoType::FrameReplace), m_layer(Layer), m_old(OldFrame), m_index(Index) { }
 	~CUndoFrameReplace() { if (!Undone()) delete m_old; }
 

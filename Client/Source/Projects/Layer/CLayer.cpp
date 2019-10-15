@@ -50,7 +50,7 @@ void CLayer::Fill()
 		return;
 	ColorPicker::Open(Qt::GlobalColor::white, [this](ColorPicker* picker) { Fill(picker->m_color); });
 }
-size_t CLayer::Index() {
+int CLayer::Index() {
 	return Project()->IndexOf(this);
 }
 
@@ -140,10 +140,10 @@ CRasterFrame * CLayer::ActiveFrame()
 	return m_frames[Project()->ActiveFrame()];
 }
 
-QPixmap * CLayer::Pixmap(size_t Frame)
+QPixmap * CLayer::Pixmap(int Frame)
 {
 	CRasterFrame* frame = 0;
-	if (Frame == UINT_MAX)
+	if (Frame == -1)
 		frame = ActiveFrame();
 	else if (Frame < Frames().size())
 		frame = Frames()[Frame];
@@ -159,17 +159,17 @@ QPixmap * CLayer::Pixmap(size_t Frame)
 	return frame->Pixmap();
 }
 
-size_t CLayer::IndexOf(const CFrame * Frame)
+int CLayer::IndexOf(const CFrame * Frame)
 {
 	auto pos = FramePos(Frame);
 	if (pos != m_frames.end())
 		return pos - m_frames.begin();
-	return UINT_MAX;
+	return -1;
 }
 
-void CLayer::AddFrame(bool IsKey, size_t Index)
+void CLayer::AddFrame(bool IsKey, int Index)
 {
-	if (Index == UINT_MAX) // Leave it to default action
+	if (Index == -1) // Leave it to default action
 	{
 		if (m_selectedframes.size())
 		{
@@ -264,7 +264,7 @@ void CLayer::AddFrame(bool IsKey, size_t Index)
 	}
 }
 
-CFrame * CLayer::ReplaceFrame(size_t Index, CFrame * New)
+CFrame * CLayer::ReplaceFrame(int Index, CFrame * New)
 {
 	CFrame* old = m_frames[Index];
 
@@ -281,7 +281,7 @@ CFrame * CLayer::ReplaceFrame(size_t Index, CFrame * New)
 	return old;
 }
 
-void CLayer::RemoveFrame(size_t Index)
+void CLayer::RemoveFrame(int Index)
 {
 	CFrame* frame = m_frames[Index];
 	if (frame->IsKey() && Index < m_frames.size() - 1 && !m_frames[Index + 1]->IsKey())
@@ -351,7 +351,7 @@ CFrame * CLayer::LastFrame()
 	return 0;
 }
 
-CFrame * CLayer::LastKey(size_t Index)
+CFrame * CLayer::LastKey(int Index)
 {
 	if (!m_frames.size())
 		return 0;
@@ -376,7 +376,7 @@ CLayer::FrameList_t::iterator CLayer::FramePos(const CFrame* Frame)
 	return m_frames.end();
 }
 
-void CLayer::PutBack(CFrame * Frame, size_t Index)
+void CLayer::PutBack(CFrame * Frame, int Index)
 {
 	if (Index >= m_frames.size())
 		m_frames.push_back((CRasterFrame*)Frame);
@@ -389,12 +389,12 @@ void CLayer::TakeBack(CFrame* Frame)
 {
 	auto pos = FramePos(Frame);
 	CFrame* frame = *pos;
-	size_t index = IndexOf(pos);
+	int index = IndexOf(pos);
 	m_frames.erase(pos);
 	CFrame::CreateEvent(CFrameEvent(frame, CFrameEvent::Remove, 0, index));
 }
 
-void CLayer::_RemoveFrame(size_t Index)
+void CLayer::_RemoveFrame(int Index)
 {
 	CFrame* frame = m_frames[Index];
 	SelectFrame(frame, false);

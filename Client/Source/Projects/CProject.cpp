@@ -45,7 +45,7 @@ void CProject::SetFramerate(size_t Framerate)
 	CreateEvent(CProjectEvent(this, CProjectEvent::Framerate));
 }
 
-void CProject::SetActiveFrame(size_t Frame)
+void CProject::SetActiveFrame(int Frame)
 {
 	if (m_activeframe == Frame)
 		return;
@@ -62,12 +62,12 @@ void CProject::SetActiveLayer(CLayer * Layer)
 	CLayer::CreateEvent(CLayerEvent(Layer, CLayerEvent::Switched));
 }
 
-size_t CProject::IndexOf(const CLayer * Layer)
+int CProject::IndexOf(const CLayer * Layer)
 {
 	auto pos = GetLayerPos(Layer);
 	if (pos != m_layers.end())
 		return pos - m_layers.begin();
-	return UINT_MAX;
+	return -1;
 }
 
 void CProject::Play()
@@ -129,7 +129,7 @@ CLayer * CProject::AddLayer(const std::string & Name, bool Private, bool Visible
 	return layer;
 }
 
-CLayer * CProject::InsertLayer(size_t Index, const std::string & Name, bool Private, bool Visible)
+CLayer * CProject::InsertLayer(int Index, const std::string & Name, bool Private, bool Visible)
 {
 	if (m_layers.size() >= MAX_LAYERS)
 		return 0;
@@ -159,7 +159,7 @@ const bool CProject::RemoveLayer(CLayer * Layer)
 		{
 			if (*it == m_activelayer)
 				SetActiveLayer(0);
-			size_t prev = IndexOf(Layer);
+			int prev = IndexOf(Layer);
 			m_undo.Push(new CUndoLayerDel(*this, *it, it - m_layers.begin()));
 			m_layers.erase(it);
 			CLayer::CreateEvent(CLayerEvent(Layer, CLayerEvent::Remove, prev));
@@ -169,12 +169,12 @@ const bool CProject::RemoveLayer(CLayer * Layer)
 	return false;
 }
 
-bool CProject::ShiftLayer(CLayer * Layer, size_t Index)
+bool CProject::ShiftLayer(CLayer * Layer, int Index)
 {
 	if (!HasLayer(Layer))
 		return false;
 
-	size_t prev = IndexOf(Layer);
+	int prev = IndexOf(Layer);
 	m_layers.insert(m_layers.begin() + Index, Layer);
 	m_layers.erase(m_layers.begin() + (Index < prev ? prev + 1 : prev));
 	if (IndexOf(Layer) != prev)
@@ -210,8 +210,8 @@ void CProject::Export(bool SingleFrame, bool Flatten)
 		return;
 	dir += '\\';
 
-	size_t start = SingleFrame ? ActiveFrame() : 0, end = SingleFrame ? ActiveFrame() : LastFrame()->Index();
-	for (size_t i = start; i <= end; i++)
+	int start = SingleFrame ? ActiveFrame() : 0, end = SingleFrame ? ActiveFrame() : LastFrame()->Index();
+	for (int i = start; i <= end; i++)
 	{
 		std::string prefix = '_' + Name() + '_', suffix = std::to_string(i) + ".png";
 		if (Flatten)
@@ -257,9 +257,9 @@ void CProject::ImportSequence(int Start)
 	CLayer::CreateEvent(CLayerEvent(layer, CLayerEvent::Add));
 }
 
-QImage CProject::Preview(size_t Frame)
+QImage CProject::Preview(int Frame)
 {
-	if (Frame == UINT_MAX)
+	if (Frame == -1)
 		Frame = ActiveFrame();
 
 	QImage img = QImage(Dimensions(), QImage::Format_ARGB32);
@@ -296,6 +296,78 @@ int CProject::EndFrame()
 	return greatest;
 }
 
+void CProject::ShiftFrames(int LayerStart, int LayerEnd, int FrameStart, int FrameEnd, int Right, int Down)
+{
+	/*
+	Don't shift if any source / destination layers do not match types (Because insane conversion would be required)
+
+	For each layer from LayerStart - LayerEnd
+	Get list of srcframes from all source layers before anything is replaced
+	If no srcfame (out of range), leave null
+
+	Get destlayer using Down
+
+
+	{
+		For each frame in srclayer from FrameEnd - FrameStart
+		Get destframe from destlayer with index offset by Right
+
+		If no destination frame, add srcframe
+		Else
+		{
+			If source frame exists, replace destframe with srcframe
+			Else replace destframe with hold frame
+		}
+
+		Replace srcframe in srclayer with hold (if not already one)
+	}
+
+	*/
+
+	m_undo.Compound(true, "Frame shift");
+
+	// Get list of srcframes from all source layers before anything is replaced
+	std::deque<std::deque<CFrame*>> frames;
+	for (int l = LayerStart; l <= LayerEnd; l++)
+	{
+		frames.push_back({});
+		for (int f = FrameStart; f <= FrameEnd; f++)
+		{
+			CFrame* frame = 0;
+			if (f < m_layers[l]->Frames().size()) // If no srcfame (out of range), leave null
+				frame = m_layers[l]->Frames()[f];
+			frames.back().push_back(frame);
+		}
+	}
+
+	// For each layer from LayerStart - LayerEnd
+	for (int l = LayerStart; l <= LayerEnd; l++)
+	{
+		// Get destlayer using Down
+		CLayer* srclayer = m_layers[l], * destlayer = m_layers[l + Down];
+		// For each frame in srclayer from FrameEnd - FrameStart
+		for (int f = FrameStart; f <= FrameEnd; f++)
+		{
+			// Get destframe from destlayer with index offset by Right
+			CFrame* srcframe = frames[l - LayerStart][f - FrameStart]; // Same order, elements relative to start
+			CFrame* destframe = 0;
+			if (f + Right < destlayer->Frames().size())
+				destframe = destlayer->Frames()[f + Right];
+
+			// If no destination frame, add srcframe
+			bool key = srcframe && f == FrameStart; // First frame replaced must be key to preserve following holds
+			if (!destframe) // If no destination frame, add srcframe
+			{
+				// TODO: Right now, replace this when you open your code
+				// Make an override function that inserts a key if a frame to copy is given
+				destlayer->AddFrame(key, f + Right);
+			}
+		}
+	}
+
+	m_undo.Compound(false);
+}
+
 void CProject::RemoveSelectedFrames()
 {
 	m_undo.Compound(true, "Delete frames");
@@ -310,13 +382,13 @@ void CProject::TimerEvent()
 	SetActiveFrame((ActiveFrame() + 1) % (LastFrame()->Index() + 1));
 }
 
-void CProject::PutBack(CLayer * Layer, size_t Index)
+void CProject::PutBack(CLayer * Layer, int Index)
 {
 	m_layers.insert(m_layers.begin() + Index, Layer);
 	Layer->LayerEvent(CLayerEvent::Add);
 }
 
-void CProject::TakeBack(size_t Index)
+void CProject::TakeBack(int Index)
 {
 	auto pos = m_layers.begin() + Index;
 	if (*pos == m_activelayer)

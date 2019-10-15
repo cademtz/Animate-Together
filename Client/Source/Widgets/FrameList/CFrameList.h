@@ -39,6 +39,9 @@ private:
 	};
 
 	e_drag m_drag = e_drag::None;
+	struct {
+		int layer, endlayer, frame, endframe;
+	} m_dragrange;
 	QPointF m_dragoffset;
 
 	bool m_selecting = false;

@@ -68,7 +68,7 @@ public:
 	// - Opens the color picker and fills the layer with the chosen color
 	void Fill();
 
-	size_t Index();
+	int Index();
 
 
 	// ========== Frame functions ========== //
@@ -92,21 +92,21 @@ public:
 
 	// - Gets the specified frame's pixmap. Defaults to active frame.
 	// - Returns null if no frame is active
-	QPixmap* Pixmap(size_t Frame = UINT_MAX);
+	QPixmap* Pixmap(int Frame = -1);
 
 	// - Gets the frame's index in the frame list
-	// - Returns UINT_MAX if the list does not contain 'Frame'
-	size_t IndexOf(const CFrame* Frame);
+	// - Returns -1 if the list does not contain 'Frame'
+	int IndexOf(const CFrame* Frame);
 
 	// - Adds a new frame to the layer
 	// - If 'Index' is left default, the active index is used
-	void AddFrame(bool IsKey, size_t Index = UINT_MAX);
+	void AddFrame(bool IsKey, int Index = -1);
 
 	// - Returns the old frame on success, else null pointer on failure.
-	CFrame* ReplaceFrame(size_t Index, CFrame* New);
+	CFrame* ReplaceFrame(int Index, CFrame* New);
 	inline void ReplaceFrame(CFrame* Old, CFrame* New) { ReplaceFrame(IndexOf(Old), New); }
 	inline void RemoveFrame(CFrame* Frame) { RemoveFrame(IndexOf(Frame)); }
-	void RemoveFrame(size_t Index);
+	void RemoveFrame(int Index);
 	void RemoveSelected();
 
 	// - Returns the frame at the end of the frame list
@@ -115,7 +115,7 @@ public:
 
 	// - Returns the last key frame starting at Index
 	// - Result will be null if no frames exist
-	CFrame* LastKey(size_t Index = UINT_MAX);
+	CFrame* LastKey(int Index = -1);
 
 
 	// ========== Event functions ========== //
@@ -130,15 +130,15 @@ protected:
 
 
 	FrameList_t::iterator FramePos(const CFrame* Frame);
-	inline FrameList_t::iterator FramePos(size_t Index) { return m_frames.begin() + Index; }
-	inline size_t IndexOf(FrameList_t::iterator Pos) const { return Pos - m_frames.begin(); }
+	inline FrameList_t::iterator FramePos(int Index) { return m_frames.begin() + Index; }
+	inline int IndexOf(FrameList_t::iterator Pos) const { return Pos - m_frames.begin(); }
 
 	friend class CUndoFrame;
-	void PutBack(CFrame* Frame, size_t Index);
+	void PutBack(CFrame* Frame, int Index);
 	void TakeBack(CFrame* Frame);
 
 	// - Removes a frame directly without creating events or undos
-	void _RemoveFrame(size_t Index);
+	void _RemoveFrame(int Index);
 	inline void _RemoveFrame(CFrame* Frame) { _RemoveFrame(IndexOf(Frame)); }
 
 	// - Replaces frame at 'Index' with 'Frame' without creating undos

@@ -31,9 +31,7 @@ class CTimeline : public QWidget
 
 public:
 	CTimeline(QWidget* Parent);
-
-protected:
-	void LayerEvent(CLayerEvent* Event);
+	//~CTimeline() { } // Issues with
 };
 
 #endif // CTimeline_H
