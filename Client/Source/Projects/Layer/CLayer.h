@@ -102,9 +102,15 @@ public:
 	// - If 'Index' is left default, the active index is used
 	void AddFrame(bool IsKey, int Index = -1);
 
+	// - Constructs a new frame with same type as the layer
+	inline CFrame* NewFrame(bool IsKey) { return new CRasterFrame(0, !IsKey); }
+
+	// - Places a key frame at Index and parents it to the layer
+	void PlaceFrame(CFrame* Frame, int Index);
+
 	// - Returns the old frame on success, else null pointer on failure.
-	CFrame* ReplaceFrame(int Index, CFrame* New);
-	inline void ReplaceFrame(CFrame* Old, CFrame* New) { ReplaceFrame(IndexOf(Old), New); }
+	CFrame* ReplaceFrame(int Index, CFrame* New, bool Delete = true);
+	inline void ReplaceFrame(CFrame* Old, CFrame* New, bool Delete = true) { ReplaceFrame(IndexOf(Old), New, Delete); }
 	inline void RemoveFrame(CFrame* Frame) { RemoveFrame(IndexOf(Frame)); }
 	void RemoveFrame(int Index);
 	void RemoveSelected();
@@ -125,6 +131,7 @@ public:
 
 protected:
 	friend class CUndoFrameReplace;
+
 
 	// ========== Internal functions ========== //
 

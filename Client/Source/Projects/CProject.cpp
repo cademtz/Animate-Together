@@ -312,14 +312,17 @@ void CProject::ShiftFrames(int LayerStart, int LayerEnd, int FrameStart, int Fra
 		For each frame in srclayer from FrameEnd - FrameStart
 		Get destframe from destlayer with index offset by Right
 
-		If no destination frame, add srcframe
-		Else
-		{
-			If source frame exists, replace destframe with srcframe
-			Else replace destframe with hold frame
-		}
+		If srcframe is key
+			Replace srcframe in srclayer with hold
+		Else if srcframe is hold and at FrameStart
+			Set srcframe to key parent
+		Else if destframe is hold
+			Skip (Both are holds)
 
-		Replace srcframe in srclayer with hold (if not already one)
+		
+		If no srcframe, create hold
+		Place srcframe
+
 	}
 
 	*/
@@ -348,20 +351,24 @@ void CProject::ShiftFrames(int LayerStart, int LayerEnd, int FrameStart, int Fra
 		// For each frame in srclayer from FrameEnd - FrameStart
 		for (int f = FrameStart; f <= FrameEnd; f++)
 		{
-			// Get destframe from destlayer with index offset by Right
 			CFrame* srcframe = frames[l - LayerStart][f - FrameStart]; // Same order, elements relative to start
 			CFrame* destframe = 0;
-			if (f + Right < destlayer->Frames().size())
-				destframe = destlayer->Frames()[f + Right];
+			int dst = f + Right;
+			if (dst < destlayer->Frames().size()) // Get destframe
+				destframe = destlayer->Frames()[dst];
 
-			// If no destination frame, add srcframe
-			bool key = srcframe && f == FrameStart; // First frame replaced must be key to preserve following holds
-			if (!destframe) // If no destination frame, add srcframe
-			{
-				// TODO: Right now, replace this when you open your code
-				// Make an override function that inserts a key if a frame to copy is given
-				destlayer->AddFrame(key, f + Right);
-			}
+			// Only replace key frames from source with holds
+
+			if (srcframe && srcframe->IsKey()) // If srcframe is key
+				srclayer->ReplaceFrame(f, srclayer->NewFrame(f == FrameStart), false); // Replace srcframe in srclayer with hold
+			else if (f == FrameStart && srcframe && !srcframe->IsKey()) // Else if srcframe is hold and at FrameStart
+				srcframe = srcframe->Parent(); // Set srcframe to key parent
+			else if (destframe && !destframe->IsKey()) // If they are both holds
+				continue;
+
+			if (!srcframe) // If no srcframe, create hold
+				srcframe = destlayer->NewFrame(false);
+			destlayer->PlaceFrame(srcframe, dst); // Place srcframe
 		}
 	}
 

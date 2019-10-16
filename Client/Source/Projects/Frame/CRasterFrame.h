@@ -35,6 +35,9 @@ public:
 			return false;
 		return false;
 	}
+
+protected:
+	CFrame* _Clone() { return new CRasterFrame(*this); }
 };
 
 

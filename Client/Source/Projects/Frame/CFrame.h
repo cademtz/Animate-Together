@@ -27,20 +27,7 @@ public:
 		Stk
 	};
 
-protected:
-	e_type m_type;
-	bool m_key;
-	CLayer* m_layer = 0;
-
-	CFrame(CLayer* Layer, e_type Type, bool Hold);
-
-	CFrame* _Parent();
-
-	friend class CLayer;
-	void SetLayer(CLayer* Layer) { m_layer = Layer; }
-
 public:
-
 	virtual ~CFrame() { }
 	virtual bool IsEmpty() = 0;
 
@@ -59,6 +46,21 @@ public:
 	// - Result may be null if the current state does not require a parent (e.g. Key, Empty)
 	template<typename T = CFrame>
 	inline T* Parent() { return (T*)_Parent(); }
+	template<typename T = CFrame>
+	inline T* Clone() { return (T*)_Clone(); }
+
+protected:
+	e_type m_type;
+	bool m_key;
+	CLayer* m_layer = 0;
+
+	CFrame(CLayer* Layer, e_type Type, bool Hold);
+
+	CFrame* _Parent();
+	virtual CFrame* _Clone() = 0;
+
+	friend class CLayer;
+	void SetLayer(CLayer* Layer) { m_layer = Layer; }
 };
 
 #endif // CFrame_H

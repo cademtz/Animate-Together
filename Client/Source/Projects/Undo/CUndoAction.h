@@ -211,11 +211,12 @@ class CUndoFrameReplace : public CUndoAction
 	CLayer& m_layer;
 	CFrame* m_old;
 	int m_index;
+	bool m_delete;
 
 public:
-	CUndoFrameReplace(CLayer& Layer, CFrame* OldFrame, int Index)
-		: CUndoAction(UndoType::FrameReplace), m_layer(Layer), m_old(OldFrame), m_index(Index) { }
-	~CUndoFrameReplace() { if (!Undone()) delete m_old; }
+	CUndoFrameReplace(CLayer& Layer, CFrame* OldFrame, int Index, bool Delete = true)
+		: CUndoAction(UndoType::FrameReplace), m_layer(Layer), m_old(OldFrame), m_index(Index), m_delete(Delete) { }
+	~CUndoFrameReplace() { if (!Undone() && m_delete) delete m_old; }
 
 	void Undo();
 	const char* TypeStr() const { return "Replace frame"; }

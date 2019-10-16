@@ -17,7 +17,7 @@ CLayer::CLayer(CProject* Parent, const std::string & Name, int Frames, bool Priv
 	: m_proj(Parent), m_name(Name), m_dimensions(Parent->Dimensions()), m_private(Private), m_visible(Visible)
 {
 	int end = Frames == -1 ? m_proj->ActiveFrame() : Frames;
-	for (size_t i = 0; i <= end; i++)
+	for (int i = 0; i <= end; i++)
 		m_frames.push_back(new CRasterFrame(this, m_frames.size()));
 }
 
@@ -221,7 +221,7 @@ void CLayer::AddFrame(bool IsKey, int Index)
 	if (Index > m_frames.size() - 1) // If active index past end of list, add holds between, then push a frame back
 	{
 		// Grab the last frame. If we add a hold, we need to find the previous key
-		for (size_t i = m_frames.size(); i < Index; i++)
+		for (int i = m_frames.size(); i < Index; i++)
 		{
 			m_frames.push_back(new CRasterFrame(this, true));
 			added.push_back(m_frames.back());
@@ -264,7 +264,23 @@ void CLayer::AddFrame(bool IsKey, int Index)
 	}
 }
 
-CFrame * CLayer::ReplaceFrame(int Index, CFrame * New)
+void CLayer::PlaceFrame(CFrame * Frame, int Index)
+{
+	Frame->SetLayer(this);
+	
+	if (Index < m_frames.size())
+		ReplaceFrame(Index, Frame);
+	else
+	{
+		if (Index > m_frames.size() - 1)
+			AddFrame(false, Index - 1);
+		m_frames.push_back((CRasterFrame*)Frame);
+		m_proj->Undos().Push(new CUndoFrame(*this, Frame, true));
+		CFrame::CreateEvent(CFrameEvent(Frame, CFrameEvent::Add));
+	}
+}
+
+CFrame * CLayer::ReplaceFrame(int Index, CFrame * New, bool Delete)
 {
 	CFrame* old = m_frames[Index];
 
@@ -276,7 +292,7 @@ CFrame * CLayer::ReplaceFrame(int Index, CFrame * New)
 	}
 
 	m_frames[Index] = (CRasterFrame*)New;
-	m_proj->Undos().Push(new CUndoFrameReplace(*this, old, Index));
+	m_proj->Undos().Push(new CUndoFrameReplace(*this, old, Index, Delete));
 	CFrame::CreateEvent(CFrameEvent(New, CFrameEvent::Replace, old, Index));
 	return old;
 }

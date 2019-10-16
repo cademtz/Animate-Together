@@ -332,8 +332,8 @@ bool CFrameList::Drag(QMouseEvent * Event)
 				if (right || down) // Selection was moved at all
 				{
 					qInfo() << "\nShift frames Right Down: (" << right << ", " << down << ")\n";
-					/*proj->ShiftFrames(m_dragrange.layer, m_dragrange.endlayer,
-						m_dragrange.frame, m_dragrange.endframe, right, down);*/
+					proj->ShiftFrames(m_dragrange.layer, m_dragrange.endlayer,
+						m_dragrange.frame, m_dragrange.endframe, right, down);
 				}
 			}
 		}

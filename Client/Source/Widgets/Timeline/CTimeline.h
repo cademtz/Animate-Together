@@ -31,7 +31,6 @@ class CTimeline : public QWidget
 
 public:
 	CTimeline(QWidget* Parent);
-	//~CTimeline() { } // Issues with
 };
 
 #endif // CTimeline_H
