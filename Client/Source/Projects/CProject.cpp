@@ -359,10 +359,15 @@ void CProject::ShiftFrames(int LayerStart, int LayerEnd, int FrameStart, int Fra
 
 			// Only replace key frames from source with holds
 
-			if (srcframe && srcframe->IsKey()) // If srcframe is key
-				srclayer->ReplaceFrame(f, srclayer->NewFrame(f == FrameStart), false); // Replace srcframe in srclayer with hold
-			else if (f == FrameStart && srcframe && !srcframe->IsKey()) // Else if srcframe is hold and at FrameStart
-				srcframe = srcframe->Parent(); // Set srcframe to key parent
+			if (srcframe) // If srcframe exists
+			{
+				if (srcframe->IsKey()) // Replace with hold. Except first frame, which must stay a key
+					srclayer->ReplaceFrame(f, srclayer->NewFrame(!f), false);
+				else if (f == FrameStart) // Else if srcframe is hold and at FrameStart
+					srcframe = srcframe->Parent()->Clone(); // Set srcframe to copy of key parent
+				else
+					srcframe = destlayer->NewFrame(false);
+			}
 			else if (destframe && !destframe->IsKey()) // If they are both holds
 				continue;
 
