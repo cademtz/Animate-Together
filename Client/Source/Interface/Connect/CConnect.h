@@ -8,10 +8,11 @@ class CConnect : public QWidget
 	Q_OBJECT
 
 public:
+	CConnect(QWidget *parent = Q_NULLPTR);
 	static inline void Open() { new CConnect(); }
 
-	CConnect(QWidget *parent = Q_NULLPTR);
-	~CConnect();
+protected:
+	void Connect();
 
 private:
 	Ui::Connect ui;

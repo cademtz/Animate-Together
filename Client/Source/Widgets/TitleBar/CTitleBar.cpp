@@ -102,13 +102,13 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 		"}");
 
 	QMenu
-		*file = new QMenu("File", m_menubar), *edit = new QMenu("Edit", m_menubar), *layer = new QMenu("Layer", m_menubar),
-		*window = new QMenu("Window", m_menubar);
+		*file = new QMenu("File", m_menubar), *sessions = new QMenu("Sessions", m_menubar), *edit = new QMenu("Edit", m_menubar),
+		*layer = new QMenu("Layer", m_menubar), *window = new QMenu("Window", m_menubar);
 	QAction
-		*newproj = new QAction("New", this), *conn = new QAction("Connect", this),/**save = new QAction("Save", this),*/ *exp = new QAction("Export as..."),
-		*imp = new QAction("Import image sequence", this),
-		*undo = new QAction("Undo", this), *redo = new QAction("Redo", this), *fill = new QAction("Fill", this),
-		*history = new QAction("History", this), *layers = new QAction("Layers", this), *l_copy = new QAction("Duplicate", this);
+		*newproj = new QAction("New"), *conn = new QAction("Connect"),/**save = new QAction("Save", this),*/
+		*exp = new QAction("Export as..."), *imp = new QAction("Import image sequence"),
+		*undo = new QAction("Undo"), *redo = new QAction("Redo"), *fill = new QAction("Fill"),
+		*history = new QAction("History"), *layers = new QAction("Layers"), *l_copy = new QAction("Duplicate");
 
 	connect(conn, &QAction::triggered, [] { CConnect::Open(); });
 	connect(exp, &QAction::triggered, [] { ExportAs(); });
@@ -127,15 +127,16 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 	redo->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
 
 	file->addActions({ newproj, exp, imp });
-	file->addSeparator();
 	edit->addActions({ undo, redo });
 	layer->addActions({ fill, l_copy });
 	window->addActions({ history, layers });
+	sessions->addAction(conn);
 
 	m_menubar->addMenu(file);
 	m_menubar->addMenu(edit);
 	m_menubar->addMenu(layer);
 	m_menubar->addMenu(window);
+	m_menubar->addMenu(sessions);
 
 	m_menubar->move(120, 3);
 	m_menubar->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
