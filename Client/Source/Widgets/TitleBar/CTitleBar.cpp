@@ -17,6 +17,7 @@
 
 #include "Interface/CreateProject/CreateProject.h"
 #include "Interface/MainWindow/MainWindow.h"
+#include "Interface/Connect/CConnect.h"
 #include "Interface/Export/CExport.h"
 #include "Interface/Import/CImport.h"
 #include "Projects/CProject.h"
@@ -104,11 +105,12 @@ CTitleBar::CTitleBar(QMainWindow * Window, QColor Background) : QWidget(Window)
 		*file = new QMenu("File", m_menubar), *edit = new QMenu("Edit", m_menubar), *layer = new QMenu("Layer", m_menubar),
 		*window = new QMenu("Window", m_menubar);
 	QAction
-		*newproj = new QAction("New", this), /**save = new QAction("Save", this),*/ *exp = new QAction("Export as..."),
+		*newproj = new QAction("New", this), *conn = new QAction("Connect", this),/**save = new QAction("Save", this),*/ *exp = new QAction("Export as..."),
 		*imp = new QAction("Import image sequence", this),
 		*undo = new QAction("Undo", this), *redo = new QAction("Redo", this), *fill = new QAction("Fill", this),
 		*history = new QAction("History", this), *layers = new QAction("Layers", this), *l_copy = new QAction("Duplicate", this);
 
+	connect(conn, &QAction::triggered, [] { CConnect::Open(); });
 	connect(exp, &QAction::triggered, [] { ExportAs(); });
 	connect(imp, &QAction::triggered, [] { ImportSequence(); });
 	connect(fill, &QAction::triggered, [] { if (CLayer* layer = MainWindow::Get().ActiveLayer()) layer->Fill(); });
