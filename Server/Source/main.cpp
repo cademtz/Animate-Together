@@ -1,9 +1,7 @@
 #include <QtCore/QCoreApplication>
-#include <qtcpserver.h>
-#include <qtcpsocket.h>
-#include <qdebug.h>
+#include "Server/CServer.h"
 
-QTcpServer* server;
+CServer* server;
 
 void NewConnection();
 void Close();
@@ -13,22 +11,12 @@ int main(int argc, char *argv[])
 	QCoreApplication a(argc, argv);
 	a.connect(&a, &QCoreApplication::aboutToQuit, &Close);
 
-	qInfo() << "Creating server...";
-
-	server = new QTcpServer(&a);
-	server->connect(server, &QTcpServer::newConnection, &NewConnection);
-	server->listen(QHostAddress::Any, 65535);
+	server = new CServer(argc, argv);
+	server->Listen();
 
 	return a.exec();
 }
 
-void NewConnection()
-{
-	QTcpSocket* sock = server->nextPendingConnection();
-	qInfo() << "New connection from " << sock->peerAddress();
-}
-
 void Close() {
-	qInfo() << "Closing server";
-	server->close();
+	server->Close();
 }

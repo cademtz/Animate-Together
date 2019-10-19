@@ -6,6 +6,7 @@
  */
 
 #include "CClient.h"
+#include <Shared/NetDefaults.h>
 
 CProject* CClient::m_proj;
 QTcpSocket CClient::m_sock;
@@ -13,9 +14,13 @@ QTcpSocket CClient::m_sock;
 void CClient::Connect(QString Host)
 {
 	QStringList info = Host.split(':');
+	int port;
 	if (info.size() < 2) // Use default if port specified
-		info.push_back("65535"); // TODO: Shared source files for connections and defaults
-	m_sock.connectToHost(info[0], info[1].toInt());
+		port = AT_DEFPORT;
+	else
+		port = info[1].toInt();
+
+	m_sock.connectToHost(info.front(), port);
 }
 
 void CClient::Close()
