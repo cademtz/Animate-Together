@@ -104,7 +104,7 @@
     <ClCompile Include="Source\Interface\Connect\CConnect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Client\CClient.cpp">
+    <ClCompile Include="Source\Client\ATClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -252,7 +252,7 @@
     <ClInclude Include="Source\Graphics\GraphicsTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Client\CClient.h">
+    <ClInclude Include="Source\Client\ATClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

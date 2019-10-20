@@ -11,7 +11,7 @@
 
 CServer::CServer(int argc, char * argv[]) : m_port(AT_DEFPORT)
 {
-	connect(this, &QTcpServer::newConnection, this, &CServer::OnConnection);
+	connect(this, &QTcpServer::newConnection, this, &CServer::ClientConnect);
 
 	if (argc < 2)
 		return;
@@ -24,7 +24,7 @@ bool CServer::Listen()
 	if (IsListening())
 		return false;
 
-	qInfo() << "Begin listening";
+	qInfo() << "Listening on port " << m_port;
 	return listen(QHostAddress::Any, m_port);
 }
 
@@ -33,8 +33,23 @@ void CServer::Close() {
 	close();
 }
 
-void CServer::OnConnection()
+void CServer::ClientConnect()
 {
 	QTcpSocket* sock = nextPendingConnection();
-	qInfo() << "New connection from " << sock->peerAddress();
+	connect(sock, &QTcpSocket::disconnected, this, &CServer::ClientDisconnect);
+	connect(sock, &QTcpSocket::readyRead, this, &CServer::Incoming);
+	m_clients.push_back(sock);
+	qInfo() << sock->peerAddress() << "Connected";
+}
+
+void CServer::ClientDisconnect()
+{
+	QTcpSocket* sock = (QTcpSocket*)QObject::sender();
+	m_clients.removeOne(sock);
+	qInfo() << sock << " Disconnected";
+}
+
+void CServer::Incoming()
+{
+	QTcpSocket* sock = (QTcpSocket*)QObject::sender();
 }

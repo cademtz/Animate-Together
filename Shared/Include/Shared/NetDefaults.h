@@ -12,5 +12,6 @@
 #endif
 
 #define AT_DEFPORT 65000
+#define AT_PROTOCOL 0
 
 #endif // NetDefaults_H

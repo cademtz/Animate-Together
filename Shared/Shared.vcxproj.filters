@@ -28,5 +28,13 @@
     <ClInclude Include="Include\Shared\NetDefaults.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Shared\CNetMsg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Include\Shared\CNetMsg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

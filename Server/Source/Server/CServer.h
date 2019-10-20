@@ -12,6 +12,7 @@
 #endif
 
 #include <qtcpserver.h>
+#include <qlist.h>
 
 class CServer : public QTcpServer
 {
@@ -23,12 +24,13 @@ public:
 	inline bool IsListening() const { return this->isListening(); }
 
 protected:
-	void OnConnection();
+	void ClientConnect();
+	void ClientDisconnect();
+	void Incoming();
 
 private:
-
 	uint16_t m_port;
-
+	QList<QTcpSocket*> m_clients;
 };
 
 #endif // CServer_H
