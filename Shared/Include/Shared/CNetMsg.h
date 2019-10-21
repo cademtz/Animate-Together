@@ -12,6 +12,8 @@
 #endif
 
 #include <qtcpsocket.h>
+#include <stdint.h>
+#include "Config.h"
 
 struct CNetMsg
 {
@@ -47,7 +49,7 @@ public:
 	enum e_type : uint8_t
 	{
 		Debug = 0,
-		Info,
+		Protocol,
 		Login,
 		Kick,
 		Ban,
@@ -70,21 +72,26 @@ protected:
 	virtual CNetMsg* NewMsg() = 0;
 
 private:
-	CBaseMsg() { }
-
 	e_type m_type;
 };
 
-class CInfoMsg : public CBaseMsg
+class CProtocolMsg : public CBaseMsg
 {
 public:
-	// - Returns protocol version
-	inline unsigned Protocol() const { return m_protocol; }
+	CProtocolMsg(CNetMsg* Msg);
+	CProtocolMsg()
+		: CBaseMsg(CBaseMsg::Protocol), m_prefix(AT_PROTO_PREFIX), m_major(AT_PROTO_MAJOR), m_minor(AT_PROTO_MINOR) { }
 
+	inline const char* Prefix() const { return m_prefix; }
+	inline unsigned Major() const { return m_major; }
+	inline unsigned Minor() const { return m_minor; }
+
+protected:
 	CNetMsg* NewMsg();
 
 private:
-	unsigned m_protocol;
+	char m_prefix[sizeof(AT_PROTO_PREFIX)];
+	unsigned m_major, m_minor;
 };
 
 #endif // CNetMsg_H

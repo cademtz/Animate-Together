@@ -7,7 +7,7 @@
 
 #include "CServer.h"
 #include <qtcpsocket.h>
-#include <Shared/NetDefaults.h>
+#include <Shared/Config.h>
 
 CServer::CServer(int argc, char * argv[]) : m_port(AT_DEFPORT)
 {

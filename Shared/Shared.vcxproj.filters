@@ -25,10 +25,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Shared\NetDefaults.h">
+    <ClInclude Include="Include\Shared\CNetMsg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Shared\CNetMsg.h">
+    <ClInclude Include="Include\Shared\Config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

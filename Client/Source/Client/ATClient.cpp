@@ -6,7 +6,7 @@
  */
 
 #include "ATClient.h"
-#include <Shared/NetDefaults.h>
+#include <Shared/Config.h>
 #include <Shared/CNetMsg.h>
 #include <qcoreapplication.h>
 
