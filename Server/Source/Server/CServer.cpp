@@ -8,6 +8,7 @@
 #include "CServer.h"
 #include <qtcpsocket.h>
 #include <Shared/Config.h>
+#include <Shared/CNetMsg.h>
 
 CServer::CServer(int argc, char * argv[]) : m_port(AT_DEFPORT)
 {
@@ -49,7 +50,13 @@ void CServer::ClientDisconnect()
 	qInfo() << sock << " Disconnected";
 }
 
+bool pending = false;
+
 void CServer::Incoming()
 {
 	QTcpSocket* sock = (QTcpSocket*)QObject::sender();
+	qInfo() << sock << "Sent data (" << sock->readBufferSize() << " bytes)";
+	sock->readAll();
+	//if (CNetMsg* msg = CNetMsg::FromData(sock->readBufferSize(), sock->readAll().data())
+		
 }

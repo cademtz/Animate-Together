@@ -11,8 +11,9 @@
 #pragma once
 #endif
 
-#include <qtcpsocket.h>
 #include <stdint.h>
+#include <qendian.h>
+#include <qtcpsocket.h>
 #include "Config.h"
 
 struct CNetMsg
@@ -20,8 +21,8 @@ struct CNetMsg
 public:
 	inline const char* Data() const { return (const char*)this; }
 	inline size_t Length() const { return m_len; }
-	inline void Send(QTcpSocket& Socket) {
-		Socket.write(Data(), m_len);
+	inline void Send(QTcpSocket* Socket) {
+		Socket->write(Data(), m_len);
 	}
 
 	// - Casts 'data' to a CNetMsg pointer
@@ -31,7 +32,7 @@ public:
 		if (length >= sizeof(CNetMsg))
 		{
 			CNetMsg* msg = (CNetMsg*)data;
-			if (msg->m_len < length)
+			if (qFromBigEndian(msg->m_len) <= length)
 				return msg;
 		}
 		return 0;
@@ -58,12 +59,14 @@ public:
 
 	inline e_type Type() const { return m_type; }
 
-	void Send(QTcpSocket& Socket)
+	void Send(QTcpSocket* Socket)
 	{
 		CNetMsg* msg = NewMsg();
 		msg->Send(Socket);
 		delete msg;
 	}
+
+	virtual ~CBaseMsg() { }
 
 protected:
 	CBaseMsg(e_type Type) : m_type(Type) { }

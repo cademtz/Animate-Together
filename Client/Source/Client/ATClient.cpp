@@ -33,7 +33,10 @@ void ATClient::Connect(QString Host)
 	_sock->connectToHost(info.front(), port);
 }
 
-void ATClient::Private::Connected() {
+void ATClient::Private::Connected()
+{
+	CProtocolMsg msg = CProtocolMsg();
+	msg.Send(_sock);
 }
 
 void ATClient::Private::Disconnected() {

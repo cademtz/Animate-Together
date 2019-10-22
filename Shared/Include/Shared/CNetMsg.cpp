@@ -8,7 +8,6 @@
 #include "CNetMsg.h"
 #include <cstring>
 #include <cassert>
-#include <qendian.h>
 
 // I'm just messing around with random stuff for serializing. Could probably make it cleaner or just use a library
 
@@ -23,7 +22,7 @@ inline void NextData(const char* Src, P& DestPos)
 template <class D, class P>
 inline void NextData(D Src, P& DestPos)
 {
-	qToBigEndian(Src, Dst);
+	qToBigEndian(Src, DestPos);
 	DestPos += sizeof(D);
 }
 
@@ -63,16 +62,6 @@ struct CalcSize
 	CalcSize() : len(0) { }
 };
 
-CNetMsg * CProtocolMsg::NewMsg()
-{
-	unsigned len = CalcSize() << len << Type() << AT_PROTO_PREFIX;
-	char* data = new char[len], * pos = data;
-	NextData(len, pos);
-	NextData(Type(), pos);
-	NextData(AT_PROTO_PREFIX, pos);
-	return CNetMsg::FromData(len, data);
-}
-
 CProtocolMsg::CProtocolMsg(CNetMsg * Msg) : CBaseMsg(Protocol)
 {
 	const char* pos = Msg->Data() + sizeof(m_prefix);
@@ -81,4 +70,14 @@ CProtocolMsg::CProtocolMsg(CNetMsg * Msg) : CBaseMsg(Protocol)
 	strcpy_s(m_prefix, Msg->Data());
 	GetData(m_major, pos);
 	GetData(m_minor, pos);
+}
+
+CNetMsg * CProtocolMsg::NewMsg()
+{
+	unsigned len = CalcSize() << len << Type() << AT_PROTO_PREFIX;
+	char* data = new char[len], * pos = data;
+	NextData(len, pos);
+	NextData((uint8_t)Type(), pos);
+	NextData(AT_PROTO_PREFIX, pos);
+	return CNetMsg::FromData(len, data);
 }
