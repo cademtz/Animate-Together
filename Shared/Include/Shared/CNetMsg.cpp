@@ -41,19 +41,19 @@ struct CalcSize
 		return len;
 	}
 
-	inline CalcSize& operator<<(CalcSize other)
+	inline CalcSize& operator+(CalcSize other)
 	{
 		len += other;
 		return *this;
 	}
 
-	inline CalcSize& operator<<(const char* Str) {
+	inline CalcSize& operator+(const char* Str) {
 		len += strlen(Str) + 1;
 		return *this;
 	}
 
 	template <class T>
-	inline CalcSize& operator<<(T)
+	inline CalcSize& operator+(T)
 	{
 		len += sizeof(T);
 		return *this;
@@ -74,10 +74,21 @@ CProtocolMsg::CProtocolMsg(CNetMsg * Msg) : CBaseMsg(Protocol)
 
 CNetMsg * CProtocolMsg::NewMsg()
 {
-	unsigned len = CalcSize() << len << Type() << AT_PROTO_PREFIX;
+	unsigned len = CalcSize() + len + Type() + AT_PROTO_PREFIX;
 	char* data = new char[len], * pos = data;
 	NextData(len, pos);
 	NextData((uint8_t)Type(), pos);
 	NextData(AT_PROTO_PREFIX, pos);
 	return CNetMsg::FromData(len, data);
+}
+
+CNetMsg * CNetMsg::FromData(unsigned length, char data[])
+{
+	if (length >= sizeof(m_len))
+	{
+		CNetMsg* msg = (CNetMsg*)data;
+		if (msg->Length() <= length)
+			return msg;
+	}
+	return 0;
 }

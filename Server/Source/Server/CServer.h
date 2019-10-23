@@ -13,6 +13,7 @@
 
 #include <qtcpserver.h>
 #include <qlist.h>
+#include "ClientSocket\CClientSocket.h"
 
 class CServer : public QTcpServer
 {
@@ -26,11 +27,12 @@ public:
 protected:
 	void ClientConnect();
 	void ClientDisconnect();
-	void Incoming();
 
 private:
 	uint16_t m_port;
-	QList<QTcpSocket*> m_clients;
+	QList<CClientSocket> m_clients;
+
+	CClientSocket* GetClient(QTcpSocket* Socket);
 };
 
 #endif // CServer_H

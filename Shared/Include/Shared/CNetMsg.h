@@ -18,29 +18,23 @@
 
 struct CNetMsg
 {
-public:
 	inline const char* Data() const { return (const char*)this; }
-	inline size_t Length() const { return m_len; }
+	inline size_t Length() const { return qFromBigEndian(m_len); }
+	inline uint8_t Type() const { return qFromBigEndian(m_type); }
 	inline void Send(QTcpSocket* Socket) {
-		Socket->write(Data(), m_len);
+		Socket->write(Data(), Length());
 	}
 
-	// - Casts 'data' to a CNetMsg pointer
+	// - Casts data to a CNetMsg pointer
 	// - Returns 0 instead if the message is incomplete
-	static CNetMsg* FromData(unsigned length, char data[])
-	{
-		if (length >= sizeof(CNetMsg))
-		{
-			CNetMsg* msg = (CNetMsg*)data;
-			if (qFromBigEndian(msg->m_len) <= length)
-				return msg;
-		}
-		return 0;
+	inline static CNetMsg* FromData(QByteArray Bytes) {
+		return FromData(Bytes.size(), Bytes.data());
 	}
+	static CNetMsg* FromData(unsigned Length, char Data[]);
 
 private:
-
-	size_t m_len;
+	unsigned m_len;
+	uint8_t m_type;
 	char m_rawdata[];
 };
 

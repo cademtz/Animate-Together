@@ -38,7 +38,6 @@ void CServer::ClientConnect()
 {
 	QTcpSocket* sock = nextPendingConnection();
 	connect(sock, &QTcpSocket::disconnected, this, &CServer::ClientDisconnect);
-	connect(sock, &QTcpSocket::readyRead, this, &CServer::Incoming);
 	m_clients.push_back(sock);
 	qInfo() << sock->peerAddress() << "Connected";
 }
@@ -46,17 +45,21 @@ void CServer::ClientConnect()
 void CServer::ClientDisconnect()
 {
 	QTcpSocket* sock = (QTcpSocket*)QObject::sender();
-	m_clients.removeOne(sock);
-	qInfo() << sock << " Disconnected";
+	for (int i = 0; i < m_clients.size(); i++)
+	{
+		if (m_clients[i].Socket() == sock)
+		{
+			m_clients.removeAt(i);
+			break;
+		}
+	}
+	qInfo() << sock->peerAddress() << " Disconnected";
 }
 
-bool pending = false;
-
-void CServer::Incoming()
+CClientSocket * CServer::GetClient(QTcpSocket * Socket)
 {
-	QTcpSocket* sock = (QTcpSocket*)QObject::sender();
-	qInfo() << sock << "Sent data (" << sock->readBufferSize() << " bytes)";
-	sock->readAll();
-	//if (CNetMsg* msg = CNetMsg::FromData(sock->readBufferSize(), sock->readAll().data())
-		
+	for (auto& client : m_clients)
+		if (client.Socket() == Socket)
+			return &client;
+	return 0;
 }

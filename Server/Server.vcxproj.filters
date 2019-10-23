@@ -27,9 +27,15 @@
     <ClCompile Include="Source\Server\CServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\ClientSocket\CClientSocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Server\CServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ClientSocket\CClientSocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
