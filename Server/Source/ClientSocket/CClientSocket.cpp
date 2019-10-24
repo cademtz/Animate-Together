@@ -12,24 +12,22 @@
 
 CClientSocket::CClientSocket(QTcpSocket * Socket, CServer * Parent)
 	: CSocketMgr(Socket, Parent), m_parent(Parent) {
+	SendMsg(CProtocolMsg());
 }
 
 void CClientSocket::HandleMsg(CNetMsg * Msg)
 {
-	qInfo() << "Handling msg...";
-
 	if (m_stage == ATNet::ProtocolStage)
 	{
-		// Check protocol and abort connection if unmatching
 		if (Msg->Type() == CBaseMsg::ProtocolMsg)
 		{
-			//if (ATNet::GoodProtocol(CProtocolMsg(Msg)))
 			CProtocolMsg proto(Msg);
 			if (!strcmp(proto.Prefix(), AT_PROTO_PREFIX) &&
 				proto.Major() == AT_PROTO_MAJOR &&
 				proto.Minor() == AT_PROTO_MINOR)
 			{
 				m_stage = ATNet::JoinStage;
+				qInfo() << Socket()->peerAddress() << ": Good protocol";
 				return;
 			}
 		}
@@ -40,7 +38,7 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 	switch (Msg->Type())
 	{
 	case CBaseMsg::ChatMsg:
-		qInfo() << CChatMsg(Msg).Text();
+		qInfo() << "Chat: " << CChatMsg(Msg).Text();
 		break;
 	}
 }

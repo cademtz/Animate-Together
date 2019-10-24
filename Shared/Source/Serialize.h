@@ -55,9 +55,8 @@ inline void GetData(char(&Dest)[N], P& SrcPos)
 template <class P>
 inline void GetData(QString& Dest, size_t Length, P& SrcPos)
 {
-	size_t size = Length * sizeof(QChar);
-	Dest = QString::fromUtf16((const ushort*)SrcPos, size);
-	SrcPos += size;
+	Dest = QString::fromUtf16((const ushort*)SrcPos, Length);
+	SrcPos += Length * sizeof(QChar);
 }
 
 template <class D, class P>

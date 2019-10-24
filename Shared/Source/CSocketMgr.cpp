@@ -19,19 +19,16 @@ CSocketMgr::CSocketMgr(QTcpSocket* Socket, QObject* Parent) : QObject(Parent), m
 
 void CSocketMgr::Incoming()
 {
-	//qInfo() << m_sock->peerAddress() << "Sent data (" << m_sock->bytesAvailable() << " bytes)";
 	qint64 unread = m_sock->bytesAvailable();
 
 	// Enough bytes to complete the next msg or read new msg length
 	while ((!m_nextmsg && unread >= sizeof(m_nextmsg)) || (m_nextmsg && unread >= m_nextmsg))
 	{
-		qInfo() << "A - m_nextmsg: " << m_nextmsg << ", unread: " << unread;
 		if (!m_nextmsg)
 		{
 			m_buffer = m_sock->read(sizeof(m_nextmsg));
 			m_nextmsg = ((CNetMsg*)m_buffer.data())->Length() - m_buffer.size();
 		}
-		qInfo() << "B - m_nextmsg: " << m_nextmsg << ", unread: " << unread;
 		if (m_sock->bytesAvailable() >= m_nextmsg)
 		{
 			m_buffer.append(m_sock->read(m_nextmsg));
@@ -40,6 +37,5 @@ void CSocketMgr::Incoming()
 			m_nextmsg = 0;
 		}
 		unread = m_sock->bytesAvailable();
-		qInfo() << "C - m_nextmsg: " << m_nextmsg << ", unread: " << unread;
 	}
 }

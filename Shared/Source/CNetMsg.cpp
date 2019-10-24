@@ -59,7 +59,7 @@ CChatMsg::CChatMsg(const char* Text) : CBaseMsg(ChatMsg)
 
 CNetMsg * CChatMsg::NewMsg()
 {
-	unsigned len = CalcSize() + len + Type() + m_text;
+	unsigned len = CalcSize() + len + Type() + m_text.size() + m_text;
 	char* data = new char[len], *pos = data;
 	NextData(len, pos);
 	NextData(Type(), pos);

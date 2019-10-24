@@ -66,7 +66,7 @@ public:
 protected:
 	CBaseMsg(e_type Type) : m_type(Type) { }
 
-	// - Allocates and creates a CNetMsg with serialized data
+	// - Allocates and constructs a CNetMsg from serialized data
 	virtual CNetMsg* NewMsg() = 0;
 
 private:
