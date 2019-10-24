@@ -6,49 +6,41 @@
  */
 
 #include "CClientSocket.h"
-#include <Shared/CNetMsg.h>
 #include <qtcpserver.h>
-#include <qdebug.h>
+#include <Shared/CNetMsg.h>
+#include "Server/CServer.h"
 
-CClientSocket::CClientSocket(QTcpSocket * Socket): m_sock(Socket) {
-	m_sock->connect(m_sock, &QTcpSocket::readyRead, [this] { Incoming(); });
-}
-
-void CClientSocket::Incoming()
-{
-	qInfo() << m_sock->peerAddress() << "Sent data (" << m_sock->bytesAvailable() << " bytes)";
-	qint64 unread = m_sock->bytesAvailable();
-
-	// Enough bytes to complete the next msg or read new msg length
-	while ((!m_nextmsg && unread >= sizeof(m_nextmsg)) || (m_nextmsg && unread >= m_nextmsg))
-	{
-		if (!m_nextmsg)
-		{
-			m_buffer = m_sock->read(sizeof(m_nextmsg));
-			CNetMsg* msg = CNetMsg::FromData(m_buffer);
-			if (msg)
-				m_nextmsg = msg->Length() - m_buffer.size();
-		}
-		if (m_sock->bytesAvailable() >= m_nextmsg)
-		{
-			m_buffer.append(m_sock->read(m_nextmsg));
-			if (CNetMsg* msg = CNetMsg::FromData(m_buffer))
-				HandleMsg(msg);
-			m_nextmsg = 0;
-		}
-	}
+CClientSocket::CClientSocket(QTcpSocket * Socket, CServer * Parent)
+	: CSocketMgr(Socket, Parent), m_parent(Parent) {
 }
 
 void CClientSocket::HandleMsg(CNetMsg * Msg)
 {
+	qInfo() << "Handling msg...";
+
+	if (m_stage == ATNet::ProtocolStage)
+	{
+		// Check protocol and abort connection if unmatching
+		if (Msg->Type() == CBaseMsg::ProtocolMsg)
+		{
+			//if (ATNet::GoodProtocol(CProtocolMsg(Msg)))
+			CProtocolMsg proto(Msg);
+			if (!strcmp(proto.Prefix(), AT_PROTO_PREFIX) &&
+				proto.Major() == AT_PROTO_MAJOR &&
+				proto.Minor() == AT_PROTO_MINOR)
+			{
+				m_stage = ATNet::JoinStage;
+				return;
+			}
+		}
+		Socket()->abort();
+		return;
+	}
+
 	switch (Msg->Type())
 	{
-	case CBaseMsg::Protocol:
-	{
-		CProtocolMsg proto(Msg);
-		qInfo() << m_sock->peerAddress() << "Sent protocol: ("
-			<< proto.Prefix() << ", " <<  proto.Major() << ", " << proto.Minor() << ')';
+	case CBaseMsg::ChatMsg:
+		qInfo() << CChatMsg(Msg).Text();
 		break;
-	}
 	}
 }

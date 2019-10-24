@@ -1,5 +1,5 @@
 /*	Description:
- *		A class to pair sockets with client-specific information and handle net messages
+ *		A class to pair sockets with client-specific information and handle messages use Animate Together's protocol
  *
  *	Author: Hold on!
  *	Created: 10/22/2019 5:58:15 PM
@@ -12,23 +12,23 @@
 #endif
 
 #include <qtcpsocket.h>
+#include <Shared/CSocketMgr.h>
+#include <Shared/Protocol.h>
 
 class CNetMsg;
+class CServer;
 
-class CClientSocket
+class CClientSocket : public CSocketMgr
 {
 public:
-	CClientSocket(QTcpSocket* Socket);
+	CClientSocket(QTcpSocket* Socket, CServer* Parent);
 
-	inline QTcpSocket* Socket() { return m_sock; }
+protected:
+	void HandleMsg(CNetMsg* Msg) override;
 
 private:
-	QTcpSocket* m_sock;
-	QByteArray m_buffer;
-	unsigned m_nextmsg = 0;
-
-	void Incoming();
-	void HandleMsg(CNetMsg* Msg);
+	ATNet::EProtoStage m_stage = ATNet::ProtocolStage;
+	CServer* m_parent;
 };
 
 #endif // CClientSocket_H

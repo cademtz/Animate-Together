@@ -18,19 +18,20 @@
 
 struct CNetMsg
 {
-	inline const char* Data() const { return (const char*)this; }
+	inline const char* Raw() const { return (const char*)this; }
+	inline const char* Data() const { return m_rawdata; }
 	inline size_t Length() const { return qFromBigEndian(m_len); }
 	inline uint8_t Type() const { return qFromBigEndian(m_type); }
 	inline void Send(QTcpSocket* Socket) {
-		Socket->write(Data(), Length());
+		Socket->write(Raw(), Length());
 	}
 
 	// - Casts data to a CNetMsg pointer
 	// - Returns 0 instead if the message is incomplete
-	inline static CNetMsg* FromData(QByteArray Bytes) {
+	inline static CNetMsg* FromData(QByteArray& Bytes) {
 		return FromData(Bytes.size(), Bytes.data());
 	}
-	static CNetMsg* FromData(unsigned Length, char Data[]);
+	static CNetMsg* FromData(unsigned Length, char* Data);
 
 private:
 	unsigned m_len;
@@ -43,15 +44,15 @@ class CBaseMsg
 public:
 	enum e_type : uint8_t
 	{
-		Debug = 0,
-		Protocol,
-		Login,
-		Kick,
-		Ban,
-		Chat,
+		DebugMsg = 0,
+		ProtocolMsg,
+		LoginMsg,
+		KickMsg,
+		BanMsg,
+		ChatMsg,
 	};
 
-	inline e_type Type() const { return m_type; }
+	inline uint8_t Type() const { return m_type; }
 
 	void Send(QTcpSocket* Socket)
 	{
@@ -77,7 +78,7 @@ class CProtocolMsg : public CBaseMsg
 public:
 	CProtocolMsg(CNetMsg* Msg);
 	CProtocolMsg()
-		: CBaseMsg(CBaseMsg::Protocol), m_prefix(AT_PROTO_PREFIX), m_major(AT_PROTO_MAJOR), m_minor(AT_PROTO_MINOR) { }
+		: CBaseMsg(ProtocolMsg), m_prefix(AT_PROTO_PREFIX), m_major(AT_PROTO_MAJOR), m_minor(AT_PROTO_MINOR) { }
 
 	inline const char* Prefix() const { return m_prefix; }
 	inline unsigned Major() const { return m_major; }
@@ -89,6 +90,22 @@ protected:
 private:
 	char m_prefix[sizeof(AT_PROTO_PREFIX)];
 	unsigned m_major, m_minor;
+};
+
+class CChatMsg : public CBaseMsg
+{
+public:
+	CChatMsg(CNetMsg* Msg);
+	CChatMsg(const char* Text = 0);
+
+	inline const QString& Text() const { return m_text; }
+	inline void SetText(const QString& String) { m_text = String; }
+
+protected:
+	CNetMsg* NewMsg();
+
+private:
+	QString m_text;
 };
 
 #endif // CNetMsg_H

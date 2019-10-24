@@ -7,8 +7,9 @@
 
 #include "CServer.h"
 #include <qtcpsocket.h>
-#include <Shared/Config.h>
 #include <Shared/CNetMsg.h>
+#include <Shared/Protocol.h>
+#include "ClientSocket/CClientSocket.h"
 
 CServer::CServer(int argc, char * argv[]) : m_port(AT_DEFPORT)
 {
@@ -37,8 +38,7 @@ void CServer::Close() {
 void CServer::ClientConnect()
 {
 	QTcpSocket* sock = nextPendingConnection();
-	connect(sock, &QTcpSocket::disconnected, this, &CServer::ClientDisconnect);
-	m_clients.push_back(sock);
+	m_clients.push_back(new CClientSocket(sock, this));
 	qInfo() << sock->peerAddress() << "Connected";
 }
 
@@ -47,8 +47,9 @@ void CServer::ClientDisconnect()
 	QTcpSocket* sock = (QTcpSocket*)QObject::sender();
 	for (int i = 0; i < m_clients.size(); i++)
 	{
-		if (m_clients[i].Socket() == sock)
+		if (m_clients[i]->Socket() == sock)
 		{
+			delete m_clients[i];
 			m_clients.removeAt(i);
 			break;
 		}
@@ -58,8 +59,8 @@ void CServer::ClientDisconnect()
 
 CClientSocket * CServer::GetClient(QTcpSocket * Socket)
 {
-	for (auto& client : m_clients)
-		if (client.Socket() == Socket)
-			return &client;
+	for (auto client : m_clients)
+		if (client->Socket() == Socket)
+			return client;
 	return 0;
 }

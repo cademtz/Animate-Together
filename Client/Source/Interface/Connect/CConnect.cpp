@@ -1,5 +1,5 @@
 #include "CConnect.h"
-#include "Client/ATClient.h"
+#include "Client/CClient.h"
 
 CConnect::CConnect(QWidget *parent)
 	: QWidget(parent)
@@ -21,6 +21,6 @@ CConnect::CConnect(QWidget *parent)
 
 void CConnect::Connect()
 {
-	ATClient::Connect(ui.tb_host->text());
+	CClient::Connect(ui.tb_host->text());
 	close();
 }
