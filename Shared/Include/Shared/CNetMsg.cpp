@@ -5,7 +5,7 @@
  *	Created: 10/19/2019 9:04:06 PM
  */
 
-#include "Shared/CNetMsg.h"
+#include "CNetMsg.h"
 #include <cstring>
 #include <cassert>
 #include "Serialize.h"
@@ -31,6 +31,13 @@ CProtocolMsg::CProtocolMsg(CNetMsg * Msg) : CBaseMsg(ProtocolMsg)
 	GetData(m_minor, pos);
 }
 
+bool CProtocolMsg::Compatible()
+{
+	return !strcmp(Prefix(), AT_PROTO_PREFIX) &&
+		Major() == AT_PROTO_MAJOR &&
+		Minor() == AT_PROTO_MINOR;
+}
+
 CNetMsg * CProtocolMsg::NewMsg()
 {
 	unsigned len = CalcSize() + len + Type() + AT_PROTO_PREFIX + m_major + m_minor;
@@ -43,18 +50,39 @@ CNetMsg * CProtocolMsg::NewMsg()
 	return CNetMsg::FromData(len, data);
 }
 
+CLoginMsg::CLoginMsg(CNetMsg * Msg) : CBaseMsg(LoginMsg)
+{
+	const char* pos = Msg->Data();
+	int userlen, passlen;
+	GetData(userlen, pos);
+	GetData(m_user, userlen, pos);
+	GetData(passlen, pos);
+	GetData(m_pass, passlen, pos);
+}
+
+bool CLoginMsg::Verify() {
+	return true; // Not implemented
+}
+
+CNetMsg * CLoginMsg::NewMsg()
+{
+	unsigned len = CalcSize() + len + Type() + m_user.size() + m_user + m_pass.size() + m_pass;
+	char* data = new char[len], * pos = data;
+	NextData(len, pos);
+	NextData(Type(), pos);
+	NextData(m_user.size(), pos);
+	NextData(m_user, pos);
+	NextData(m_pass.size(), pos);
+	NextData(m_pass, pos);
+	return CNetMsg::FromData(len, data);
+}
+
 CChatMsg::CChatMsg(CNetMsg * Msg) : CBaseMsg(ChatMsg)
 {
 	const char* pos = Msg->Data();
 	int textlen;
 	GetData(textlen, pos);
 	GetData(m_text, textlen, pos);
-}
-
-CChatMsg::CChatMsg(const char* Text) : CBaseMsg(ChatMsg)
-{
-	if (Text)
-		m_text = Text;
 }
 
 CNetMsg * CChatMsg::NewMsg()

@@ -23,12 +23,17 @@ class CClientSocket : public CSocketMgr
 public:
 	CClientSocket(QTcpSocket* Socket, CServer* Parent);
 
+	inline QString Name() const { return m_user; }
+
 protected:
 	void HandleMsg(CNetMsg* Msg) override;
+	void Disconnected() override;
 
 private:
 	ATNet::EProtoStage m_stage = ATNet::ProtocolStage;
 	CServer* m_parent;
+
+	QString m_user;
 };
 
 #endif // CClientSocket_H

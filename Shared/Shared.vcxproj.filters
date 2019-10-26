@@ -39,13 +39,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\CNetMsg.cpp">
+    <ClCompile Include="Include\Shared\CNetMsg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\CSocketMgr.cpp">
+    <ClCompile Include="Include\Shared\CSocketMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Protocol.cpp">
+    <ClCompile Include="Include\Shared\Protocol.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

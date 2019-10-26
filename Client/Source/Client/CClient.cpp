@@ -42,14 +42,10 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		// Check protocol and abort connection if unmatching
 		if (Msg->Type() == CBaseMsg::ProtocolMsg)
 		{
-			//if (ATNet::GoodProtocol(CProtocolMsg(Msg)))
-			CProtocolMsg proto(Msg);
-			if (!strcmp(proto.Prefix(), AT_PROTO_PREFIX) &&
-				proto.Major() == AT_PROTO_MAJOR &&
-				proto.Minor() == AT_PROTO_MINOR)
+			if (CProtocolMsg(Msg).Compatible())
 			{
 				m_stage = ATNet::JoinStage;
-				SendMsg(CChatMsg("Hello from animator!"));
+				SendMsg(CLoginMsg("Hello from animator!"));
 				return;
 			}
 		}

@@ -80,29 +80,48 @@ public:
 	CProtocolMsg()
 		: CBaseMsg(ProtocolMsg), m_prefix(AT_PROTO_PREFIX), m_major(AT_PROTO_MAJOR), m_minor(AT_PROTO_MINOR) { }
 
+	// - Returns true if the protocol will maintain compatibility with current version
+	bool Compatible();
+
 	inline const char* Prefix() const { return m_prefix; }
 	inline unsigned Major() const { return m_major; }
 	inline unsigned Minor() const { return m_minor; }
 
 protected:
-	CNetMsg* NewMsg();
+	CNetMsg* NewMsg() override;
 
 private:
 	char m_prefix[sizeof(AT_PROTO_PREFIX)];
 	unsigned m_major, m_minor;
 };
 
+class CLoginMsg : public CBaseMsg
+{
+public:
+	CLoginMsg(CNetMsg* Msg);
+	CLoginMsg(QString User, QString Pass = QString()) : CBaseMsg(LoginMsg), m_user(User), m_pass(Pass) { }
+
+	// - Checks given login. How a server verifies is determined in configuration
+	bool Verify();
+
+protected:
+	CNetMsg* NewMsg() override;
+
+private:
+	QString m_user, m_pass;
+};
+
 class CChatMsg : public CBaseMsg
 {
 public:
 	CChatMsg(CNetMsg* Msg);
-	CChatMsg(const char* Text = 0);
+	CChatMsg(QString Text = QString()) : CBaseMsg(ChatMsg), m_text(Text) { }
 
 	inline const QString& Text() const { return m_text; }
 	inline void SetText(const QString& String) { m_text = String; }
 
 protected:
-	CNetMsg* NewMsg();
+	CNetMsg* NewMsg() override;
 
 private:
 	QString m_text;

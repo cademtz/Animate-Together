@@ -11,10 +11,4 @@
 
 namespace ATNet
 {
-	bool GoodProtocol(const CProtocolMsg * Msg)
-	{
-		return !strcmp(Msg->Prefix(), AT_PROTO_PREFIX) &&
-			Msg->Major() == AT_PROTO_MAJOR &&
-			Msg->Minor() == AT_PROTO_MINOR;
-	}
 }

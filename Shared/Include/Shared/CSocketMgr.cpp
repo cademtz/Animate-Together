@@ -4,7 +4,7 @@
  *	Author: Hold on!
  *	Created: 10/23/2019 11:15:54 PM
  */
-#include "Shared/CSocketMgr.h"
+#include "CSocketMgr.h"
 
 CSocketMgr::CSocketMgr(QTcpSocket* Socket, QObject* Parent) : QObject(Parent), m_sock(Socket)
 {
