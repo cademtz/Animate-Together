@@ -8,6 +8,7 @@
 #include "CClient.h"
 #include <Shared/CNetMsg.h>
 #include <qcoreapplication.h>
+#include <qmessagebox.h>
 
 void CClient::Connect(QString Host)
 {
@@ -37,19 +38,39 @@ void CClient::Disconnected() {
 
 void CClient::HandleMsg(CNetMsg * Msg)
 {
-	if (m_stage == ATNet::ProtocolStage)
+	if (m_stage > ATNet::ProtocolStage) // Priority messages that can occur at any time
 	{
-		// Check protocol and abort connection if unmatching
-		if (Msg->Type() == CBaseMsg::ProtocolMsg)
+		switch (Msg->Type())
 		{
-			if (CProtocolMsg(Msg).Compatible())
-			{
-				m_stage = ATNet::JoinStage;
-				SendMsg(CLoginMsg("Hello from animator!"));
-				return;
-			}
+		case CBaseMsg::ServerMsg:
+			QMessageBox(QMessageBox::NoIcon, tr("Server message"), CServerMsg(Msg).Text()).exec();
+			break;
 		}
-		Socket()->abort();
+	}
+
+	switch (m_stage)
+	{
+	case ATNet::ProtocolStage:
+		// Check protocol and abort connection if unmatching
+		if (Msg->Type() == CBaseMsg::ProtocolMsg && CProtocolMsg(Msg).Compatible())
+		{
+			m_stage = ATNet::JoinStage;
+			SendMsg(CLoginMsg("Hold", "on!"));
+		}
+		else
+			Socket()->abort();
+		return;
+	case ATNet::JoinStage:
+		if (Msg->Type() == CBaseMsg::WelcomeMsg)
+		{
+			m_stage = ATNet::FinalStage;
+			SendMsg(CChatMsg("Hello from animator!"));
+			CWelcomeMsg welcome(Msg);
+			QMessageBox(QMessageBox::NoIcon, "Message of the Day", welcome.Motd()).exec();
+			return;
+		}
+		else
+			Socket()->close();
 		return;
 	}
 

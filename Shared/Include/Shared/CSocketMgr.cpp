@@ -22,7 +22,8 @@ void CSocketMgr::Incoming()
 	qint64 unread = m_sock->bytesAvailable();
 
 	// Enough bytes to complete the next msg or read new msg length
-	while ((!m_nextmsg && unread >= sizeof(m_nextmsg)) || (m_nextmsg && unread >= m_nextmsg))
+	while (m_sock->state() == QTcpSocket::ConnectedState &&
+		((!m_nextmsg && unread >= sizeof(m_nextmsg)) || (m_nextmsg && unread >= m_nextmsg)))
 	{
 		if (!m_nextmsg)
 		{

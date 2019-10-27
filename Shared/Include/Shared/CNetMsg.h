@@ -44,17 +44,18 @@ class CBaseMsg
 public:
 	enum e_type : uint8_t
 	{
-		DebugMsg = 0,
-		ProtocolMsg,
-		LoginMsg,
-		KickMsg,
-		BanMsg,
-		ChatMsg,
+		ServerMsg = 0,	// - A message box from the server
+		ProtocolMsg,	// - Sender's protocol info
+		LoginMsg,		// - Sender's login info
+		KickMsg,		// - User request to kick
+		BanMsg,			// - User request to ban
+		ChatMsg,		// - Chat message from server or user
+		WelcomeMsg,		// - Server has accepted user's login and sends the MOTD
 	};
 
 	inline uint8_t Type() const { return m_type; }
 
-	void Send(QTcpSocket* Socket)
+	void Send(QTcpSocket* Socket) const
 	{
 		CNetMsg* msg = NewMsg();
 		msg->Send(Socket);
@@ -67,10 +68,25 @@ protected:
 	CBaseMsg(e_type Type) : m_type(Type) { }
 
 	// - Allocates and constructs a CNetMsg from serialized data
-	virtual CNetMsg* NewMsg() = 0;
+	virtual CNetMsg* NewMsg() const = 0;
 
 private:
 	e_type m_type;
+};
+
+class CServerMsg : public CBaseMsg
+{
+public:
+	CServerMsg(CNetMsg* Msg);
+	CServerMsg(QString Text) : CBaseMsg(ServerMsg), m_text(Text) { }
+
+	inline QString Text() const { return m_text; }
+
+protected:
+	CNetMsg* NewMsg() const override;
+		
+private:
+	QString m_text;
 };
 
 class CProtocolMsg : public CBaseMsg
@@ -88,7 +104,7 @@ public:
 	inline unsigned Minor() const { return m_minor; }
 
 protected:
-	CNetMsg* NewMsg() override;
+	CNetMsg* NewMsg() const override;
 
 private:
 	char m_prefix[sizeof(AT_PROTO_PREFIX)];
@@ -99,13 +115,15 @@ class CLoginMsg : public CBaseMsg
 {
 public:
 	CLoginMsg(CNetMsg* Msg);
-	CLoginMsg(QString User, QString Pass = QString()) : CBaseMsg(LoginMsg), m_user(User), m_pass(Pass) { }
+	CLoginMsg(QString User, QString Pass = QString())
+		: CBaseMsg(LoginMsg), m_user(User), m_pass(Pass) { }
+	CLoginMsg() : CBaseMsg(LoginMsg) { }
 
-	// - Checks given login. How a server verifies is determined in configuration
-	bool Verify();
+	inline QString User() const { return m_user; }
+	inline QString Pass() const { return m_pass; }
 
 protected:
-	CNetMsg* NewMsg() override;
+	CNetMsg* NewMsg() const override;
 
 private:
 	QString m_user, m_pass;
@@ -121,10 +139,30 @@ public:
 	inline void SetText(const QString& String) { m_text = String; }
 
 protected:
-	CNetMsg* NewMsg() override;
+	CNetMsg* NewMsg() const override;
 
 private:
 	QString m_text;
+};
+
+class CWelcomeMsg : public CBaseMsg
+{
+public:
+	CWelcomeMsg(CNetMsg* Msg);
+	CWelcomeMsg(QString Motd = QString(), bool IsUrl = false)
+		: CBaseMsg(WelcomeMsg), m_motd(Motd), m_url(IsUrl) { }
+
+	inline bool IsUrl() const { return m_url; }
+	inline QString Motd() const { return m_motd; }
+
+	inline void SetMotd(QString Motd, bool IsUrl = false) { m_motd = Motd, m_url = IsUrl; }
+
+protected:
+	CNetMsg* NewMsg() const override;
+
+private:
+	bool m_url;
+	QString m_motd;
 };
 
 #endif // CNetMsg_H

@@ -24,15 +24,22 @@ public:
 	CClientSocket(QTcpSocket* Socket, CServer* Parent);
 
 	inline QString Name() const { return m_user; }
+	void Kick(QString Reason);
 
 protected:
 	void HandleMsg(CNetMsg* Msg) override;
 	void Disconnected() override;
 
 private:
+	// - Returns true on valid login and sets user information
+	// - Method of checking depends on server configuration
+	bool CheckLogin(CNetMsg* Msg);
+
 	ATNet::EProtoStage m_stage = ATNet::ProtocolStage;
 	CServer* m_parent;
 
+	// - User ID, unique within session
+	unsigned m_uuid = 0;
 	QString m_user;
 };
 

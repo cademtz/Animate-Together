@@ -38,7 +38,7 @@ bool CProtocolMsg::Compatible()
 		Minor() == AT_PROTO_MINOR;
 }
 
-CNetMsg * CProtocolMsg::NewMsg()
+CNetMsg * CProtocolMsg::NewMsg() const
 {
 	unsigned len = CalcSize() + len + Type() + AT_PROTO_PREFIX + m_major + m_minor;
 	char* data = new char[len], * pos = data;
@@ -60,11 +60,7 @@ CLoginMsg::CLoginMsg(CNetMsg * Msg) : CBaseMsg(LoginMsg)
 	GetData(m_pass, passlen, pos);
 }
 
-bool CLoginMsg::Verify() {
-	return true; // Not implemented
-}
-
-CNetMsg * CLoginMsg::NewMsg()
+CNetMsg * CLoginMsg::NewMsg() const
 {
 	unsigned len = CalcSize() + len + Type() + m_user.size() + m_user + m_pass.size() + m_pass;
 	char* data = new char[len], * pos = data;
@@ -85,7 +81,7 @@ CChatMsg::CChatMsg(CNetMsg * Msg) : CBaseMsg(ChatMsg)
 	GetData(m_text, textlen, pos);
 }
 
-CNetMsg * CChatMsg::NewMsg()
+CNetMsg * CChatMsg::NewMsg() const
 {
 	unsigned len = CalcSize() + len + Type() + m_text.size() + m_text;
 	char* data = new char[len], *pos = data;
@@ -93,5 +89,45 @@ CNetMsg * CChatMsg::NewMsg()
 	NextData(Type(), pos);
 	NextData(m_text.size(), pos);
 	NextData(m_text, pos);
+	return CNetMsg::FromData(len, data);
+}
+
+CServerMsg::CServerMsg(CNetMsg * Msg) : CBaseMsg(ServerMsg)
+{
+	const char* pos = Msg->Data();
+	int textlen;
+	GetData(textlen, pos);
+	GetData(m_text, textlen, pos);
+}
+
+CNetMsg * CServerMsg::NewMsg() const
+{
+	unsigned len = CalcSize() + len + Type() + m_text.size() + m_text;
+	char* data = new char[len], *pos = data;
+	NextData(len, pos);
+	NextData(Type(), pos);
+	NextData(m_text.size(), pos);
+	NextData(m_text, pos);
+	return CNetMsg::FromData(len, data);
+}
+
+CWelcomeMsg::CWelcomeMsg(CNetMsg * Msg) : CBaseMsg(WelcomeMsg)
+{
+	const char* pos = Msg->Data();
+	int motdlen;
+	GetData((uint8_t&)m_url, pos);
+	GetData(motdlen, pos);
+	GetData(m_motd, motdlen, pos);
+}
+
+CNetMsg * CWelcomeMsg::NewMsg() const
+{
+	unsigned len = CalcSize() + len + Type() + m_url + m_motd.size() + m_motd;
+	char* data = new char[len], *pos = data;
+	NextData(len, pos);
+	NextData(Type(), pos);
+	NextData(m_url, pos);
+	NextData(m_motd.size(), pos);
+	NextData(m_motd, pos);
 	return CNetMsg::FromData(len, data);
 }

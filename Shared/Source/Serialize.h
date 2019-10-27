@@ -31,6 +31,13 @@ inline void NextData(const QString& Src, P& DestPos)
 	DestPos += size;
 }
 
+template <class P>
+inline void NextData(const bool& Src, P& DestPos)
+{
+	*(bool*)DestPos = Src;
+	DestPos += sizeof(bool);
+}
+
 template <class D, class P>
 inline void NextData(const D& Src, P& DestPos)
 {

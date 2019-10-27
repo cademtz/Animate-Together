@@ -13,6 +13,7 @@
 
 #include <qtcpserver.h>
 #include <qlist.h>
+#include <Shared/CNetMsg.h>
 
 class CClientSocket;
 
@@ -23,15 +24,23 @@ public:
 
 	bool Listen();
 	void Close();
+
 	inline bool IsListening() const { return this->isListening(); }
+	inline const CWelcomeMsg& Motd() const{ return m_motd; }
 
 protected:
 	friend CClientSocket;
 	void ClientConnect();
 	void ClientDisconnect();
 
+	// - Returns a unique-per-session User ID very time. Always non-zero
+	inline unsigned NewUUID() { return ++m_lastuuid; }
+
 private:
 	uint16_t m_port;
+	CWelcomeMsg m_motd;
+	unsigned m_lastuuid = 0;
+
 	QList<CClientSocket*> m_clients;
 
 	CClientSocket* GetClient(QTcpSocket* Socket);

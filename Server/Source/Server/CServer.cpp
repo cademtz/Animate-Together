@@ -14,6 +14,7 @@
 CServer::CServer(int argc, char * argv[]) : m_port(AT_DEFPORT)
 {
 	connect(this, &QTcpServer::newConnection, this, &CServer::ClientConnect);
+	m_motd.SetMotd("Welcome to my Animate Together!");
 
 	if (argc < 2)
 		return;
