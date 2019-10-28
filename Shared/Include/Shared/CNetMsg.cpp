@@ -50,6 +50,18 @@ CNetMsg * CProtocolMsg::NewMsg() const
 	return CNetMsg::FromData(len, data);
 }
 
+
+CAuthParamsMsg::CAuthParamsMsg(CNetMsg * Msg) : CBaseMsg(AuthParamsMsg)
+{
+	
+}
+
+CAuthParamsMsg::CAuthParamsMsg(bool User, bool Token, bool Pass) : CBaseMsg(AuthParamsMsg)
+{
+
+}
+
+
 CLoginMsg::CLoginMsg(CNetMsg * Msg) : CBaseMsg(LoginMsg)
 {
 	const char* pos = Msg->Data();

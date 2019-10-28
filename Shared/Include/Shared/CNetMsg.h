@@ -46,7 +46,8 @@ public:
 	{
 		ServerMsg = 0,	// - A message box from the server
 		ProtocolMsg,	// - Sender's protocol info
-		LoginMsg,		// - Sender's login info
+		AuthParamsMsg,	// - Server's requested login parameters
+		LoginMsg,		// - User's login info
 		KickMsg,		// - User request to kick
 		BanMsg,			// - User request to ban
 		ChatMsg,		// - Chat message from server or user
@@ -109,6 +110,25 @@ protected:
 private:
 	char m_prefix[sizeof(AT_PROTO_PREFIX)];
 	unsigned m_major, m_minor;
+};
+
+class CAuthParamsMsg : public CBaseMsg
+{
+public:
+	CAuthParamsMsg(CNetMsg* Msg);
+	CAuthParamsMsg(bool User, bool Token, bool Pass);
+
+protected:
+	CNetMsg* NewMsg() const override { return 0; }
+
+private:
+	enum EFlags {
+		UserFlag = (1 << 0),
+		TokenFlag = (1 << 1),
+		PassFlag = (1 << 2),
+	};
+
+	unsigned m_flags;
 };
 
 class CLoginMsg : public CBaseMsg

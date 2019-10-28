@@ -23,7 +23,7 @@ class CClientSocket : public CSocketMgr
 public:
 	CClientSocket(QTcpSocket* Socket, CServer* Parent);
 
-	inline QString Name() const { return m_user; }
+	inline QString User() const { return m_user; }
 	void Kick(QString Reason);
 
 protected:
@@ -31,9 +31,12 @@ protected:
 	void Disconnected() override;
 
 private:
-	// - Returns true on valid login and sets user information
+	enum class ELogin {
+		Valid = 0, Error, BadInfo, Duplicate
+	};
+	// - Returns login status and sets user information if valid
 	// - Method of checking depends on server configuration
-	bool CheckLogin(CNetMsg* Msg);
+	ELogin CheckLogin(CNetMsg* Msg);
 
 	ATNet::EProtoStage m_stage = ATNet::ProtocolStage;
 	CServer* m_parent;

@@ -27,6 +27,7 @@ public:
 
 	inline bool IsListening() const { return this->isListening(); }
 	inline const CWelcomeMsg& Motd() const{ return m_motd; }
+	inline const QList<CClientSocket*>& Clients() const { return m_clients; }
 
 protected:
 	friend CClientSocket;

@@ -37,20 +37,29 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 			Socket()->abort();
 		return;
 	case ATNet::JoinStage:
-		if (CheckLogin(Msg))
+		switch (CheckLogin(Msg))
 		{
+		case ELogin::Valid:
 			m_stage = ATNet::FinalStage;
 			SendMsg(m_parent->Motd());
+			break;
+		case ELogin::Error:
+			Kick(tr("Error confirming login. Retry, update client, or report a bug"));
+			break;
+		case ELogin::Duplicate:
+			Kick(tr("User already joined with same login"));
+			break;
+		case ELogin::BadInfo:
+			Kick(tr("Login info was incorrect"));
+			break;
 		}
-		else
-			Kick(tr("Invalid login"));
 		return;
 	}
 
 	switch (Msg->Type())
 	{
 	case CBaseMsg::ChatMsg:
-		qInfo() << Name() << ": " << CChatMsg(Msg).Text();
+		qInfo() << User() << ": " << CChatMsg(Msg).Text();
 		break;
 	}
 }
@@ -59,23 +68,28 @@ void CClientSocket::Disconnected() {
 	qInfo() << Socket()->peerAddress() << " Disconnected";
 }
 
-bool CClientSocket::CheckLogin(CNetMsg * Msg)
+CClientSocket::ELogin CClientSocket::CheckLogin(CNetMsg * Msg)
 {
 	if (Msg->Type() != CBaseMsg::LoginMsg)
-		return false;
+		return ELogin::Error;
 
-	bool valid = false;
+	ELogin status = ELogin::Valid;
 	CLoginMsg login(Msg);
-	if (login.User() == "Hold") // Test code
-		valid = login.Pass() == "on!";
-	else
-		valid = true;
 
-	if (valid)
+	for (auto client : m_parent->Clients())
+	{
+		if (login.User() == client->User())
+		{
+			status = ELogin::Duplicate;
+			break;
+		}
+	}
+
+	if (status == ELogin::Valid)
 	{
 		m_user = login.User();
 		m_uuid = m_parent->NewUUID();
 	}
 
-	return valid;
+	return status;
 }
