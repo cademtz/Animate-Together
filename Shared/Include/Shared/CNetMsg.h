@@ -42,12 +42,11 @@ private:
 class CBaseMsg
 {
 public:
-	enum e_type : uint8_t
+	enum EType : uint8_t
 	{
 		ServerMsg = 0,	// - A message box from the server
 		ProtocolMsg,	// - Sender's protocol info
-		AuthParamsMsg,	// - Server's requested login parameters
-		LoginMsg,		// - User's login info
+		LoginMsg,		// - Sender requesting or sending login info
 		KickMsg,		// - User request to kick
 		BanMsg,			// - User request to ban
 		ChatMsg,		// - Chat message from server or user
@@ -66,13 +65,13 @@ public:
 	virtual ~CBaseMsg() { }
 
 protected:
-	CBaseMsg(e_type Type) : m_type(Type) { }
+	CBaseMsg(EType Type) : m_type(Type) { }
 
 	// - Allocates and constructs a CNetMsg from serialized data
 	virtual CNetMsg* NewMsg() const = 0;
 
 private:
-	e_type m_type;
+	EType m_type;
 };
 
 class CServerMsg : public CBaseMsg
@@ -112,33 +111,22 @@ private:
 	unsigned m_major, m_minor;
 };
 
-class CAuthParamsMsg : public CBaseMsg
-{
-public:
-	CAuthParamsMsg(CNetMsg* Msg);
-	CAuthParamsMsg(bool User, bool Token, bool Pass);
-
-protected:
-	CNetMsg* NewMsg() const override { return 0; }
-
-private:
-	enum EFlags {
-		UserFlag = (1 << 0),
-		TokenFlag = (1 << 1),
-		PassFlag = (1 << 2),
-	};
-
-	unsigned m_flags;
-};
-
 class CLoginMsg : public CBaseMsg
 {
 public:
-	CLoginMsg(CNetMsg* Msg);
-	CLoginMsg(QString User, QString Pass = QString())
-		: CBaseMsg(LoginMsg), m_user(User), m_pass(Pass) { }
-	CLoginMsg() : CBaseMsg(LoginMsg) { }
+	enum EFlags
+	{
+		TokenFlag = 0, // - Requires or sends a token in 'User' string
+		PassFlag = (1 << 0) // - Requires or sends a password in the 'Pass' string
+	};
 
+	CLoginMsg(CNetMsg* Msg);
+	CLoginMsg(uint8_t ReqFlags = 0) : CBaseMsg(LoginMsg), m_flags(ReqFlags) { }
+	CLoginMsg::CLoginMsg(QString User, QString Pass)
+		: CBaseMsg(LoginMsg), m_user(User), m_pass(Pass), m_flags(Pass.isEmpty() ? 0 : PassFlag) { }
+
+
+	inline uint8_t Flags() const { return m_flags; }
 	inline QString User() const { return m_user; }
 	inline QString Pass() const { return m_pass; }
 
@@ -146,6 +134,7 @@ protected:
 	CNetMsg* NewMsg() const override;
 
 private:
+	uint8_t m_flags = 0;
 	QString m_user, m_pass;
 };
 

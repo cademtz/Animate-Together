@@ -26,7 +26,9 @@ public:
 	void Close();
 
 	inline bool IsListening() const { return this->isListening(); }
-	inline const CWelcomeMsg& Motd() const{ return m_motd; }
+	inline const QString& Pass() const { return m_pass; }
+	inline CLoginMsg Auth() const { return CLoginMsg(m_pass.isEmpty() ? 0 : CLoginMsg::PassFlag); }
+	inline const CWelcomeMsg& Motd() const { return m_motd; }
 	inline const QList<CClientSocket*>& Clients() const { return m_clients; }
 
 protected:
@@ -39,6 +41,7 @@ protected:
 
 private:
 	uint16_t m_port;
+	QString m_pass;
 	CWelcomeMsg m_motd;
 	unsigned m_lastuuid = 0;
 

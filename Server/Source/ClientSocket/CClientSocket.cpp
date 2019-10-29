@@ -31,6 +31,7 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 		if (Msg->Type() == CBaseMsg::ProtocolMsg && CProtocolMsg(Msg).Compatible())
 		{
 			m_stage = ATNet::JoinStage;
+			SendMsg(m_parent->Auth());
 			qInfo() << Socket()->peerAddress() << ": Good protocol";
 		}
 		else
@@ -73,23 +74,17 @@ CClientSocket::ELogin CClientSocket::CheckLogin(CNetMsg * Msg)
 	if (Msg->Type() != CBaseMsg::LoginMsg)
 		return ELogin::Error;
 
-	ELogin status = ELogin::Valid;
 	CLoginMsg login(Msg);
+	if (m_parent->Auth().Flags() &CLoginMsg::PassFlag)
+		if (login.Pass() != m_parent->Pass())
+			return ELogin::BadInfo;
 
 	for (auto client : m_parent->Clients())
-	{
 		if (login.User() == client->User())
-		{
-			status = ELogin::Duplicate;
-			break;
-		}
-	}
+			return ELogin::Duplicate;
 
-	if (status == ELogin::Valid)
-	{
-		m_user = login.User();
-		m_uuid = m_parent->NewUUID();
-	}
+	m_user = login.User();
+	m_uuid = m_parent->NewUUID();
 
-	return status;
+	return ELogin::Valid;
 }

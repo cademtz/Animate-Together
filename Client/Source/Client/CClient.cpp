@@ -53,15 +53,17 @@ void CClient::HandleMsg(CNetMsg * Msg)
 	case ATNet::ProtocolStage:
 		// Check protocol and abort connection if unmatching
 		if (Msg->Type() == CBaseMsg::ProtocolMsg && CProtocolMsg(Msg).Compatible())
-		{
 			m_stage = ATNet::JoinStage;
-			SendMsg(CLoginMsg("Hold", "on!"));
-		}
 		else
 			Socket()->abort();
 		return;
 	case ATNet::JoinStage:
-		if (Msg->Type() == CBaseMsg::WelcomeMsg)
+		switch(Msg->Type())
+		{
+		case CBaseMsg::LoginMsg:
+			SendMsg(CLoginMsg("Hold on!", "Educated guess"));
+			return;
+		case CBaseMsg::WelcomeMsg:
 		{
 			m_stage = ATNet::FinalStage;
 			SendMsg(CChatMsg("Hello from animator!"));
@@ -69,8 +71,8 @@ void CClient::HandleMsg(CNetMsg * Msg)
 			QMessageBox(QMessageBox::NoIcon, "Message of the Day", welcome.Motd()).exec();
 			return;
 		}
-		else
-			Socket()->close();
+		}
+		Socket()->close();
 		return;
 	}
 

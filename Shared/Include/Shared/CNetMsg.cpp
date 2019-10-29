@@ -50,22 +50,11 @@ CNetMsg * CProtocolMsg::NewMsg() const
 	return CNetMsg::FromData(len, data);
 }
 
-
-CAuthParamsMsg::CAuthParamsMsg(CNetMsg * Msg) : CBaseMsg(AuthParamsMsg)
-{
-	
-}
-
-CAuthParamsMsg::CAuthParamsMsg(bool User, bool Token, bool Pass) : CBaseMsg(AuthParamsMsg)
-{
-
-}
-
-
 CLoginMsg::CLoginMsg(CNetMsg * Msg) : CBaseMsg(LoginMsg)
 {
 	const char* pos = Msg->Data();
 	int userlen, passlen;
+	GetData(m_flags, pos);
 	GetData(userlen, pos);
 	GetData(m_user, userlen, pos);
 	GetData(passlen, pos);
@@ -74,10 +63,11 @@ CLoginMsg::CLoginMsg(CNetMsg * Msg) : CBaseMsg(LoginMsg)
 
 CNetMsg * CLoginMsg::NewMsg() const
 {
-	unsigned len = CalcSize() + len + Type() + m_user.size() + m_user + m_pass.size() + m_pass;
+	unsigned len = CalcSize() + len + Type() + m_flags + m_user.size() + m_user + m_pass.size() + m_pass;
 	char* data = new char[len], * pos = data;
 	NextData(len, pos);
 	NextData(Type(), pos);
+	NextData(m_flags, pos);
 	NextData(m_user.size(), pos);
 	NextData(m_user, pos);
 	NextData(m_pass.size(), pos);
