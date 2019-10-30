@@ -16,6 +16,8 @@
 #include <qtcpsocket.h>
 #include "Config.h"
 
+// - CNetMsg wraps around raw serialized data for quickly handling networkable message data
+
 struct CNetMsg
 {
 	inline const char* Raw() const { return (const char*)this; }
@@ -28,10 +30,10 @@ struct CNetMsg
 
 	// - Casts data to a CNetMsg pointer
 	// - Returns 0 instead if the message is incomplete
-	inline static CNetMsg* FromData(QByteArray& Bytes) {
+	inline static CNetMsg* FromData(const QByteArray& Bytes) {
 		return FromData(Bytes.size(), Bytes.data());
 	}
-	static CNetMsg* FromData(unsigned Length, char* Data);
+	static CNetMsg* FromData(unsigned Length, const char* Data);
 
 private:
 	unsigned m_len;
@@ -59,7 +61,7 @@ public:
 	{
 		CNetMsg* msg = NewMsg();
 		msg->Send(Socket);
-		delete msg;
+		//delete[](char*)msg;
 	}
 
 	virtual ~CBaseMsg() { }
@@ -99,7 +101,7 @@ public:
 	// - Returns true if the protocol will maintain compatibility with current version
 	bool Compatible();
 
-	inline const char* Prefix() const { return m_prefix; }
+	inline QString Prefix() const { return m_prefix; }
 	inline unsigned Major() const { return m_major; }
 	inline unsigned Minor() const { return m_minor; }
 
@@ -107,7 +109,7 @@ protected:
 	CNetMsg* NewMsg() const override;
 
 private:
-	char m_prefix[sizeof(AT_PROTO_PREFIX)];
+	QString m_prefix = AT_PROTO_PREFIX;
 	unsigned m_major, m_minor;
 };
 

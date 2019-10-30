@@ -10,7 +10,7 @@
 #include <cassert>
 #include "Serialize.h"
 
-CNetMsg * CNetMsg::FromData(unsigned length, char* Data)
+CNetMsg * CNetMsg::FromData(unsigned length, const char* Data)
 {
 	if (length >= sizeof(m_len))
 	{
@@ -23,31 +23,37 @@ CNetMsg * CNetMsg::FromData(unsigned length, char* Data)
 
 CProtocolMsg::CProtocolMsg(CNetMsg * Msg) : CBaseMsg(ProtocolMsg)
 {
+	/*CSerizialize nice = CSerizialize() << sizeof(unsigned) << Type();
 	const char* pos = Msg->Data();
 	assert(Msg->Length() > sizeof(m_prefix));
 
 	GetData(m_prefix, pos);
 	GetData(m_major, pos);
-	GetData(m_minor, pos);
+	GetData(m_minor, pos);*/
+	QByteArray bruh(Msg->Data(), Msg->Length() - 5);
+	CSerialize::Deserialize(Msg->Data(), m_prefix, m_major, m_minor);
 }
 
 bool CProtocolMsg::Compatible()
 {
-	return !strcmp(Prefix(), AT_PROTO_PREFIX) &&
+	return Prefix() == AT_PROTO_PREFIX &&
 		Major() == AT_PROTO_MAJOR &&
 		Minor() == AT_PROTO_MINOR;
 }
 
 CNetMsg * CProtocolMsg::NewMsg() const
 {
-	unsigned len = CalcSize() + len + Type() + AT_PROTO_PREFIX + m_major + m_minor;
+	/*unsigned len = CalcSize() + len + Type() + AT_PROTO_PREFIX + m_major + m_minor;
 	char* data = new char[len], * pos = data;
 	NextData(len, pos);
 	NextData(Type(), pos);
 	NextData(AT_PROTO_PREFIX, pos);
 	NextData(m_major, pos);
 	NextData(m_minor, pos);
-	return CNetMsg::FromData(len, data);
+	return CNetMsg::FromData(len, data);*/
+
+	auto bruh = new CSerialize(Type(), AT_PROTO_PREFIX, m_major, m_minor);
+	return CNetMsg::FromData(bruh->Bytes());
 }
 
 CLoginMsg::CLoginMsg(CNetMsg * Msg) : CBaseMsg(LoginMsg)
