@@ -31,10 +31,10 @@
     <ClInclude Include="Include\Shared\Config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Serialize.h">
+    <ClInclude Include="Include\Shared\Protocol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Shared\Protocol.h">
+    <ClInclude Include="Include\Shared\CSerialize.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

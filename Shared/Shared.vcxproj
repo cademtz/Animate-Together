@@ -27,7 +27,7 @@
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="Source\Serialize.h" />
+    <ClInclude Include="Include\Shared\CSerialize.h" />
     <ClInclude Include="Include\Shared\Config.h">
       <SubType>
       </SubType>

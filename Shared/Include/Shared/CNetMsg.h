@@ -15,6 +15,7 @@
 #include <qendian.h>
 #include <qtcpsocket.h>
 #include "Config.h"
+#include "CSerialize.h"
 
 // - CNetMsg wraps around raw serialized data for quickly handling networkable message data
 
@@ -57,11 +58,8 @@ public:
 
 	inline uint8_t Type() const { return m_type; }
 
-	void Send(QTcpSocket* Socket) const
-	{
-		CNetMsg* msg = NewMsg();
-		msg->Send(Socket);
-		//delete[](char*)msg;
+	inline void Send(QTcpSocket* Socket) const {
+		Socket->write(Serialize().Bytes());
 	}
 
 	virtual ~CBaseMsg() { }
@@ -70,7 +68,7 @@ protected:
 	CBaseMsg(EType Type) : m_type(Type) { }
 
 	// - Allocates and constructs a CNetMsg from serialized data
-	virtual CNetMsg* NewMsg() const = 0;
+	virtual const CSerialize Serialize() const = 0;
 
 private:
 	EType m_type;
@@ -79,13 +77,17 @@ private:
 class CServerMsg : public CBaseMsg
 {
 public:
-	CServerMsg(CNetMsg* Msg);
+	CServerMsg(CNetMsg* Msg) : CBaseMsg(ServerMsg) {
+		CSerialize::Deserialize(Msg->Data(), m_text);
+	}
 	CServerMsg(QString Text) : CBaseMsg(ServerMsg), m_text(Text) { }
 
 	inline QString Text() const { return m_text; }
 
 protected:
-	CNetMsg* NewMsg() const override;
+	const CSerialize Serialize() const override {
+		return CSerialize(Type(), m_text.utf16());
+	}
 		
 private:
 	QString m_text;
@@ -94,7 +96,9 @@ private:
 class CProtocolMsg : public CBaseMsg
 {
 public:
-	CProtocolMsg(CNetMsg* Msg);
+	CProtocolMsg(CNetMsg * Msg) : CBaseMsg(ProtocolMsg) {
+		CSerialize::Deserialize(Msg->Data(), m_prefix, m_major, m_minor);
+	}
 	CProtocolMsg()
 		: CBaseMsg(ProtocolMsg), m_prefix(AT_PROTO_PREFIX), m_major(AT_PROTO_MAJOR), m_minor(AT_PROTO_MINOR) { }
 
@@ -106,7 +110,9 @@ public:
 	inline unsigned Minor() const { return m_minor; }
 
 protected:
-	CNetMsg* NewMsg() const override;
+	const CSerialize Serialize() const override {
+		return CSerialize(Type(), m_prefix, m_major, m_minor);
+	}
 
 private:
 	QString m_prefix = AT_PROTO_PREFIX;
@@ -122,18 +128,21 @@ public:
 		PassFlag = (1 << 0) // - Requires or sends a password in the 'Pass' string
 	};
 
-	CLoginMsg(CNetMsg* Msg);
+	CLoginMsg(CNetMsg* Msg) : CBaseMsg(LoginMsg) {
+		CSerialize::Deserialize(Msg->Data(), m_flags, m_user, m_pass);
+	}
 	CLoginMsg(uint8_t ReqFlags = 0) : CBaseMsg(LoginMsg), m_flags(ReqFlags) { }
 	CLoginMsg::CLoginMsg(QString User, QString Pass)
 		: CBaseMsg(LoginMsg), m_user(User), m_pass(Pass), m_flags(Pass.isEmpty() ? 0 : PassFlag) { }
-
 
 	inline uint8_t Flags() const { return m_flags; }
 	inline QString User() const { return m_user; }
 	inline QString Pass() const { return m_pass; }
 
 protected:
-	CNetMsg* NewMsg() const override;
+	const CSerialize Serialize() const override {
+		return CSerialize(Type(), m_flags, m_user.utf16(), m_pass);
+	}
 
 private:
 	uint8_t m_flags = 0;
@@ -143,14 +152,18 @@ private:
 class CChatMsg : public CBaseMsg
 {
 public:
-	CChatMsg(CNetMsg* Msg);
+	CChatMsg(CNetMsg* Msg) : CBaseMsg(ChatMsg) {
+		CSerialize::Deserialize(Msg->Data(), m_text);
+	}
 	CChatMsg(QString Text = QString()) : CBaseMsg(ChatMsg), m_text(Text) { }
 
 	inline const QString& Text() const { return m_text; }
 	inline void SetText(const QString& String) { m_text = String; }
 
 protected:
-	CNetMsg* NewMsg() const override;
+	const CSerialize Serialize() const override {
+		return CSerialize(Type(), m_text.utf16());
+	}
 
 private:
 	QString m_text;
@@ -159,7 +172,9 @@ private:
 class CWelcomeMsg : public CBaseMsg
 {
 public:
-	CWelcomeMsg(CNetMsg* Msg);
+	CWelcomeMsg(CNetMsg* Msg) : CBaseMsg(WelcomeMsg) {
+		CSerialize::Deserialize(Msg->Data(), m_motd);
+	}
 	CWelcomeMsg(QString Motd = QString(), bool IsUrl = false)
 		: CBaseMsg(WelcomeMsg), m_motd(Motd), m_url(IsUrl) { }
 
@@ -169,7 +184,9 @@ public:
 	inline void SetMotd(QString Motd, bool IsUrl = false) { m_motd = Motd, m_url = IsUrl; }
 
 protected:
-	CNetMsg* NewMsg() const override;
+	const CSerialize Serialize() const override {
+		return CSerialize(Type(), m_motd.utf16());
+	}
 
 private:
 	bool m_url;
