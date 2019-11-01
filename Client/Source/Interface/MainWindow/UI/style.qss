@@ -1,4 +1,10 @@
-QLabel, QCheckBox {
+QMessageBox {
+	background: #303030;
+}
+QMessageBox QLabel {
+	color: #aaaaaa;
+}
+QCheckBox {
 	color: rgb(225, 225, 225);
 	font: 500 8pt "Arial";
 }

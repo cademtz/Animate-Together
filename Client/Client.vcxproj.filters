@@ -107,6 +107,9 @@
     <ClCompile Include="Source\Client\CClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Widgets\MotdView\CMotdView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -253,6 +256,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Client\CClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Widgets\MotdView\CMotdView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

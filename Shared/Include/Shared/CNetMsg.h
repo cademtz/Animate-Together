@@ -77,17 +77,13 @@ private:
 class CServerMsg : public CBaseMsg
 {
 public:
-	CServerMsg(CNetMsg* Msg) : CBaseMsg(ServerMsg) {
-		CSerialize::Deserialize(Msg->Data(), m_text);
-	}
+	CServerMsg(CNetMsg* Msg);
 	CServerMsg(QString Text) : CBaseMsg(ServerMsg), m_text(Text) { }
 
 	inline QString Text() const { return m_text; }
 
 protected:
-	const CSerialize Serialize() const override {
-		return CSerialize(Type(), m_text.utf16());
-	}
+	const CSerialize Serialize() const override;
 		
 private:
 	QString m_text;
@@ -96,9 +92,7 @@ private:
 class CProtocolMsg : public CBaseMsg
 {
 public:
-	CProtocolMsg(CNetMsg * Msg) : CBaseMsg(ProtocolMsg) {
-		CSerialize::Deserialize(Msg->Data(), m_prefix, m_major, m_minor);
-	}
+	CProtocolMsg(CNetMsg * Msg);
 	CProtocolMsg()
 		: CBaseMsg(ProtocolMsg), m_prefix(AT_PROTO_PREFIX), m_major(AT_PROTO_MAJOR), m_minor(AT_PROTO_MINOR) { }
 
@@ -110,9 +104,7 @@ public:
 	inline unsigned Minor() const { return m_minor; }
 
 protected:
-	const CSerialize Serialize() const override {
-		return CSerialize(Type(), m_prefix, m_major, m_minor);
-	}
+	const CSerialize Serialize() const override;
 
 private:
 	QString m_prefix = AT_PROTO_PREFIX;
@@ -124,13 +116,11 @@ class CLoginMsg : public CBaseMsg
 public:
 	enum EFlags
 	{
-		TokenFlag = 0, // - Requires or sends a token in 'User' string
-		PassFlag = (1 << 0) // - Requires or sends a password in the 'Pass' string
+		TokenFlag = 0, // - Requiring or sending a token in 'User' string
+		PassFlag = (1 << 0) // - Requiring or sending a password in the 'Pass' string
 	};
 
-	CLoginMsg(CNetMsg* Msg) : CBaseMsg(LoginMsg) {
-		CSerialize::Deserialize(Msg->Data(), m_flags, m_user, m_pass);
-	}
+	CLoginMsg(CNetMsg* Msg);
 	CLoginMsg(uint8_t ReqFlags = 0) : CBaseMsg(LoginMsg), m_flags(ReqFlags) { }
 	CLoginMsg::CLoginMsg(QString User, QString Pass)
 		: CBaseMsg(LoginMsg), m_user(User), m_pass(Pass), m_flags(Pass.isEmpty() ? 0 : PassFlag) { }
@@ -140,9 +130,7 @@ public:
 	inline QString Pass() const { return m_pass; }
 
 protected:
-	const CSerialize Serialize() const override {
-		return CSerialize(Type(), m_flags, m_user.utf16(), m_pass);
-	}
+	const CSerialize Serialize() const override;
 
 private:
 	uint8_t m_flags = 0;
@@ -152,18 +140,14 @@ private:
 class CChatMsg : public CBaseMsg
 {
 public:
-	CChatMsg(CNetMsg* Msg) : CBaseMsg(ChatMsg) {
-		CSerialize::Deserialize(Msg->Data(), m_text);
-	}
+	CChatMsg(CNetMsg* Msg);
 	CChatMsg(QString Text = QString()) : CBaseMsg(ChatMsg), m_text(Text) { }
 
 	inline const QString& Text() const { return m_text; }
 	inline void SetText(const QString& String) { m_text = String; }
 
 protected:
-	const CSerialize Serialize() const override {
-		return CSerialize(Type(), m_text.utf16());
-	}
+	const CSerialize Serialize() const override;
 
 private:
 	QString m_text;
@@ -172,9 +156,7 @@ private:
 class CWelcomeMsg : public CBaseMsg
 {
 public:
-	CWelcomeMsg(CNetMsg* Msg) : CBaseMsg(WelcomeMsg) {
-		CSerialize::Deserialize(Msg->Data(), m_motd);
-	}
+	CWelcomeMsg(CNetMsg* Msg);
 	CWelcomeMsg(QString Motd = QString(), bool IsUrl = false)
 		: CBaseMsg(WelcomeMsg), m_motd(Motd), m_url(IsUrl) { }
 
@@ -184,9 +166,7 @@ public:
 	inline void SetMotd(QString Motd, bool IsUrl = false) { m_motd = Motd, m_url = IsUrl; }
 
 protected:
-	const CSerialize Serialize() const override {
-		return CSerialize(Type(), m_motd.utf16());
-	}
+	const CSerialize Serialize() const override;
 
 private:
 	bool m_url;

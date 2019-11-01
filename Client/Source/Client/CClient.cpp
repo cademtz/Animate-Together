@@ -9,6 +9,7 @@
 #include <Shared/CNetMsg.h>
 #include <qcoreapplication.h>
 #include <qmessagebox.h>
+#include "Widgets/MotdView/CMotdView.h"
 
 void CClient::Connect(QString Host)
 {
@@ -67,8 +68,7 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		{
 			m_stage = ATNet::FinalStage;
 			SendMsg(CChatMsg("Hello from animator!"));
-			CWelcomeMsg welcome(Msg);
-			QMessageBox(QMessageBox::NoIcon, "Message of the Day", welcome.Motd()).exec();
+			CMotdView::Open(CWelcomeMsg(Msg));
 			return;
 		}
 		}
