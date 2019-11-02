@@ -22,4 +22,8 @@
 
 #define AT_DEFPORT 65000
 
+#define AT_CFG "Config"
+#define AT_CFG_SERVER AT_CFG "/Server"
+#define AT_CFG_CLIENT AT_CFG "/Client"
+
 #endif // Config_H

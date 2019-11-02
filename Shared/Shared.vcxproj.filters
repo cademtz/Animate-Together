@@ -37,6 +37,9 @@
     <ClInclude Include="Include\Shared\CSerialize.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Shared\CJsonConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Include\Shared\CNetMsg.cpp">
@@ -46,6 +49,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Include\Shared\Protocol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Include\Shared\CJsonConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

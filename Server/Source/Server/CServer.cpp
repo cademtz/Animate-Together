@@ -9,40 +9,14 @@
 #include <qtcpsocket.h>
 #include <Shared/CNetMsg.h>
 #include <Shared/Protocol.h>
+#include <Shared/CJsonConfig.h>
 #include "ClientSocket/CClientSocket.h"
 
 CServer::CServer(int argc, char * argv[]) : m_port(AT_DEFPORT)
 {
 	connect(this, &QTcpServer::newConnection, this, &CServer::ClientConnect);
-	m_motd.SetMotd(
-		"<style>"
-		"body {"
-			"background: #303030;"
-			"color: #eee;"
-			"margin: 20px;"
-			"font-family: 'Roboto';"
-			"letter-spacing: 0.5pt;"
-		"}"
-		"h2 {"
-		  "font-weight: 300;"
-		"}"
-		"p, li {"
-		  "color: #ccc;"
-		"}"
-		".important {"
-		  "color: #faa;"
-		  "font-weight: bold;"
-		"}</style>"
-
-		"<body><h2>Welcome to my Animate Together!</h2>"
-		"<p>Rules:</p>"
-		"<ul>"
-		"<li>No smelly people</li>"
-		"<li class='important'>Be good at animating</li>"
-		"<li>Privating open layers being used or needed is a temp ban</li>"
-		"<li>No.</li>"
-		"</ul></body>"
-	);
+	CServerCfg cfg;
+	m_motd.SetMotd("Welcome to my Animate Together!");
 	//m_pass = "123abc";
 
 	if (argc < 2)
