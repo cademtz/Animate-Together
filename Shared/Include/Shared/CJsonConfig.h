@@ -26,7 +26,19 @@ public:
 	const QFile& File() const { return m_file; }
 	const QJsonDocument& Doc() const { return m_doc; }
 
+	QString Str(const QString& Key, QString Default = QString());
+	int Int(const QString& Key, int Default = -1);
+
+	template<typename T>
+	void SetVal(const QString& Key, const T& Val)
+	{
+		m_doc.object()[Key] = Val;
+		Write();
+	}
+
 private:
+	void Write();
+
 	QFile m_file;
 	QJsonDocument m_doc;
 };
@@ -35,6 +47,10 @@ class CServerCfg : private CJsonConfig
 {
 public:
 	CServerCfg() : CJsonConfig("Server.json", AT_CFG_SERVER) { }
+
+	uint16_t Port() { return Int("MotdFile", AT_DEFPORT); }
+	QString Password() { return Str("Password"); }
+	QFile MotdFile() { return Str("MotdFile", "Motd.html"); }
 };
 
 #endif // CJsonConfig_H

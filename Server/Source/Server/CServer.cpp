@@ -16,6 +16,7 @@ CServer::CServer(int argc, char * argv[]) : m_port(AT_DEFPORT)
 {
 	connect(this, &QTcpServer::newConnection, this, &CServer::ClientConnect);
 	CServerCfg cfg;
+	m_port = cfg.Port();
 	m_motd.SetMotd("Welcome to my Animate Together!");
 	//m_pass = "123abc";
 

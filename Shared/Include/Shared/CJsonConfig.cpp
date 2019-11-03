@@ -7,6 +7,7 @@
 
 #include "CJsonConfig.h"
 #include <qdir.h>
+#include <qjsonobject.h>
 
 bool CJsonConfig::Open(QString File, QString Dir)
 {
@@ -21,7 +22,11 @@ bool CJsonConfig::Open(QString File, QString Dir)
 	if (!File.isEmpty() || (!m_file.isOpen() && !m_file.exists()))
 		opened = m_file.open(QIODevice::ReadWrite | QIODevice::Text);
 	if (opened)
-		m_doc = QJsonDocument::fromJson(m_file.readAll());
+	{
+		QJsonDocument doc = QJsonDocument::fromJson(m_file.readAll());
+		if (doc.isObject())
+			m_doc = doc;
+	}
 	return opened;
 }
 
@@ -29,4 +34,25 @@ void CJsonConfig::Close()
 {
 	m_file.close();
 	m_doc = QJsonDocument();
+}
+
+QString CJsonConfig::Str(const QString& Key, QString Default)
+{
+	if (m_doc.object().contains(Key))
+		return m_doc.object()[Key].toString();
+	SetVal(Key, Default);
+	return Default;
+}
+
+int CJsonConfig::Int(const QString & Key, int Default)
+{
+	if (m_doc.object().contains(Key))
+		return m_doc.object()[Key].toInt();
+	SetVal(Key, Default);
+	return Default;
+}
+
+void CJsonConfig::Write()
+{
+	m_file.write(m_doc.toBinaryData());
 }
