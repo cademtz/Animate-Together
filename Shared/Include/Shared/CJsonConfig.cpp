@@ -7,7 +7,8 @@
 
 #include "CJsonConfig.h"
 #include <qdir.h>
-#include <qjsonobject.h>
+#include <qjsondocument.h>
+#include <qdebug.h>
 
 bool CJsonConfig::Open(QString File, QString Dir)
 {
@@ -20,39 +21,44 @@ bool CJsonConfig::Open(QString File, QString Dir)
 	if (!File.isEmpty())
 		m_file.setFileName(File);
 	if (!File.isEmpty() || (!m_file.isOpen() && !m_file.exists()))
-		opened = m_file.open(QIODevice::ReadWrite | QIODevice::Text);
+		opened = m_file.open(QIODevice::ReadOnly);
 	if (opened)
 	{
 		QJsonDocument doc = QJsonDocument::fromJson(m_file.readAll());
 		if (doc.isObject())
-			m_doc = doc;
+			m_obj = doc.object();
 	}
 	return opened;
 }
 
 void CJsonConfig::Close()
 {
+	Write();
 	m_file.close();
-	m_doc = QJsonDocument();
+	m_obj = QJsonObject();
 }
 
 QString CJsonConfig::Str(const QString& Key, QString Default)
 {
-	if (m_doc.object().contains(Key))
-		return m_doc.object()[Key].toString();
-	SetVal(Key, Default);
+	if (m_obj.contains(Key))
+		return m_obj[Key].toString();
+	m_obj[Key] = QJsonValue(Default);
 	return Default;
 }
 
 int CJsonConfig::Int(const QString & Key, int Default)
 {
-	if (m_doc.object().contains(Key))
-		return m_doc.object()[Key].toInt();
-	SetVal(Key, Default);
+	if (m_obj.contains(Key))
+		return m_obj[Key].toInt();
+	m_obj[Key] = Default;
 	return Default;
 }
 
 void CJsonConfig::Write()
 {
-	m_file.write(m_doc.toBinaryData());
+	if (m_file.isOpen())
+		m_file.close();
+	if (m_file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+		m_file.write(QJsonDocument(m_obj).toJson());
+	m_file.close();
 }

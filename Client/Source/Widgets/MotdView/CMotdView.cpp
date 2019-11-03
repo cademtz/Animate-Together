@@ -21,8 +21,10 @@ CMotdView::CMotdView(const CWelcomeMsg & Msg, QWidget * Parent) :	QWidget(Parent
 	else
 	{
 		QTextBrowser* browser = new QTextBrowser(this);
+		browser->setLineWrapMode(QTextBrowser::NoWrap);
 		browser->setDocument(new QTextDocument(browser));
 		browser->document()->setHtml(Msg.Motd());
+		browser->setFrameStyle(0);
 		m_display = browser;
 	}
 

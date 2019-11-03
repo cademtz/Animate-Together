@@ -17,8 +17,14 @@ CServer::CServer(int argc, char * argv[]) : m_port(AT_DEFPORT)
 	connect(this, &QTcpServer::newConnection, this, &CServer::ClientConnect);
 	CServerCfg cfg;
 	m_port = cfg.Port();
-	m_motd.SetMotd("Welcome to my Animate Together!");
-	//m_pass = "123abc";
+	m_pass = cfg.Password();
+
+	QFile motdf = cfg.MotdFile();
+	if (motdf.exists())
+	{
+		motdf.open(QIODevice::ReadOnly);
+		m_motd.SetMotd(motdf.readAll());
+	}
 
 	if (argc < 2)
 		return;

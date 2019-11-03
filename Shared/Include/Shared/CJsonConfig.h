@@ -13,34 +13,28 @@
 #endif
 
 #include <qfile.h>
-#include <qjsondocument.h>
+#include <qjsonobject.h>
 #include "Config.h"
 
 class CJsonConfig
 {
 public:
 	inline CJsonConfig(QString File = QString(), QString Dir = QString()) { Open(File, Dir); }
+	inline ~CJsonConfig() { Close(); }
 
 	bool Open(QString File = QString(), QString Dir = QString());
 	void Close();
 	const QFile& File() const { return m_file; }
-	const QJsonDocument& Doc() const { return m_doc; }
+	const QJsonObject& JsonObject() const { return m_obj; }
 
 	QString Str(const QString& Key, QString Default = QString());
 	int Int(const QString& Key, int Default = -1);
-
-	template<typename T>
-	void SetVal(const QString& Key, const T& Val)
-	{
-		m_doc.object()[Key] = Val;
-		Write();
-	}
 
 private:
 	void Write();
 
 	QFile m_file;
-	QJsonDocument m_doc;
+	QJsonObject m_obj;
 };
 
 class CServerCfg : private CJsonConfig
@@ -48,9 +42,9 @@ class CServerCfg : private CJsonConfig
 public:
 	CServerCfg() : CJsonConfig("Server.json", AT_CFG_SERVER) { }
 
-	uint16_t Port() { return Int("MotdFile", AT_DEFPORT); }
+	uint16_t Port() { return Int("Port", AT_DEFPORT); }
 	QString Password() { return Str("Password"); }
-	QFile MotdFile() { return Str("MotdFile", "Motd.html"); }
+	QString MotdFile() { return Str("MotdFile", AT_CFG_SERVER "/Motd.html"); }
 };
 
 #endif // CJsonConfig_H
