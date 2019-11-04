@@ -110,6 +110,9 @@
     <ClCompile Include="Source\Widgets\MotdView\CMotdView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Interface\Login\CLogin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -259,6 +262,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Widgets\MotdView\CMotdView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Interface\Login\CLogin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

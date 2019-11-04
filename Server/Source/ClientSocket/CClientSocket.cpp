@@ -20,7 +20,7 @@ void CClientSocket::Kick(QString Reason)
 	if (Reason.isEmpty())
 		Reason = tr("Kicked from server");
 	SendMsg(CServerMsg(Reason));
-	Socket()->close();
+	Socket()->disconnectFromHost();
 }
 
 void CClientSocket::HandleMsg(CNetMsg * Msg)

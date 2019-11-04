@@ -29,7 +29,16 @@ CServer::CServer(int argc, char * argv[]) : m_port(AT_DEFPORT)
 	if (argc < 2)
 		return;
 
-	// TODO: Simple console or file configuration
+	for (int i = 1; i < argc; i++)
+	{
+		if (i >= argc - 1) // Commands that require two args
+			break;
+		if (!strcmp(argv[i], "-port"))
+			m_port = QString(argv[i + 1]).toInt();
+		else if (!strcmp(argv[i], "-password"))
+			m_pass = argv[i + 1];
+		i++;
+	}
 }
 
 bool CServer::Listen()

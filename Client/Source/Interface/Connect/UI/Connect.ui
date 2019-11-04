@@ -20,7 +20,7 @@
       <string>Connect</string>
      </property>
      <property name="shortcut">
-      <string>Ctrl+S</string>
+      <string>Return</string>
      </property>
     </widget>
    </item>
@@ -37,6 +37,10 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>tb_host</tabstop>
+  <tabstop>btn_connect</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

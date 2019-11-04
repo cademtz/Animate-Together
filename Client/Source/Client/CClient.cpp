@@ -6,10 +6,11 @@
  */
 
 #include "CClient.h"
-#include <Shared/CNetMsg.h>
 #include <qcoreapplication.h>
 #include <qmessagebox.h>
+#include <Shared/CNetMsg.h>
 #include "Widgets/MotdView/CMotdView.h"
+#include "Interface/Login/CLogin.h"
 
 void CClient::Connect(QString Host)
 {
@@ -21,6 +22,13 @@ void CClient::Connect(QString Host)
 		port = info[1].toInt();
 
 	Client().Socket()->connectToHost(info.front(), port);
+}
+
+void CClient::Login(const QString & User, const QString & Pass)
+{
+	if (Client().m_stage != ATNet::JoinStage)
+		return;
+	Client().SendMsg(CLoginMsg(User, Pass));
 }
 
 void CClient::Close() {
@@ -62,7 +70,7 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		switch(Msg->Type())
 		{
 		case CBaseMsg::LoginMsg:
-			SendMsg(CLoginMsg("Hold on!", "Educated guess"));
+			CLogin::Open(CLoginMsg(Msg).Flags() & CLoginMsg::PassFlag);
 			return;
 		case CBaseMsg::WelcomeMsg:
 		{
@@ -72,7 +80,7 @@ void CClient::HandleMsg(CNetMsg * Msg)
 			return;
 		}
 		}
-		Socket()->close();
+		Socket()->disconnectFromHost();
 		return;
 	}
 
@@ -80,4 +88,11 @@ void CClient::HandleMsg(CNetMsg * Msg)
 	{
 
 	}
+}
+
+void CClient::Error(QTcpSocket::SocketError Error)
+{
+	QMessageBox msg(QMessageBox::Warning, "Network error", Socket()->errorString());
+	msg.setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
+	msg.exec();
 }

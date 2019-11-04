@@ -22,6 +22,7 @@ class CClient : public CSocketMgr
 {
 public:
 	static void Connect(QString Host);
+	static void Login(const QString& User, const QString& Pass = QString());
 	static void Close();
 
 private:
@@ -32,14 +33,15 @@ private:
 	}
 
 	CClient() : CSocketMgr(), m_stage(ATNet::ClosedStage) { }
-	~CClient() { }
+	~CClient() { Socket()->disconnectFromHost(); }
 
 	ATNet::EProtoStage m_stage;
 	CProject* m_proj;
 
-	void Connected();
-	void Disconnected();
-	void HandleMsg(CNetMsg* Msg);
+	void Connected() override;
+	void Disconnected() override;
+	void HandleMsg(CNetMsg* Msg) override;
+	void Error(QTcpSocket::SocketError Error);
 };
 
 #endif // CClient_H

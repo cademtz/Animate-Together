@@ -1,5 +1,5 @@
 /*	Description:
- *		Defaults and 
+ *		Defaults, information, and settings for all Animate Together projects
  *
  *	Author: Hold on!
  *	Created: 10/18/2019 5:41:27 PM

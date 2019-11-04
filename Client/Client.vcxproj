@@ -244,6 +244,10 @@
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Interface\Import\CImport.cpp" />
+    <ClCompile Include="Source\Interface\Login\CLogin.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Interface\Prefs\CPrefs.cpp" />
     <ClCompile Include="Source\Interface\Export\CExport.cpp" />
     <ClCompile Include="Source\Graphics\GraphicsFrame\CGraphicsFrame.cpp">
@@ -414,6 +418,10 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="Source\Graphics\LayerLayout\CLayerLayout.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Interface\Login\CLogin.h">
       <SubType>
       </SubType>
     </ClInclude>
