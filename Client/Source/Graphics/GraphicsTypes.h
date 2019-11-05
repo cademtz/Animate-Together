@@ -20,6 +20,9 @@ enum class e_graphicstype
 	FrameLayout,
 	LayerLayout,
 	ScrubBar,
+	Stroke,
+	Pixmap,
+	Text,
 };
 
 #endif // GraphicsTypes_H
