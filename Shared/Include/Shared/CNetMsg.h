@@ -54,6 +54,7 @@ public:
 		BanMsg,			// - User request to ban
 		ChatMsg,		// - Chat message from server or user
 		WelcomeMsg,		// - Server has accepted user's login and sends the MOTD
+		StrokeMsg,		// - A client has made or continued a new stroke
 	};
 
 	inline uint8_t Type() const { return m_type; }

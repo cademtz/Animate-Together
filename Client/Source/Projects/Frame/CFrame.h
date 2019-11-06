@@ -13,7 +13,7 @@
 #endif
 
 #include "Projects/Events/Events.h"
-#include "Projects/Events/CEventHandler.h"
+#include <Shared/CEventHandler.h>
 
 class CLayer;
 class CFrame : public CEventHandler<CFrameEvent>

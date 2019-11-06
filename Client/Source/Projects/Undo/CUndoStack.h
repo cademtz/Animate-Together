@@ -17,7 +17,7 @@
 #include <qpixmap.h>
 #include <functional>
 #include "CUndoAction.h"
-#include "Projects/Events/CEventHandler.h"
+#include <Shared/CEventHandler.h>
 
 class CUndoStack : public CEventHandler<CUndoAction>
 {

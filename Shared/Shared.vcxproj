@@ -23,10 +23,12 @@
       <SubType>
       </SubType>
     </QtMoc>
+    <ClInclude Include="Include\Shared\CEventHandler.h" />
     <ClInclude Include="Include\Shared\CJsonConfig.h">
       <SubType>
       </SubType>
     </ClInclude>
+    <ClInclude Include="Include\Shared\CStroke.h" />
     <ClInclude Include="Include\Shared\Protocol.h">
       <SubType>
       </SubType>

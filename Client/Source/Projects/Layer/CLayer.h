@@ -17,7 +17,7 @@
 #include <qpixmap.h>
 #include "Projects/Events/Events.h"
 #include "Projects/Frame/CRasterFrame.h"
-#include "Projects/Events/CEventHandler.h"
+#include <Shared/CEventHandler.h>
 
 class CProject;
 

@@ -11,25 +11,32 @@
 #pragma once
 #endif
 
-#include <list>
+#include <qlist.h>
 #include <qpoint.h>
+#include "CNetMsg.h"
 
 class CStroke
 {
+	struct PointStruct
+	{
+		QPoint point;
+		qreal pressure;
+	};
+
 public:
-	typedef std::list<struct PointStruct> Points_t;
+	typedef QList<PointStruct> Points_t;
 	CStroke(const Points_t& Points) : m_points(Points) { }
 	CStroke() { }
 
 	inline Points_t Points() { return m_points; }
+	inline CStroke& operator+(const CStroke& Other)
+	{
+		m_points.append(Other.m_points);
+		return *this;
+	}
+	inline CStroke& operator+=(const CStroke& Other) { return *this + Other; }
 
 private:
-	struct PointStruct
-	{
-		QPoint point;
-		qreal scale;
-	};
-
 	Points_t m_points;
 };
 

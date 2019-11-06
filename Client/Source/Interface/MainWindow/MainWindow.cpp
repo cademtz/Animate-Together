@@ -6,6 +6,7 @@
 #include <qlayout.h>
 #include <qevent.h>
 
+#include "Client/CClient.h"
 #include "Projects/CProject.h"
 #include "Widgets/Canvas/CCanvas.h"
 #include "Widgets/ToolBar/CToolBar.h"
@@ -13,6 +14,7 @@
 #include "Widgets/Timeline/CTimeline.h"
 #include "Widgets/MiniPalette/CMiniPalette.h"
 #include "Interface/ColorPicker/ColorPicker.h"
+#include "Interface/Login/CLogin.h"
 
 QString MainWindow::m_globalstyle;
 
@@ -71,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent)
 	resize(width(), height() + m_titlebar->height() + m_toolbar->height() + m_timeline->minimumHeight());
 
 	CUndoStack::Listen([this](const CUndoAction* Undo) { UndoStackEvent(Undo); });
+	CClient::Listen([this](const CBaseMsg* Msg) { ClientEvent(Msg); });
 }
 
 MainWindow::~MainWindow()
@@ -109,6 +112,16 @@ void MainWindow::TogglePanel(QWidget * Panel)
 void MainWindow::UndoStackEvent(const CUndoAction* Undo)
 {
 	m_history->update();
+}
+
+void MainWindow::ClientEvent(const CBaseMsg * Msg)
+{
+	switch (Msg->Type())
+	{
+	case CBaseMsg::LoginMsg:
+		CLogin::Open(((CLoginMsg*)Msg)->Flags() & CLoginMsg::PassFlag);
+		return;
+	}
 }
 
 void MainWindow::Undo() {

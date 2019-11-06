@@ -8,7 +8,7 @@
 #include "Events.h"
 #include "Projects/Layer/CLayer.h"
 #include "Projects/Palette/CPalette.h"
-#include "CEventHandler.h"
+#include <Shared/CEventHandler.h>
 
 template <typename TEventClass, typename TCallback>
 std::list<std::function<TCallback>> CEventHandler<TEventClass, TCallback>::m_listeners;

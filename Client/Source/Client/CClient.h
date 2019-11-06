@@ -14,11 +14,13 @@
 #include <qtcpsocket.h>
 #include <Shared/Protocol.h>
 #include <Shared/CSocketMgr.h>
+#include <Shared/CEventHandler.h>
 
 class CProject;
 class CNetMsg;
+class CBaseMsg;
 
-class CClient : public CSocketMgr
+class CClient : public CSocketMgr, public CEventHandler<CBaseMsg>
 {
 public:
 	static void Connect(QString Host);

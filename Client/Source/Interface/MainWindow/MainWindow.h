@@ -15,6 +15,7 @@ class CCanvas;
 class CToolBar;
 class CUndoAction;
 class CTimeline;
+class CBaseMsg;
 
 enum class e_layerevent;
 enum class e_undoevent;
@@ -57,6 +58,7 @@ public:
 	inline static void ToggleLayers() { TogglePanel(MainWindow::Get().GetLayerPanel()); }
 
 	void UndoStackEvent(const CUndoAction* Undo);
+	void ClientEvent(const CBaseMsg* Msg);
 
 	static void Undo();
 	static void Redo();

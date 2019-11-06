@@ -12,19 +12,21 @@
 #endif
 
 #include <qgraphicsitem.h>
+#include <Shared/CStroke.h>
 #include "Graphics/GraphicsTypes.h"
-#include "Projects/Objects/CStroke.h"
 
-class CGraphicsStroke : public QGraphicsItem
+class CGraphicsStroke : public QGraphicsPixmapItem
 {
 public:
-	CGraphicsStroke(const CStroke& Stroke, QGraphicsItem* Parent = 0) : QGraphicsItem(Parent), m_stroke(Stroke) { }
+	CGraphicsStroke(const CStroke& Stroke, QGraphicsItem* Parent = 0) : QGraphicsPixmapItem(Parent), m_stroke(Stroke) { }
+
+	void Add(const CStroke& Other);
 
 protected:
-	int		type() const { return (int)e_graphicstype::Stroke; }
-	void	paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+	int	type() const { return (int)e_graphicstype::Stroke; }
+
 private:
-	const CStroke& m_stroke;
+	CStroke m_stroke;
 };
 
 

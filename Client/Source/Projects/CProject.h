@@ -21,7 +21,7 @@
 #include "Layer/CLayer.h"
 #include "Undo/CUndoStack.h"
 #include "Palette/CPalette.h"
-#include "Events/CEventHandler.h"
+#include <Shared/CEventHandler.h>
 
 enum class e_export
 {

@@ -116,6 +116,9 @@
     <ClCompile Include="Source\Graphics\CanvasScene\CCanvasScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Graphics\GraphicsStroke\CGraphicsStroke.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -237,9 +240,6 @@
     <ClInclude Include="Source\Projects\Frame\CRasterFrame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Projects\Events\CEventHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Graphics\GraphicsFrame\CGraphicsFrame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -274,9 +274,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\GraphicsStroke\CGraphicsStroke.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Projects\Objects\CStroke.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -12,6 +12,8 @@
 #include "Widgets/MotdView/CMotdView.h"
 #include "Interface/Login/CLogin.h"
 
+CClient::Listeners_t CClient::m_listeners;
+
 void CClient::Connect(QString Host)
 {
 	QStringList info = Host.split(':');
@@ -70,7 +72,8 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		switch(Msg->Type())
 		{
 		case CBaseMsg::LoginMsg:
-			CLogin::Open(CLoginMsg(Msg).Flags() & CLoginMsg::PassFlag);
+			CreateEvent(CLoginMsg(Msg));
+			//CLogin::Open(CLoginMsg(Msg).Flags() & CLoginMsg::PassFlag);
 			return;
 		case CBaseMsg::WelcomeMsg:
 		{
