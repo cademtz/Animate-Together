@@ -10,7 +10,6 @@
 #include <qmessagebox.h>
 #include <Shared/CNetMsg.h>
 #include "Widgets/MotdView/CMotdView.h"
-#include "Interface/Login/CLogin.h"
 
 CClient::Listeners_t CClient::m_listeners;
 
@@ -73,7 +72,6 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		{
 		case CBaseMsg::LoginMsg:
 			CreateEvent(CLoginMsg(Msg));
-			//CLogin::Open(CLoginMsg(Msg).Flags() & CLoginMsg::PassFlag);
 			return;
 		case CBaseMsg::WelcomeMsg:
 		{

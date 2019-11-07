@@ -1,6 +1,6 @@
 /*	Description:
- *		Stores all variables and information held in a project file.
- *		Pretty much the meat of the entire program and what the interface is based around controlling.
+ *		Stores all variables and information needed to interact with networked or local projects on a user level.
+ *		Makes up the core of what the software is entered around.
  *
  *	Author: Hold on!
  *	Created: 2/25/2019 7:11:53 PM

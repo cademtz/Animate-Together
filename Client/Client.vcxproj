@@ -286,6 +286,7 @@
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
     </ClCompile>
+    <ClCompile Include="Source\Projects\Frame\CFrame.cpp" />
     <ClCompile Include="Source\Projects\Frame\CRasterFrame.cpp">
       <SubType>
       </SubType>
@@ -295,10 +296,6 @@
       </SubType>
     </ClCompile>
     <ClCompile Include="Source\Projects\Events\Events.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="Source\Projects\Frame\CFrame.cpp">
       <SubType>
       </SubType>
     </ClCompile>
@@ -442,10 +439,7 @@
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="Source\Projects\Frame\CFrame.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
+    <ClInclude Include="Source\Projects\Frame\CFrame.h" />
     <ClInclude Include="Source\Projects\Frame\CRasterFrame.h">
       <SubType>
       </SubType>

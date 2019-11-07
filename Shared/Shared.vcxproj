@@ -23,12 +23,28 @@
       <SubType>
       </SubType>
     </QtMoc>
+    <ClInclude Include="Include\Shared\CBaseLayer.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Include\Shared\CEventHandler.h" />
+    <ClInclude Include="Include\Shared\CFolderLayer.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Include\Shared\CJsonConfig.h">
       <SubType>
       </SubType>
     </ClInclude>
+    <ClInclude Include="Include\Shared\CSharedProject.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Include\Shared\CStroke.h" />
+    <ClInclude Include="Include\Shared\Events.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Include\Shared\Protocol.h">
       <SubType>
       </SubType>
@@ -44,11 +60,19 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Include\Shared\CBaseLayer.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Include\Shared\CJsonConfig.cpp">
       <SubType>
       </SubType>
     </ClCompile>
     <ClCompile Include="Include\Shared\CNetMsg.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Include\Shared\CSharedProject.cpp">
       <SubType>
       </SubType>
     </ClCompile>

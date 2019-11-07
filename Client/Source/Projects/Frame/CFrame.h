@@ -24,7 +24,7 @@ public:
 		null = 0,
 		Raster,
 		Vector,
-		Stk
+		Stick
 	};
 
 public:
