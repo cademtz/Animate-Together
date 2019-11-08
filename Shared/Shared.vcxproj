@@ -41,7 +41,7 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="Include\Shared\CStroke.h" />
-    <ClInclude Include="Include\Shared\Events.h">
+    <ClInclude Include="Include\Shared\CNetEvent.h">
       <SubType>
       </SubType>
     </ClInclude>
@@ -61,6 +61,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Include\Shared\CBaseLayer.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Include\Shared\CFolderLayer.cpp">
       <SubType>
       </SubType>
     </ClCompile>

@@ -1,6 +1,6 @@
 /*	Description:
  *		Stores all variables and information needed to network a project.
- *		Makes up the core of what the software is entered around.
+ *		Makes up the core of what Animate Together is centered around.
  *
  *		Details:
  *			All layers stored in a project are assumed to be owned by it.
@@ -19,19 +19,21 @@
 #include <qstring.h>
 #include <qlist.h>
 #include "CEventHandler.h"
-#include "Events.h"
+#include "CNetEvent.h"
 #include "CFolderLayer.h"
 
-class CSharedProject : public CEventHandler<CProjectEventMsg>
+class CSharedProject : public CEventHandler<CSharedProjectMsg>
 {
 public:
+	CSharedProject();
+
 	inline QString Name() const { return m_name; }
 	inline void SetName(const QString& Name) { m_name = Name; }
-	inline const CFolderLayer* Layers() { return &m_layers; }
+	inline const CFolderLayer& Root() { return m_root; }
 
 private:
 	QString m_name;
-	CFolderLayer m_layers;
+	CFolderLayer m_root;
 };
 
 

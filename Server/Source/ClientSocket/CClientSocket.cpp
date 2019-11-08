@@ -28,7 +28,7 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 	switch (m_stage)
 	{
 	case ATNet::ProtocolStage:
-		if (Msg->Type() == CBaseMsg::ProtocolMsg && CProtocolMsg(Msg).Compatible())
+		if (Msg->Type() == CBaseMsg::Msg_Protocol && CProtocolMsg(Msg).Compatible())
 		{
 			m_stage = ATNet::JoinStage;
 			SendMsg(m_parent->Auth());
@@ -59,7 +59,7 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 
 	switch (Msg->Type())
 	{
-	case CBaseMsg::ChatMsg:
+	case CBaseMsg::Msg_Chat:
 		qInfo() << User() << ": " << CChatMsg(Msg).Text();
 		break;
 	}
@@ -71,7 +71,7 @@ void CClientSocket::Disconnected() {
 
 CClientSocket::ELogin CClientSocket::CheckLogin(CNetMsg * Msg)
 {
-	if (Msg->Type() != CBaseMsg::LoginMsg)
+	if (Msg->Type() != CBaseMsg::Msg_Login)
 		return ELogin::Error;
 
 	CLoginMsg login(Msg);

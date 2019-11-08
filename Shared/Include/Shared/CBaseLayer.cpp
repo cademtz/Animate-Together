@@ -6,8 +6,13 @@
  */
 
 #include "CBaseLayer.h"
+#include "CFolderLayer.h"
 
-inline CSharedProject * CBaseLayer::Project() const
+CFolderLayer * CBaseLayer::Root() const
 {
 	return nullptr;
+}
+
+inline CSharedProject * CBaseLayer::RootProject() const {
+	return Root()->RootProject();
 }

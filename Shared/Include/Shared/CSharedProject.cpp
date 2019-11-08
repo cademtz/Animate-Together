@@ -8,3 +8,7 @@
 #include "CSharedProject.h"
 
 CSharedProject::Listeners_t CSharedProject::m_listeners;
+
+CSharedProject::CSharedProject() : m_root(this)
+{
+}

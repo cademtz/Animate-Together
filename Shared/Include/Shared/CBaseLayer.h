@@ -30,11 +30,13 @@ public:
 	virtual ~CBaseLayer() { }
 
 	inline EType Type() const { return m_type; }
-	inline CSharedProject* Project() const;
+	inline CFolderLayer* Parent() const { return m_parent; }
+	CFolderLayer* Root() const;
+	CSharedProject* RootProject() const;
 
 private:
 	EType m_type;
-	CFolderLayer* m_parent;
+	CFolderLayer* m_parent = 0;
 };
 
 #endif // CBaseLayer_H

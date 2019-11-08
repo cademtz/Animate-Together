@@ -118,7 +118,7 @@ void MainWindow::ClientEvent(const CBaseMsg * Msg)
 {
 	switch (Msg->Type())
 	{
-	case CBaseMsg::LoginMsg:
+	case CBaseMsg::Msg_Login:
 		CLogin::Open(((CLoginMsg*)Msg)->Flags() & CLoginMsg::PassFlag);
 		return;
 	}

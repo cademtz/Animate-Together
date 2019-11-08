@@ -20,7 +20,7 @@ CNetMsg * CNetMsg::FromData(unsigned length, const char* Data)
 	return 0;
 }
 
-CServerMsg::CServerMsg(CNetMsg * Msg) : CBaseMsg(ServerMsg) {
+CServerMsg::CServerMsg(CNetMsg * Msg) : CBaseMsg(Msg_Server) {
 	CSerialize::Deserialize(Msg->Data(), m_text);
 }
 
@@ -28,7 +28,7 @@ const CSerialize CServerMsg::Serialize() const {
 	return CSerialize(Type(), m_text.utf16());
 }
 
-CProtocolMsg::CProtocolMsg(CNetMsg * Msg) : CBaseMsg(ProtocolMsg) {
+CProtocolMsg::CProtocolMsg(CNetMsg * Msg) : CBaseMsg(Msg_Protocol) {
 	CSerialize::Deserialize(Msg->Data(), m_prefix, m_major, m_minor);
 }
 
@@ -43,7 +43,7 @@ const CSerialize CProtocolMsg::Serialize() const {
 	return CSerialize(Type(), m_prefix, m_major, m_minor);
 }
 
-CLoginMsg::CLoginMsg(CNetMsg * Msg) : CBaseMsg(LoginMsg) {
+CLoginMsg::CLoginMsg(CNetMsg * Msg) : CBaseMsg(Msg_Login) {
 	CSerialize::Deserialize(Msg->Data(), m_flags, m_user, m_pass);
 }
 
@@ -51,7 +51,7 @@ const CSerialize CLoginMsg::Serialize() const {
 	return CSerialize(Type(), m_flags, m_user.utf16(), m_pass);
 }
 
-CChatMsg::CChatMsg(CNetMsg * Msg) : CBaseMsg(ChatMsg) {
+CChatMsg::CChatMsg(CNetMsg * Msg) : CBaseMsg(Msg_Chat) {
 	CSerialize::Deserialize(Msg->Data(), m_text);
 }
 
@@ -59,7 +59,7 @@ const CSerialize CChatMsg::Serialize() const {
 	return CSerialize(Type(), m_text.utf16());
 }
 
-CWelcomeMsg::CWelcomeMsg(CNetMsg * Msg) : CBaseMsg(WelcomeMsg) {
+CWelcomeMsg::CWelcomeMsg(CNetMsg * Msg) : CBaseMsg(Msg_Welcome) {
 	CSerialize::Deserialize(Msg->Data(), m_url, m_motd);
 }
 

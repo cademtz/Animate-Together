@@ -47,14 +47,15 @@ class CBaseMsg
 public:
 	enum EType : uint8_t
 	{
-		ServerMsg = 0,	// - A message box from the server
-		ProtocolMsg,	// - Sender's protocol info
-		LoginMsg,		// - Sender requesting or sending login info
-		KickMsg,		// - User request to kick
-		BanMsg,			// - User request to ban
-		ChatMsg,		// - Chat message from server or user
-		WelcomeMsg,		// - Server has accepted user's login and sends the MOTD
-		StrokeMsg,		// - A client has made or continued a new stroke
+		Msg_Server = 0,	// - A message box from the server
+		Msg_Protocol,	// - Sender's protocol info
+		Msg_Login,		// - Sender requesting or sending login info
+		Msg_Kick,		// - User request to kick
+		Msg_Ban,		// - User request to ban
+		Msg_Chat,		// - Chat message from server or user
+		Msg_Welcome,	// - Server has accepted user's login and sends the MOTD
+		Msg_Stroke,		// - A client has made or continued a new stroke
+		Msg_Event,		// - Server or client has performed a specific action
 	};
 
 	inline uint8_t Type() const { return m_type; }
@@ -79,7 +80,7 @@ class CServerMsg : public CBaseMsg
 {
 public:
 	CServerMsg(CNetMsg* Msg);
-	CServerMsg(QString Text) : CBaseMsg(ServerMsg), m_text(Text) { }
+	CServerMsg(QString Text) : CBaseMsg(Msg_Server), m_text(Text) { }
 
 	inline QString Text() const { return m_text; }
 
@@ -95,7 +96,7 @@ class CProtocolMsg : public CBaseMsg
 public:
 	CProtocolMsg(CNetMsg * Msg);
 	CProtocolMsg()
-		: CBaseMsg(ProtocolMsg), m_prefix(AT_PROTO_PREFIX), m_major(AT_PROTO_MAJOR), m_minor(AT_PROTO_MINOR) { }
+		: CBaseMsg(Msg_Protocol), m_prefix(AT_PROTO_PREFIX), m_major(AT_PROTO_MAJOR), m_minor(AT_PROTO_MINOR) { }
 
 	// - Returns true if the protocol will maintain compatibility with current version
 	bool Compatible();
@@ -122,9 +123,9 @@ public:
 	};
 
 	CLoginMsg(CNetMsg* Msg);
-	CLoginMsg(uint8_t ReqFlags = 0) : CBaseMsg(LoginMsg), m_flags(ReqFlags) { }
+	CLoginMsg(uint8_t ReqFlags = 0) : CBaseMsg(Msg_Login), m_flags(ReqFlags) { }
 	CLoginMsg::CLoginMsg(QString User, QString Pass)
-		: CBaseMsg(LoginMsg), m_user(User), m_pass(Pass), m_flags(Pass.isEmpty() ? 0 : PassFlag) { }
+		: CBaseMsg(Msg_Login), m_user(User), m_pass(Pass), m_flags(Pass.isEmpty() ? 0 : PassFlag) { }
 
 	inline uint8_t Flags() const { return m_flags; }
 	inline QString User() const { return m_user; }
@@ -142,7 +143,7 @@ class CChatMsg : public CBaseMsg
 {
 public:
 	CChatMsg(CNetMsg* Msg);
-	CChatMsg(QString Text = QString()) : CBaseMsg(ChatMsg), m_text(Text) { }
+	CChatMsg(QString Text = QString()) : CBaseMsg(Msg_Chat), m_text(Text) { }
 
 	inline const QString& Text() const { return m_text; }
 	inline void SetText(const QString& String) { m_text = String; }
@@ -159,7 +160,7 @@ class CWelcomeMsg : public CBaseMsg
 public:
 	CWelcomeMsg(CNetMsg* Msg);
 	CWelcomeMsg(QString Motd = QString(), bool IsUrl = false)
-		: CBaseMsg(WelcomeMsg), m_motd(Motd), m_url(IsUrl) { }
+		: CBaseMsg(Msg_Welcome), m_motd(Motd), m_url(IsUrl) { }
 
 	inline bool IsUrl() const { return m_url; }
 	inline QString Motd() const { return m_motd; }
