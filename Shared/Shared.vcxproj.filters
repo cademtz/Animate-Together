@@ -58,6 +58,12 @@
     <ClInclude Include="Include\Shared\CNetEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Shared\CBaseFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Shared\CUser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Include\Shared\CNetMsg.cpp">

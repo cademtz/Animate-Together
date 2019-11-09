@@ -10,9 +10,16 @@
 
 CFolderLayer * CBaseLayer::Root() const
 {
-	return nullptr;
+	CFolderLayer* folder;
+	if (Type() == Layer_Folder)
+		folder = (CFolderLayer*)this;
+	else
+		folder = Parent();
+	while (folder->Parent())
+		folder = folder->Parent();
+	return folder;
 }
 
-inline CSharedProject * CBaseLayer::RootProject() const {
-	return Root()->RootProject();
+CSharedProject * CBaseLayer::RootProject() const {
+	return Root()->_Project();
 }

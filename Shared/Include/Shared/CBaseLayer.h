@@ -26,13 +26,14 @@ public:
 		Layer_Audio
 	};
 
-	CBaseLayer(EType Type, CFolderLayer* Parent) : m_type(Type), m_parent(Parent) { }
-	virtual ~CBaseLayer() { }
-
 	inline EType Type() const { return m_type; }
 	inline CFolderLayer* Parent() const { return m_parent; }
 	CFolderLayer* Root() const;
 	CSharedProject* RootProject() const;
+
+protected:
+	CBaseLayer(EType Type, CFolderLayer* Parent) : m_type(Type), m_parent(Parent) { }
+	virtual ~CBaseLayer() { }
 
 private:
 	EType m_type;

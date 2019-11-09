@@ -34,7 +34,9 @@ public:
 	inline const LayerList_t& Layers() const { return m_layers; }
 
 protected:
+	friend CBaseLayer;
 	friend CSharedProject;
+
 	inline void SetRootProject(CSharedProject* Project)
 	{
 		if (Parent())
