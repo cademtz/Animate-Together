@@ -12,7 +12,7 @@
 #endif
 
 #include <qgraphicsitem.h>
-#include <Shared/CStroke.h>
+#include <NetObjects/CStroke.h>
 #include "Graphics/GraphicsTypes.h"
 
 class CGraphicsStroke : public QGraphicsPixmapItem

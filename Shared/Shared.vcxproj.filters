@@ -40,9 +40,6 @@
     <ClInclude Include="Include\Shared\CJsonConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Shared\CStroke.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Shared\CEventHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -61,7 +58,16 @@
     <ClInclude Include="Include\Shared\CBaseFrame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Shared\CUser.h">
+    <ClInclude Include="Include\NetObjects\CUser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\NetObjects\CNetObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\NetObjects\CBrush.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\NetObjects\CStroke.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -85,6 +91,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Include\Shared\CFolderLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Include\NetObjects\CNetObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
