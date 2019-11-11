@@ -22,7 +22,7 @@
 #include <qlist.h>
 #include "CEventHandler.h"
 #include "CNetEvent.h"
-#include "CFolderLayer.h"
+#include "NetObjects/CFolderLayer.h"
 
 class CSharedProject : public CEventHandler<CSharedProjectMsg>
 {

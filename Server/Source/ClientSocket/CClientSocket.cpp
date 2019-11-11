@@ -75,7 +75,7 @@ CClientSocket::ELogin CClientSocket::CheckLogin(CNetMsg * Msg)
 		return ELogin::Error;
 
 	CLoginMsg login(Msg);
-	if (m_parent->Auth().Flags() &CLoginMsg::PassFlag)
+	if (m_parent->Auth().Flags() &CLoginMsg::Flag_Pass)
 		if (login.Pass() != m_parent->Pass())
 			return ELogin::BadInfo;
 

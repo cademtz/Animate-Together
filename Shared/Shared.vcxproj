@@ -19,15 +19,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\Shared\CUserList.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <QtMoc Include="Include\Shared\CSocketMgr.h">
       <SubType>
       </SubType>
     </QtMoc>
-    <ClInclude Include="Include\Shared\CBaseFrame.h">
+    <ClInclude Include="Include\NetObjects\CBaseFrame.h">
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="Include\Shared\CBaseLayer.h">
+    <ClInclude Include="Include\NetObjects\CBaseLayer.h">
       <SubType>
       </SubType>
     </ClInclude>
@@ -36,7 +40,7 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="Include\Shared\CEventHandler.h" />
-    <ClInclude Include="Include\Shared\CFolderLayer.h">
+    <ClInclude Include="Include\NetObjects\CFolderLayer.h">
       <SubType>
       </SubType>
     </ClInclude>
@@ -76,11 +80,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Include\Shared\CBaseLayer.cpp">
+    <ClCompile Include="Include\NetObjects\CBaseLayer.cpp">
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Include\Shared\CFolderLayer.cpp">
+    <ClCompile Include="Include\NetObjects\CFolderLayer.cpp">
       <SubType>
       </SubType>
     </ClCompile>
@@ -101,6 +105,10 @@
       </SubType>
     </ClCompile>
     <ClCompile Include="Include\Shared\CSocketMgr.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Include\Shared\CUserList.cpp">
       <SubType>
       </SubType>
     </ClCompile>

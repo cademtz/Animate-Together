@@ -11,10 +11,12 @@
 #pragma once
 #endif
 
+#include "CNetObject.h"
+
 class CSharedProject;
 class CFolderLayer;
 
-class CBaseLayer
+class CBaseLayer : public CNetObject
 {
 public:
 	enum EType

@@ -27,7 +27,7 @@ public:
 
 	inline bool IsListening() const { return this->isListening(); }
 	inline const QString& Pass() const { return m_pass; }
-	inline CLoginMsg Auth() const { return CLoginMsg(m_pass.isEmpty() ? 0 : CLoginMsg::PassFlag); }
+	inline CLoginMsg Auth() const { return CLoginMsg(m_pass.isEmpty() ? 0 : CLoginMsg::Flag_Pass); }
 	inline const CWelcomeMsg& Motd() const { return m_motd; }
 	inline const QList<CClientSocket*>& Clients() const { return m_clients; }
 

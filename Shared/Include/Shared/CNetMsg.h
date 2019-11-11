@@ -118,14 +118,15 @@ class CLoginMsg : public CBaseMsg
 public:
 	enum EFlags
 	{
-		TokenFlag = 0, // - Requiring or sending a token in 'User' string
-		PassFlag = (1 << 0) // - Requiring or sending a password in the 'Pass' string
+		Flag_Required = 0,		// - Servers requires the client to send a login with the specified flags
+		Flag_Token = (1 << 0),	// - Expects a token in the 'User' string
+		Flag_Pass = (1 << 1)	// - Expects a password in the 'Pass' string
 	};
 
 	CLoginMsg(CNetMsg* Msg);
 	CLoginMsg(uint8_t ReqFlags = 0) : CBaseMsg(Msg_Login), m_flags(ReqFlags) { }
 	CLoginMsg::CLoginMsg(QString User, QString Pass)
-		: CBaseMsg(Msg_Login), m_user(User), m_pass(Pass), m_flags(Pass.isEmpty() ? 0 : PassFlag) { }
+		: CBaseMsg(Msg_Login), m_user(User), m_pass(Pass), m_flags(Pass.isEmpty() ? 0 : Flag_Pass) { }
 
 	inline uint8_t Flags() const { return m_flags; }
 	inline QString User() const { return m_user; }

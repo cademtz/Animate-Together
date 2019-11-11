@@ -14,7 +14,7 @@
 #pragma once
 #endif
 
-#include "NetObjects/CNetObject.h"
+#include "NetObject.h"
 
 class CBaseFrame : public CNetObject
 {
