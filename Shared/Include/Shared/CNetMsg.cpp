@@ -6,8 +6,7 @@
  */
 
 #include "CNetMsg.h"
-#include <cstring>
-#include <cassert>
+#include "NetObjects/CUser.h"
 
 CNetMsg * CNetMsg::FromData(unsigned length, const char* Data)
 {
@@ -65,4 +64,13 @@ CWelcomeMsg::CWelcomeMsg(CNetMsg * Msg) : CBaseMsg(Msg_Welcome) {
 
 const CSerialize CWelcomeMsg::Serialize() const {
 	return CSerialize(Type(), m_url, m_motd.utf16());
+}
+
+CJoinMsg::CJoinMsg(CNetMsg * Msg) : CBaseMsg(Msg_Join)
+{
+}
+
+const CSerialize CJoinMsg::Serialize() const
+{
+	return CSerialize();
 }

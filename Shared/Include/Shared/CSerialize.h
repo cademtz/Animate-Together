@@ -67,9 +67,17 @@ public:
 		UpdateLen();
 	}
 
-	inline void Add() { }
+
+	inline void Add(const CSerialize& Data)
+	{
+		m_bytes.append(Data.Bytes());
+		UpdateLen();
+	}
 
 private:
+
+	inline void Add() { }
+
 	inline void AddUtf(const QString& Str, bool Utf16)
 	{
 		Add(Utf16); // Utf header
@@ -99,6 +107,14 @@ private:
 		else
 			Str = QString::fromUtf8(Pos, size);
 		Pos += size * (utf16 ? sizeof(char16_t) : sizeof(char));
+	}
+
+	static inline void Next(const char*& Pos, CSerialize& Data)
+	{
+		int size;
+		Next(Pos, size);
+		Data = CSerialize(Pos, size);
+		Pos += size;
 	}
 
 	static inline void Next(const char*& Pos, bool& Val) // qbswap likes char and uint8, but not bool apparently?

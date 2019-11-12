@@ -42,6 +42,7 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 		{
 		case ELogin::Valid:
 			m_stage = ATNet::FinalStage;
+			//SendMsg(CJoinMsg());
 			SendMsg(m_parent->Motd());
 			break;
 		case ELogin::Error:

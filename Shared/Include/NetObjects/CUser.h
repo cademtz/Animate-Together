@@ -20,12 +20,12 @@ class CUser : public CNetObject
 public:
 	enum EPerms : uint8_t
 	{
-		Perm_Guest, // - If not set, the user may only spectate
-		Perm_Privating, // - User can private layers
-		Perm_ManageUsers, // - Server allows ban and kick requests
-		Perm_ManageLayers, // - User may override layer privating
-		Perm_ManageProj, // - User can change project settings
-		Perm_Admin, // - Overrides any server restrictions on this user
+		Perm_Guest,			// - If not set, the user may only spectate
+		Perm_Privating,		// - User can private layers
+		Perm_ManageUsers,	// - Server allows ban and kick requests
+		Perm_ManageLayers,	// - User may override layer privating
+		Perm_ManageProj,	// - User can change project settings
+		Perm_Admin,			// - Overrides any server restrictions on this user
 	};
 
 	// - Creates an entirely new networkable user

@@ -50,10 +50,11 @@ public:
 		Msg_Server = 0,	// - A message box from the server
 		Msg_Protocol,	// - Sender's protocol info
 		Msg_Login,		// - Sender requesting or sending login info
+		Msg_Join,		// - Server accepts login and sends public user info
 		Msg_Kick,		// - User request to kick
 		Msg_Ban,		// - User request to ban
 		Msg_Chat,		// - Chat message from server or user
-		Msg_Welcome,	// - Server has accepted user's login and sends the MOTD
+		Msg_Welcome,	// - Server is sending the MOTD
 		Msg_Stroke,		// - A client has made or continued a new stroke
 		Msg_Event,		// - Server or client has performed a specific action
 	};
@@ -174,6 +175,24 @@ protected:
 private:
 	bool m_url;
 	QString m_motd;
+};
+
+
+class CUser;
+
+class CJoinMsg : public CBaseMsg
+{
+public:
+	CJoinMsg(CNetMsg* Msg);
+	CJoinMsg(const CUser* User) : CBaseMsg(Msg_Join), m_user(User) { }
+
+	inline const CUser* User() const { return m_user; }
+
+protected:
+	const CSerialize Serialize() const override;
+
+private:
+	const CUser* m_user;
 };
 
 #endif // CNetMsg_H
