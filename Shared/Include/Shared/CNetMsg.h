@@ -16,6 +16,7 @@
 #include <qtcpsocket.h>
 #include "Config.h"
 #include "CSerialize.h"
+#include "NetObjects/CNetObject.h"
 
 // - CNetMsg wraps around raw serialized data for quickly handling networkable message data
 
@@ -186,13 +187,18 @@ public:
 	CJoinMsg(CNetMsg* Msg);
 	CJoinMsg(const CUser* User) : CBaseMsg(Msg_Join), m_user(User) { }
 
-	inline const CUser* User() const { return m_user; }
+	// - Creates a join message to send to the new user
+	CJoinMsg(const CNetObject* NewUser)
+		: CBaseMsg(Msg_Join), m_handle(NewUser->Handle()) { }
 
+	inline const CUser* User() const { return m_user; }
+	inline unsigned Handle() const { return m_user ? ((CNetObject*)m_user)->Handle() : m_handle; }
 protected:
 	const CSerialize Serialize() const override;
 
 private:
-	const CUser* m_user;
+	const CUser* m_user = 0;
+	unsigned m_handle;
 };
 
 #endif // CNetMsg_H

@@ -20,18 +20,20 @@ class CUser : public CNetObject
 public:
 	enum EPerms : uint8_t
 	{
-		Perm_Guest,			// - If not set, the user may only spectate
-		Perm_Privating,		// - User can private layers
-		Perm_ManageUsers,	// - Server allows ban and kick requests
-		Perm_ManageLayers,	// - User may override layer privating
-		Perm_ManageProj,	// - User can change project settings
-		Perm_Admin,			// - Overrides any server restrictions on this user
+		Perm_Guest			= 0,		// - If not set, the user may only spectate
+		Perm_Privating		= (1 << 0),	// - User can private layers
+		Perm_ManageUsers	= (1 << 1),	// - Server allows ban and kick requests
+		Perm_ManageLayers	= (1 << 2),	// - User may override layer privating
+		Perm_ManageProj		= (1 << 3),	// - User can change project settings
+		Perm_Admin			= (1 << 4),	// - Overrides any server restrictions on this user
 	};
 
 	// - Creates an entirely new networkable user
 	CUser(QString Name) : m_name(Name) { }
 
 	inline QString Name() const { return m_name; }
+	inline EPerms Perms() const { return m_perms; }
+	inline void SetPerms(EPerms Perms) { m_perms = Perms; }
 	inline void AddAction(CNetEvent* Action) { m_actions.push_back(Action); }
 
 private:
