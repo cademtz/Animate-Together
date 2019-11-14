@@ -68,9 +68,13 @@ const CSerialize CWelcomeMsg::Serialize() const {
 
 CJoinMsg::CJoinMsg(CNetMsg * Msg) : CBaseMsg(Msg_Join)
 {
+	QString name;
+	uint8_t perms;
+	CSerialize::Deserialize(Msg->Data(), m_handle, name, perms);
 }
 
 const CSerialize CJoinMsg::Serialize() const
 {
 	return CSerialize();
+	// return CSerialize(Type(), m_handle, m_user->Name().utf16(), m_user->Perms());
 }

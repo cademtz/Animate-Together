@@ -32,7 +32,7 @@ public:
 	CUser(QString Name) : m_name(Name) { }
 
 	inline QString Name() const { return m_name; }
-	inline EPerms Perms() const { return m_perms; }
+	inline uint8_t Perms() const { return m_perms; }
 	inline void SetPerms(EPerms Perms) { m_perms = Perms; }
 	inline void AddAction(CNetEvent* Action) { m_actions.push_back(Action); }
 

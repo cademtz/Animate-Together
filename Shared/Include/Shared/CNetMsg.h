@@ -185,14 +185,11 @@ class CJoinMsg : public CBaseMsg
 {
 public:
 	CJoinMsg(CNetMsg* Msg);
-	CJoinMsg(const CUser* User) : CBaseMsg(Msg_Join), m_user(User) { }
+	CJoinMsg(const CUser* User)
+		: CBaseMsg(Msg_Join), m_user(User), m_handle(((CNetObject*)User)->Handle()) { }
 
-	// - Creates a join message to send to the new user
-	CJoinMsg(const CNetObject* NewUser)
-		: CBaseMsg(Msg_Join), m_handle(NewUser->Handle()) { }
+	inline unsigned Handle() const { return m_handle; }
 
-	inline const CUser* User() const { return m_user; }
-	inline unsigned Handle() const { return m_user ? ((CNetObject*)m_user)->Handle() : m_handle; }
 protected:
 	const CSerialize Serialize() const override;
 

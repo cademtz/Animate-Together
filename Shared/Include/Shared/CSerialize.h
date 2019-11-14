@@ -14,6 +14,15 @@
 #include <qstring.h>
 #include <qendian.h>
 
+struct SerialStream
+{
+	const char* data;
+	int pos = 0;
+
+	template<typename T>
+	inline SerialStream& operator>>(T& Var);
+};
+
 class CSerialize
 {
 public:
@@ -25,20 +34,26 @@ public:
 	CSerialize(QByteArray Bytes = QByteArray(sizeof(int), 0)) : m_bytes(Bytes) { }
 
 	inline const QByteArray Bytes() const { return m_bytes; }
+	static SerialStream Stream(const char* Data) { return { Data }; }
 
 	// - Sets instance's data to use existing serialized bytes
 	inline void SetSerialized(QByteArray Bytes) {
 		m_bytes = Bytes;
 	}
 
-	template <typename... VarArgs>
+	template<typename... VarArgs>
 	inline void Deserialize(VarArgs&... Args) {
 		Next(m_bytes.data() + sizeof(m_bytes.size()), Args...);
 	}
 
-	template <typename... VarArgs>
+	template<typename... VarArgs>
 	static inline void Deserialize(const char* Data, VarArgs&... Args) {
 		Next(Data, Args...);
+	}
+
+	template <typename T>
+	static inline void FromStream(SerialStream& Stream, T& Data) {
+		Next(Stream.pos(), Data);
 	}
 
 	template<typename T, typename... VarArgs>
@@ -66,7 +81,6 @@ public:
 		m_bytes.append((char*)&big, sizeof(T));
 		UpdateLen();
 	}
-
 
 	inline void Add(const CSerialize& Data)
 	{
@@ -138,5 +152,12 @@ private:
 
 	QByteArray m_bytes;
 };
+
+template<typename T>
+inline SerialStream & SerialStream::operator>>(T & Var)
+{
+	CSerialize::FromStream(*this, Var);
+	return *this;
+}
 
 #endif // CSerialize_H
