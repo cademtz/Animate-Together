@@ -18,11 +18,10 @@
 class CUserList
 {
 public:
-	void HandleMsg(const CNetMsg* Msg);
-
 	// - Gets a CUser instance linked with a handle
 	// - Returns a null pointer if not found
 	CUser* FromHandle(const CNetObject& Object);
+	inline QList<CUser*>& Users() { return m_users; }
 
 private:
 	QList<CUser*> m_users;

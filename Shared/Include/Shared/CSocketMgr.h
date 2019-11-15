@@ -24,6 +24,9 @@ public:
 
 	inline QTcpSocket* Socket() { return m_sock; }
 	inline void SendMsg(const CBaseMsg& Msg) { Msg.Send(m_sock); }
+	inline void SendData(const CSerialize& Data) {
+		CNetMsg::FromData(Data.Bytes())->Send(m_sock);
+	}
 
 protected:
 	virtual void HandleMsg(CNetMsg* Msg) = 0;

@@ -81,9 +81,6 @@
     <ClCompile Include="Include\Shared\CSocketMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Include\Shared\Protocol.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Include\Shared\CJsonConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

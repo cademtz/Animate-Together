@@ -31,6 +31,9 @@ public:
 	inline const CWelcomeMsg& Motd() const { return m_motd; }
 	inline const QList<CClientSocket*>& Clients() const { return m_clients; }
 
+	// - Sends a message to all joined users, unless specified otherwise
+	void SendAll(const CBaseMsg& Msg, bool JoinedOnly = true);
+
 protected:
 	friend CClientSocket;
 	void ClientConnect();

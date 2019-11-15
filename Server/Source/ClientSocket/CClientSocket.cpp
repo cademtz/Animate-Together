@@ -8,7 +8,9 @@
 #include "CClientSocket.h"
 #include <qtcpserver.h>
 #include <Shared/CNetMsg.h>
+#include <Shared/CUserList.h>
 #include "Server/CServer.h"
+
 
 CClientSocket::CClientSocket(QTcpSocket * Socket, CServer * Parent)
 	: CSocketMgr(Socket, Parent), m_parent(Parent) {
@@ -41,10 +43,13 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 		switch (CheckLogin(Msg))
 		{
 		case ELogin::Valid:
+		{
 			m_stage = ATNet::FinalStage;
-			//SendMsg(CJoinMsg());
+			CUser user(m_user, CUser::Perm_Guest);
+			m_parent->SendAll(CJoinMsg(user));
 			SendMsg(m_parent->Motd());
 			break;
+		}
 		case ELogin::Error:
 			Kick(tr("Error confirming login. Retry, update client, or report a bug"));
 			break;

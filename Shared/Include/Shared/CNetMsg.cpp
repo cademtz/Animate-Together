@@ -6,7 +6,7 @@
  */
 
 #include "CNetMsg.h"
-#include "NetObjects/CUser.h"
+#include "CUserList.h"
 
 CNetMsg * CNetMsg::FromData(unsigned length, const char* Data)
 {
@@ -66,15 +66,14 @@ const CSerialize CWelcomeMsg::Serialize() const {
 	return CSerialize(Type(), m_url, m_motd.utf16());
 }
 
-CJoinMsg::CJoinMsg(CNetMsg * Msg) : CBaseMsg(Msg_Join)
-{
-	QString name;
-	uint8_t perms;
-	CSerialize::Deserialize(Msg->Data(), m_handle, name, perms);
+CJoinMsg::CJoinMsg(CNetMsg * Msg) : CBaseMsg(Msg_Join) {
+	CSerialize::Deserialize(Msg->Data(), m_name, m_perms, m_handle);
 }
 
-const CSerialize CJoinMsg::Serialize() const
-{
-	return CSerialize();
-	// return CSerialize(Type(), m_handle, m_user->Name().utf16(), m_user->Perms());
+CJoinMsg::CJoinMsg(const CUser & User)
+	: CBaseMsg(Msg_Join), m_name(User.Name()), m_perms(User.Perms()), m_handle(User.Handle()) {
+}
+
+const CSerialize CJoinMsg::Serialize() const {
+	return CSerialize(Type(), m_name.utf16(), m_perms, m_handle);
 }

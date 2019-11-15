@@ -7,15 +7,6 @@
 
 #include "CUserList.h"
 
-void CUserList::HandleMsg(const CNetMsg * Msg)
-{
-	switch (Msg->Type())
-	{
-	case CBaseMsg::Msg_Login:
-		break;
-	}
-}
-
 CUser * CUserList::FromHandle(const CNetObject & Object)
 {
 	for (CUser* user : m_users)

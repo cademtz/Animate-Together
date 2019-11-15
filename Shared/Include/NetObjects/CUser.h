@@ -29,7 +29,11 @@ public:
 	};
 
 	// - Creates an entirely new networkable user
-	CUser(QString Name) : m_name(Name) { }
+	CUser(QString Name, EPerms Perms) : m_name(Name), m_perms(Perms) { }
+
+	// - Create user from a join msg
+	CUser(QString Name, EPerms Perms, unsigned Handle)
+		: CNetObject(Handle), m_name(Name), m_perms(Perms) { }
 
 	inline QString Name() const { return m_name; }
 	inline uint8_t Perms() const { return m_perms; }

@@ -24,6 +24,7 @@ public:
 	CClientSocket(QTcpSocket* Socket, CServer* Parent);
 
 	inline QString User() const { return m_user; }
+	inline ATNet::EProtoStage Stage() const { return m_stage; }
 	void Kick(QString Reason);
 
 protected:

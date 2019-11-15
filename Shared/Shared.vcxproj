@@ -112,10 +112,6 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Include\Shared\Protocol.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2A1D4CB2-2DA3-428E-A320-BC966809EB0B}</ProjectGuid>

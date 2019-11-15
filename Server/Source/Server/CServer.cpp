@@ -55,6 +55,17 @@ void CServer::Close() {
 	close();
 }
 
+void CServer::SendAll(const CBaseMsg & Msg, bool JoinedOnly)
+{
+	CSerialize data = Msg.Serialize();
+	for (auto client : m_clients)
+	{
+		if (client->Stage() == ATNet::FinalStage ||
+			(JoinedOnly && client->Stage() == ATNet::JoinStage))
+			client->SendData(data);
+	}
+}
+
 void CServer::ClientConnect()
 {
 	QTcpSocket* sock = nextPendingConnection();

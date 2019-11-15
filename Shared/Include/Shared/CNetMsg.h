@@ -66,13 +66,11 @@ public:
 		Socket->write(Serialize().Bytes());
 	}
 
+	virtual const CSerialize Serialize() const = 0;
 	virtual ~CBaseMsg() { }
 
 protected:
 	CBaseMsg(EType Type) : m_type(Type) { }
-
-	// - Allocates and constructs a CNetMsg from serialized data
-	virtual const CSerialize Serialize() const = 0;
 
 private:
 	EType m_type;
@@ -185,16 +183,18 @@ class CJoinMsg : public CBaseMsg
 {
 public:
 	CJoinMsg(CNetMsg* Msg);
-	CJoinMsg(const CUser* User)
-		: CBaseMsg(Msg_Join), m_user(User), m_handle(((CNetObject*)User)->Handle()) { }
+	CJoinMsg(const CUser& User);
 
 	inline unsigned Handle() const { return m_handle; }
+	inline QString Name() const { return m_name; }
+	inline uint8_t Perms() const { return m_perms; }
 
 protected:
 	const CSerialize Serialize() const override;
 
 private:
-	const CUser* m_user = 0;
+	QString m_name;
+	uint8_t m_perms;
 	unsigned m_handle;
 };
 

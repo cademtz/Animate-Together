@@ -88,6 +88,14 @@ public:
 		UpdateLen();
 	}
 
+	template<typename T>
+	inline void Add(const QList<T>& List)
+	{
+		Add(List.size());
+		for (T item : List)
+			Add(item);
+	}
+
 private:
 
 	inline void Add() { }
@@ -135,6 +143,19 @@ private:
 	{
 		Val = *(bool*)Pos;
 		Pos += sizeof(Val);
+	}
+
+	template<typename T>
+	static inline void Next(const char*& Pos, QList<T> List)
+	{
+		int size;
+		Next(Pos, size);
+		for (int i = 0; i < size; i++)
+		{
+			T item;
+			Next(Pos, item);
+			List.append(item);
+		}
 	}
 
 	template<typename T>

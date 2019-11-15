@@ -19,14 +19,11 @@ namespace ATNet
 {
 	enum EProtoStage
 	{
-		ClosedStage,
+		ClosedStage = 0,
 		ProtocolStage,
 		JoinStage,
 		FinalStage
 	};
-
-	//bool GoodProtocol(const CProtocolMsg* Msg);
-	//inline bool GoodProtocol(const CProtocolMsg& Msg) { return GoodProtocol(&Msg); }
 }
 
 #endif // Protocol_H
