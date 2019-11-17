@@ -21,11 +21,11 @@ CLogin::CLogin(bool HasPass)
 	pal.setBrush(QPalette::Window, QColor(50, 50, 50));
 	setPalette(pal);
 
-	m_user = new QLineEdit("Nickname", this), m_pass = new QLineEdit("Password", this);
+	m_name = new QLineEdit("Nickname", this), m_pass = new QLineEdit("Password", this);
 	m_ok = new QPushButton("Join", this);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
-	layout->addWidget(m_user);
+	layout->addWidget(m_name);
 	if (HasPass)
 		layout->addWidget(m_pass);
 	else
@@ -41,6 +41,6 @@ CLogin::CLogin(bool HasPass)
 
 void CLogin::Confirm()
 {
-	CClient::Login(m_user->text(), m_pass->text());
+	CClient::Login(m_name->text(), m_pass->text());
 	close();
 }

@@ -15,6 +15,8 @@
 #include "CNetObject.h"
 #include "Shared/CNetEvent.h"
 
+class CJoinMsg;
+
 class CUser : public CNetObject
 {
 public:
@@ -32,8 +34,7 @@ public:
 	CUser(QString Name, EPerms Perms) : m_name(Name), m_perms(Perms) { }
 
 	// - Create user from a join msg
-	CUser(QString Name, EPerms Perms, unsigned Handle)
-		: CNetObject(Handle), m_name(Name), m_perms(Perms) { }
+	CUser(const CJoinMsg& Joined);
 
 	inline QString Name() const { return m_name; }
 	inline uint8_t Perms() const { return m_perms; }

@@ -19,10 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Shared\CUserList.h">
-      <SubType>
-      </SubType>
-    </ClInclude>
     <QtMoc Include="Include\Shared\CSocketMgr.h">
       <SubType>
       </SubType>
@@ -88,6 +84,10 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Include\NetObjects\CUser.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Include\Shared\CJsonConfig.cpp">
       <SubType>
       </SubType>
@@ -105,10 +105,6 @@
       </SubType>
     </ClCompile>
     <ClCompile Include="Include\Shared\CSocketMgr.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
-    <ClCompile Include="Include\Shared\CUserList.cpp">
       <SubType>
       </SubType>
     </ClCompile>

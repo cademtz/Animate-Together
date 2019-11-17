@@ -19,6 +19,7 @@
 class CProject;
 class CNetMsg;
 class CBaseMsg;
+class CUser;
 
 class CClient : public CSocketMgr, public CEventHandler<CBaseMsg>
 {
@@ -26,6 +27,11 @@ public:
 	static void Connect(QString Host);
 	static void Login(const QString& User, const QString& Pass = QString());
 	static void Close();
+
+	// - Returns the client's own user info
+	// - Value is always null while not joined to a server
+	inline static const CUser* LocalUser() { return Client().m_self; }
+	static const CUser* FromHandle(CNetObject Object);
 
 private:
 	static inline CClient& Client()
@@ -35,10 +41,12 @@ private:
 	}
 
 	CClient() : CSocketMgr(), m_stage(ATNet::ClosedStage) { }
-	~CClient() { Socket()->disconnectFromHost(); }
+	~CClient();
 
 	ATNet::EProtoStage m_stage;
 	CProject* m_proj;
+	QList<CUser*> m_users;
+	CUser* m_self = nullptr;
 
 	void Connected() override;
 	void Disconnected() override;

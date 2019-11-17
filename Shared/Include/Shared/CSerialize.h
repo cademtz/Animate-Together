@@ -13,6 +13,7 @@
 
 #include <qstring.h>
 #include <qendian.h>
+#include "NetObjects/CNetObject.h"
 
 struct SerialStream
 {
@@ -96,6 +97,9 @@ public:
 			Add(item);
 	}
 
+	template<typename T>
+	inline void Add(const CNetObject& Obj) { Add(Obj.Handle()); }
+
 private:
 
 	inline void Add() { }
@@ -156,6 +160,13 @@ private:
 			Next(Pos, item);
 			List.append(item);
 		}
+	}
+
+	static inline void Next(const char*& Pos, CNetObject& Obj)
+	{
+		unsigned handle;
+		Next(Pos, handle);
+		Obj = CNetObject(handle);
 	}
 
 	template<typename T>

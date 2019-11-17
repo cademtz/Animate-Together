@@ -8,7 +8,7 @@
 #include "CClientSocket.h"
 #include <qtcpserver.h>
 #include <Shared/CNetMsg.h>
-#include <Shared/CUserList.h>
+#include <NetObjects/CUser.h>
 #include "Server/CServer.h"
 
 
@@ -40,25 +40,39 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 			Socket()->abort();
 		return;
 	case ATNet::JoinStage:
-		switch (CheckLogin(Msg))
+		switch (Msg->Type())
 		{
-		case ELogin::Valid:
+		case CBaseMsg::Msg_Login:
 		{
-			m_stage = ATNet::FinalStage;
-			CUser user(m_user, CUser::Perm_Guest);
-			m_parent->SendAll(CJoinMsg(user));
-			SendMsg(m_parent->Motd());
-			break;
+			CLoginMsg login(Msg);
+			switch (CheckLogin(login))
+			{
+			case ELogin::Valid:
+			{
+				m_stage = ATNet::FinalStage;
+				m_user = new CUser(login.Name(), CUser::Perm_Guest);
+
+				// The first message a new joining user recieves will be their own information
+				CJoinMsg join(m_user);
+				m_parent->SendAll(join);
+				SendMsg(m_parent->Motd());
+
+				for (auto client : m_parent->Clients()) // Send all users info to client
+					if (client != this)
+						SendMsg(CJoinMsg(client->User()));
+				break;
+			}
+			case ELogin::Error:
+				Kick(tr("Error confirming login. Retry, update client, or report a bug"));
+				break;
+			case ELogin::Duplicate:
+				Kick(tr("User already joined with same login"));
+				break;
+			case ELogin::BadInfo:
+				Kick(tr("Login info was incorrect"));
+				break;
+			}
 		}
-		case ELogin::Error:
-			Kick(tr("Error confirming login. Retry, update client, or report a bug"));
-			break;
-		case ELogin::Duplicate:
-			Kick(tr("User already joined with same login"));
-			break;
-		case ELogin::BadInfo:
-			Kick(tr("Login info was incorrect"));
-			break;
 		}
 		return;
 	}
@@ -66,8 +80,12 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 	switch (Msg->Type())
 	{
 	case CBaseMsg::Msg_Chat:
-		qInfo() << User() << ": " << CChatMsg(Msg).Text();
+	{
+		CChatMsg chat(Msg);
+		qInfo() << m_user->Name() << ": " << chat.Text();
+		m_parent->SendAll(CChatMsg(chat.Text(), m_user));
 		break;
+	}
 	}
 }
 
@@ -75,22 +93,15 @@ void CClientSocket::Disconnected() {
 	qInfo() << Socket()->peerAddress() << " Disconnected";
 }
 
-CClientSocket::ELogin CClientSocket::CheckLogin(CNetMsg * Msg)
+CClientSocket::ELogin CClientSocket::CheckLogin(const CLoginMsg& Login)
 {
-	if (Msg->Type() != CBaseMsg::Msg_Login)
-		return ELogin::Error;
-
-	CLoginMsg login(Msg);
 	if (m_parent->Auth().Flags() &CLoginMsg::Flag_Pass)
-		if (login.Pass() != m_parent->Pass())
+		if (Login.Pass() != m_parent->Pass())
 			return ELogin::BadInfo;
 
 	for (auto client : m_parent->Clients())
-		if (login.User() == client->User())
+		if (Login.Name() == client->User()->Name())
 			return ELogin::Duplicate;
-
-	m_user = login.User();
-	m_uuid = m_parent->NewUUID();
 
 	return ELogin::Valid;
 }

@@ -9,6 +9,7 @@
 #include <qcoreapplication.h>
 #include <qmessagebox.h>
 #include <Shared/CNetMsg.h>
+#include <NetObjects/CUser.h>
 #include "Widgets/MotdView/CMotdView.h"
 
 CClient::Listeners_t CClient::m_listeners;
@@ -36,14 +37,33 @@ void CClient::Close() {
 	Client().Socket()->close();
 }
 
+const CUser * CClient::FromHandle(CNetObject Object)
+{
+	for (auto user : Client().m_users)
+		if (user->Handle() == Object.Handle())
+			return user;
+	return 0;
+}
+
+CClient::~CClient()
+{
+	Socket()->disconnectFromHost();
+}
+
 void CClient::Connected()
 {
 	m_stage = ATNet::ProtocolStage;
 	SendMsg(CProtocolMsg());
 }
 
-void CClient::Disconnected() {
+void CClient::Disconnected() 
+{
 	m_stage = ATNet::ClosedStage;
+	for (auto user : m_users)
+		delete user;
+	m_users.clear();
+	if (m_self)
+		m_self = nullptr;
 }
 
 void CClient::HandleMsg(CNetMsg * Msg)
@@ -73,11 +93,12 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		case CBaseMsg::Msg_Login:
 			CreateEvent(CLoginMsg(Msg));
 			return;
-		case CBaseMsg::Msg_Welcome:
+		case CBaseMsg::Msg_Join:
 		{
 			m_stage = ATNet::FinalStage;
-			SendMsg(CChatMsg("Hello from animator!"));
-			CMotdView::Open(CWelcomeMsg(Msg));
+			CJoinMsg join(Msg);
+			m_self = new CUser(join);
+			m_users.push_back(m_self);
 			return;
 		}
 		}
@@ -87,7 +108,25 @@ void CClient::HandleMsg(CNetMsg * Msg)
 
 	switch (Msg->Type())
 	{
-
+	case CBaseMsg::Msg_Welcome:
+	{
+		SendMsg(CChatMsg("Hello from animator!"));
+		CMotdView::Open(CWelcomeMsg(Msg));
+		return;
+	}
+	case CBaseMsg::Msg_Join:
+	{
+		CJoinMsg join(Msg);
+		m_users.push_back(new CUser(join));
+		break;
+	}
+	case CBaseMsg::Msg_Chat:
+	{
+		CChatMsg chat(Msg);
+		CreateEvent(chat);
+		QMessageBox(QMessageBox::NoIcon, FromHandle(chat.User())->Name(), chat.Text()).exec();
+		break;
+	}
 	}
 }
 

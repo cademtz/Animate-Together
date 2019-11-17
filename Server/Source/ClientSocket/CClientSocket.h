@@ -17,13 +17,20 @@
 
 class CNetMsg;
 class CServer;
+class CUser;
 
 class CClientSocket : public CSocketMgr
 {
 public:
 	CClientSocket(QTcpSocket* Socket, CServer* Parent);
+	~CClientSocket() {
+		if (m_user)
+			delete m_user;
+	}
 
-	inline QString User() const { return m_user; }
+	// - Returns the user belonging to the socket
+	// - Value is null if the client hasn't reached final stage
+	inline CUser* User() const { return m_user; }
 	inline ATNet::EProtoStage Stage() const { return m_stage; }
 	void Kick(QString Reason);
 
@@ -35,16 +42,15 @@ private:
 	enum class ELogin {
 		Valid = 0, Error, BadInfo, Duplicate
 	};
+
 	// - Returns login status and sets user information if valid
 	// - Method of checking depends on server configuration
-	ELogin CheckLogin(CNetMsg* Msg);
+	ELogin CheckLogin(const CLoginMsg& Login);
 
 	ATNet::EProtoStage m_stage = ATNet::ProtocolStage;
 	CServer* m_parent;
 
-	// - User ID, unique within session
-	unsigned m_uuid = 0;
-	QString m_user;
+	CUser* m_user = 0;
 };
 
 #endif // CClientSocket_H

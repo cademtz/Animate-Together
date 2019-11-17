@@ -70,9 +70,6 @@
     <ClInclude Include="Include\NetObjects\CBaseFrame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Shared\CUserList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Include\Shared\CNetMsg.cpp">
@@ -96,7 +93,7 @@
     <ClCompile Include="Include\NetObjects\CFolderLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Include\Shared\CUserList.cpp">
+    <ClCompile Include="Include\NetObjects\CUser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

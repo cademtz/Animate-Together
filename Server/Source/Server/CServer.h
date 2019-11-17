@@ -39,14 +39,10 @@ protected:
 	void ClientConnect();
 	void ClientDisconnect();
 
-	// - Returns a unique-per-session User ID very time. Always non-zero
-	inline unsigned NewUUID() { return ++m_lastuuid; }
-
 private:
 	uint16_t m_port;
 	QString m_pass;
 	CWelcomeMsg m_motd;
-	unsigned m_lastuuid = 0;
 
 	QList<CClientSocket*> m_clients;
 

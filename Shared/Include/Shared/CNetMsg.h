@@ -18,6 +18,8 @@
 #include "CSerialize.h"
 #include "NetObjects/CNetObject.h"
 
+class CUser;
+
 // - CNetMsg wraps around raw serialized data for quickly handling networkable message data
 
 struct CNetMsg
@@ -126,10 +128,10 @@ public:
 	CLoginMsg(CNetMsg* Msg);
 	CLoginMsg(uint8_t ReqFlags = 0) : CBaseMsg(Msg_Login), m_flags(ReqFlags) { }
 	CLoginMsg::CLoginMsg(QString User, QString Pass)
-		: CBaseMsg(Msg_Login), m_user(User), m_pass(Pass), m_flags(Pass.isEmpty() ? 0 : Flag_Pass) { }
+		: CBaseMsg(Msg_Login), m_name(User), m_pass(Pass), m_flags(Pass.isEmpty() ? 0 : Flag_Pass) { }
 
 	inline uint8_t Flags() const { return m_flags; }
-	inline QString User() const { return m_user; }
+	inline QString Name() const { return m_name; }
 	inline QString Pass() const { return m_pass; }
 
 protected:
@@ -137,15 +139,16 @@ protected:
 
 private:
 	uint8_t m_flags = 0;
-	QString m_user, m_pass;
+	QString m_name, m_pass;
 };
 
 class CChatMsg : public CBaseMsg
 {
 public:
 	CChatMsg(CNetMsg* Msg);
-	CChatMsg(QString Text = QString()) : CBaseMsg(Msg_Chat), m_text(Text) { }
+	CChatMsg(QString Text, const CUser* User = 0);
 
+	inline const CNetObject& User() const { return m_user; }
 	inline const QString& Text() const { return m_text; }
 	inline void SetText(const QString& String) { m_text = String; }
 
@@ -153,6 +156,7 @@ protected:
 	const CSerialize Serialize() const override;
 
 private:
+	CNetObject m_user;
 	QString m_text;
 };
 
@@ -176,14 +180,11 @@ private:
 	QString m_motd;
 };
 
-
-class CUser;
-
 class CJoinMsg : public CBaseMsg
 {
 public:
 	CJoinMsg(CNetMsg* Msg);
-	CJoinMsg(const CUser& User);
+	CJoinMsg(const CUser* User);
 
 	inline unsigned Handle() const { return m_handle; }
 	inline QString Name() const { return m_name; }

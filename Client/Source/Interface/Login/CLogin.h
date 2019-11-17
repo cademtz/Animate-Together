@@ -24,7 +24,7 @@ private:
 	CLogin(bool HasPass);
 	void Confirm();
 
-	QLineEdit* m_user, * m_pass;
+	QLineEdit* m_name, * m_pass;
 	QPushButton* m_ok;
 };
 

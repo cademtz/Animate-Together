@@ -6,7 +6,7 @@
  */
 
 #include "CNetMsg.h"
-#include "CUserList.h"
+#include "NetObjects/CUser.h"
 
 CNetMsg * CNetMsg::FromData(unsigned length, const char* Data)
 {
@@ -43,19 +43,24 @@ const CSerialize CProtocolMsg::Serialize() const {
 }
 
 CLoginMsg::CLoginMsg(CNetMsg * Msg) : CBaseMsg(Msg_Login) {
-	CSerialize::Deserialize(Msg->Data(), m_flags, m_user, m_pass);
+	CSerialize::Deserialize(Msg->Data(), m_flags, m_name, m_pass);
 }
 
 const CSerialize CLoginMsg::Serialize() const {
-	return CSerialize(Type(), m_flags, m_user.utf16(), m_pass);
+	return CSerialize(Type(), m_flags, m_name.utf16(), m_pass);
 }
 
 CChatMsg::CChatMsg(CNetMsg * Msg) : CBaseMsg(Msg_Chat) {
-	CSerialize::Deserialize(Msg->Data(), m_text);
+	CSerialize::Deserialize(Msg->Data(), m_user, m_text);
+}
+
+CChatMsg::CChatMsg(QString Text, const CUser* Sender)
+	: CBaseMsg(Msg_Chat), m_user(Sender->Handle()), m_text(Text)
+{
 }
 
 const CSerialize CChatMsg::Serialize() const {
-	return CSerialize(Type(), m_text.utf16());
+	return CSerialize(Type(), m_user, m_text.utf16());
 }
 
 CWelcomeMsg::CWelcomeMsg(CNetMsg * Msg) : CBaseMsg(Msg_Welcome) {
@@ -70,8 +75,8 @@ CJoinMsg::CJoinMsg(CNetMsg * Msg) : CBaseMsg(Msg_Join) {
 	CSerialize::Deserialize(Msg->Data(), m_name, m_perms, m_handle);
 }
 
-CJoinMsg::CJoinMsg(const CUser & User)
-	: CBaseMsg(Msg_Join), m_name(User.Name()), m_perms(User.Perms()), m_handle(User.Handle()) {
+CJoinMsg::CJoinMsg(const CUser* User)
+	: CBaseMsg(Msg_Join), m_name(User->Name()), m_perms(User->Perms()), m_handle(User->Handle()) {
 }
 
 const CSerialize CJoinMsg::Serialize() const {

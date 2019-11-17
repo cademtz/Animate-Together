@@ -16,13 +16,10 @@ class CNetObject
 {
 public:
 	inline CNetObject(const CNetObject& Other) : m_handle(Other.m_handle) { }
+	inline CNetObject(unsigned Handle = _NewHandle()) : m_handle(Handle) { }
 
 	inline unsigned Handle() const { return m_handle; }
 	static inline void Reset() { m_nexthandle = 1; }
-
-protected:
-	inline CNetObject(unsigned Handle = _NewHandle()) : m_handle(Handle) { }
-
 
 private:
 	unsigned m_handle;
