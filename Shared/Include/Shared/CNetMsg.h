@@ -156,7 +156,7 @@ protected:
 	const CSerialize Serialize() const override;
 
 private:
-	CNetObject m_user;
+	CNetObject m_user = CNetObject(0);
 	QString m_text;
 };
 

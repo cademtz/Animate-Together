@@ -97,7 +97,6 @@ public:
 			Add(item);
 	}
 
-	template<typename T>
 	inline void Add(const CNetObject& Obj) { Add(Obj.Handle()); }
 
 private:

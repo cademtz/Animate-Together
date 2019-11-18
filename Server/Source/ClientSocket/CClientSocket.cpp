@@ -100,7 +100,7 @@ CClientSocket::ELogin CClientSocket::CheckLogin(const CLoginMsg& Login)
 			return ELogin::BadInfo;
 
 	for (auto client : m_parent->Clients())
-		if (Login.Name() == client->User()->Name())
+		if (client->User() && Login.Name() == client->User()->Name())
 			return ELogin::Duplicate;
 
 	return ELogin::Valid;

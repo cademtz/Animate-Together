@@ -55,8 +55,10 @@ CChatMsg::CChatMsg(CNetMsg * Msg) : CBaseMsg(Msg_Chat) {
 }
 
 CChatMsg::CChatMsg(QString Text, const CUser* Sender)
-	: CBaseMsg(Msg_Chat), m_user(Sender->Handle()), m_text(Text)
+	: CBaseMsg(Msg_Chat), m_text(Text)
 {
+	if (Sender)
+		m_user = Sender->Handle();
 }
 
 const CSerialize CChatMsg::Serialize() const {
