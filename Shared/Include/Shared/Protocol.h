@@ -19,10 +19,10 @@ namespace ATNet
 {
 	enum EProtoStage
 	{
-		ClosedStage = 0,
-		ProtocolStage,
-		JoinStage,
-		FinalStage
+		Stage_Closed = 0,
+		Stage_Protocol,
+		Stage_Join,
+		Stage_Final
 	};
 }
 

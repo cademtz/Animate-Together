@@ -29,17 +29,17 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 {
 	switch (m_stage)
 	{
-	case ATNet::ProtocolStage:
+	case ATNet::Stage_Protocol:
 		if (Msg->Type() == CBaseMsg::Msg_Protocol && CProtocolMsg(Msg).Compatible())
 		{
-			m_stage = ATNet::JoinStage;
+			m_stage = ATNet::Stage_Join;
 			SendMsg(m_parent->Auth());
 			qInfo() << Socket()->peerAddress() << ": Good protocol";
 		}
 		else
 			Socket()->abort();
 		return;
-	case ATNet::JoinStage:
+	case ATNet::Stage_Join:
 		switch (Msg->Type())
 		{
 		case CBaseMsg::Msg_Login:
@@ -49,17 +49,9 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 			{
 			case ELogin::Valid:
 			{
-				m_stage = ATNet::FinalStage;
+				m_stage = ATNet::Stage_Final;
 				m_user = new CUser(login.Name(), CUser::Perm_Guest);
-
-				// The first message a new joining user recieves will be their own information
-				CJoinMsg join(m_user);
-				m_parent->SendAll(join);
-				SendMsg(m_parent->Motd());
-
-				for (auto client : m_parent->Clients()) // Send all users info to client
-					if (client != this)
-						SendMsg(CJoinMsg(client->User()));
+				Joined();
 				break;
 			}
 			case ELogin::Error:
@@ -104,4 +96,16 @@ CClientSocket::ELogin CClientSocket::CheckLogin(const CLoginMsg& Login)
 			return ELogin::Duplicate;
 
 	return ELogin::Valid;
+}
+
+void CClientSocket::Joined()
+{
+	// The first message a new joining user recieves will be their own information
+	CJoinMsg join(m_user);
+	m_parent->SendAll(join);
+	SendMsg(m_parent->Motd());
+
+	for (auto client : m_parent->Clients()) // Send all users info to client
+		if (client != this)
+			SendMsg(CJoinMsg(client->User()));
 }

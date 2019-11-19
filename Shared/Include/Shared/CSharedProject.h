@@ -40,5 +40,4 @@ private:
 	unsigned m_framerate;
 };
 
-
 #endif // CSharedProject_H

@@ -40,7 +40,7 @@ private:
 		return client;
 	}
 
-	CClient() : CSocketMgr(), m_stage(ATNet::ClosedStage) { }
+	CClient() : CSocketMgr(), m_stage(ATNet::Stage_Closed) { }
 	~CClient();
 
 	ATNet::EProtoStage m_stage;

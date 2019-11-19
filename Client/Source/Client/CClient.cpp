@@ -28,7 +28,7 @@ void CClient::Connect(QString Host)
 
 void CClient::Login(const QString & User, const QString & Pass)
 {
-	if (Client().m_stage != ATNet::JoinStage)
+	if (Client().m_stage != ATNet::Stage_Join)
 		return;
 	Client().SendMsg(CLoginMsg(User, Pass));
 }
@@ -52,13 +52,13 @@ CClient::~CClient()
 
 void CClient::Connected()
 {
-	m_stage = ATNet::ProtocolStage;
+	m_stage = ATNet::Stage_Protocol;
 	SendMsg(CProtocolMsg());
 }
 
 void CClient::Disconnected() 
 {
-	m_stage = ATNet::ClosedStage;
+	m_stage = ATNet::Stage_Closed;
 	for (auto user : m_users)
 		delete user;
 	m_users.clear();
@@ -68,7 +68,7 @@ void CClient::Disconnected()
 
 void CClient::HandleMsg(CNetMsg * Msg)
 {
-	if (m_stage > ATNet::ProtocolStage) // Priority messages that can occur at any time
+	if (m_stage > ATNet::Stage_Protocol) // Priority messages that can occur at any time
 	{
 		switch (Msg->Type())
 		{
@@ -80,14 +80,14 @@ void CClient::HandleMsg(CNetMsg * Msg)
 
 	switch (m_stage)
 	{
-	case ATNet::ProtocolStage:
+	case ATNet::Stage_Protocol:
 		// Check protocol and abort connection if unmatching
 		if (Msg->Type() == CBaseMsg::Msg_Protocol && CProtocolMsg(Msg).Compatible())
-			m_stage = ATNet::JoinStage;
+			m_stage = ATNet::Stage_Join;
 		else
 			Socket()->abort();
 		return;
-	case ATNet::JoinStage:
+	case ATNet::Stage_Join:
 		switch(Msg->Type())
 		{
 		case CBaseMsg::Msg_Login:
@@ -95,7 +95,7 @@ void CClient::HandleMsg(CNetMsg * Msg)
 			return;
 		case CBaseMsg::Msg_Join:
 		{
-			m_stage = ATNet::FinalStage;
+			m_stage = ATNet::Stage_Final;
 			CJoinMsg join(Msg);
 			m_self = new CUser(join);
 			m_users.push_back(m_self);

@@ -47,9 +47,12 @@ private:
 	// - Method of checking depends on server configuration
 	ELogin CheckLogin(const CLoginMsg& Login);
 
-	ATNet::EProtoStage m_stage = ATNet::ProtocolStage;
-	CServer* m_parent;
+	// - Called when the client has successfully joined a session
+	// - Sends current project data needed for the client side project
+	void Joined();
 
+	ATNet::EProtoStage m_stage = ATNet::Stage_Protocol;
+	CServer* m_parent;
 	CUser* m_user = 0;
 };
 

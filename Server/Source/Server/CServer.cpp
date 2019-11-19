@@ -43,7 +43,7 @@ CServer::CServer(int argc, char * argv[]) : m_port(AT_DEFPORT)
 
 bool CServer::Listen()
 {
-	if (IsListening())
+	if (isListening())
 		return false;
 
 	qInfo() << "Listening on port " << m_port;
@@ -60,8 +60,8 @@ void CServer::SendAll(const CBaseMsg & Msg, bool JoinedOnly)
 	CSerialize data = Msg.Serialize();
 	for (auto client : m_clients)
 	{
-		if (client->Stage() == ATNet::FinalStage ||
-			(JoinedOnly && client->Stage() == ATNet::JoinStage))
+		if (client->Stage() == ATNet::Stage_Final ||
+			(JoinedOnly && client->Stage() == ATNet::Stage_Join))
 			client->SendData(data);
 	}
 }
