@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include <qstring.h>
 #include "CNetObject.h"
 
 class CSharedProject;
@@ -29,17 +30,21 @@ public:
 	};
 
 	inline EType Type() const { return m_type; }
-	inline CFolderLayer* Parent() const { return m_parent; }
 	CFolderLayer* Root() const;
 	CSharedProject* RootProject() const;
+	inline CFolderLayer* Parent() const { return m_parent; }
+	inline void SetParent(CFolderLayer* Parent) { m_parent = Parent; }
+	inline QString Name() const { return m_name; }
+	inline void SetName(const QString& Name) { m_name = Name; }
 
 protected:
-	CBaseLayer(EType Type, CFolderLayer* Parent) : m_type(Type), m_parent(Parent) { }
+	CBaseLayer(EType Type, CFolderLayer* Parent = nullptr) : m_type(Type), m_parent(Parent) { }
 	virtual ~CBaseLayer() { }
 
 private:
 	EType m_type;
 	CFolderLayer* m_parent = 0;
+	QString m_name;
 };
 
 #endif // CBaseLayer_H

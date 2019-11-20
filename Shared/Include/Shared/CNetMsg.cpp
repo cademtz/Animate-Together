@@ -7,6 +7,7 @@
 
 #include "CNetMsg.h"
 #include "NetObjects/CUser.h"
+#include "CSharedProject.h"
 
 CNetMsg * CNetMsg::FromData(unsigned length, const char* Data)
 {
@@ -83,4 +84,19 @@ CJoinMsg::CJoinMsg(const CUser* User)
 
 const CSerialize CJoinMsg::Serialize() const {
 	return CSerialize(Type(), m_name.utf16(), m_perms, m_handle);
+}
+
+CProjSetupMsg::CProjSetupMsg(CNetMsg * Msg) : CBaseMsg(Msg_ProjSetup)
+{
+	CSerialize::Deserialize(Msg->Data(), m_name, m_framerate);
+}
+
+CProjSetupMsg::CProjSetupMsg(const CSharedProject * Project)
+	: CBaseMsg(Msg_ProjSetup), m_name(Project->Name()), m_framerate(Project->Framerate())
+{
+}
+
+const CSerialize CProjSetupMsg::Serialize() const
+{
+	return CSerialize(m_name.utf16(), m_framerate);
 }

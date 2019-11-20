@@ -7,8 +7,14 @@
 
 #include "CFolderLayer.h"
 
-void CFolderLayer::_InsertLayer(int Index, CBaseLayer* Layer)
+void CFolderLayer::Append(CBaseLayer * Layer)
 {
+	Layer->SetParent(this);
+	m_layers.append(Layer);
+}
+
+void CFolderLayer::Insert(int Index, CBaseLayer * Layer)
+{
+	Layer->SetParent(this);
 	m_layers.insert(Index, Layer);
-	
 }

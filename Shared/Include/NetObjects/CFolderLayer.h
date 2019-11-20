@@ -28,10 +28,17 @@ class CFolderLayer : public CBaseLayer
 public:
 	typedef QList<CBaseLayer*> LayerList_t;
 
-	CFolderLayer(CFolderLayer* Parent) : CBaseLayer(CBaseLayer::Layer_Folder, Parent) { }
-	CFolderLayer(CSharedProject* Parent) : CBaseLayer(CBaseLayer::Layer_Folder, 0), m_root(Parent) { }
+	CFolderLayer(CSharedProject* Proj) : CBaseLayer(Layer_Folder), m_proj(Proj) { }
+	CFolderLayer(QString Name = "New Folder") : CBaseLayer(Layer_Folder) {
+		SetName(Name);
+	}
 
 	inline const LayerList_t& Layers() const { return m_layers; }
+
+	// TO DO: Events n stuff for these functions (kinda why the list isn't simply public)
+
+	void Append(CBaseLayer* Layer);
+	void Insert(int Index, CBaseLayer* Layer);
 
 protected:
 	friend CBaseLayer;
@@ -41,18 +48,16 @@ protected:
 	{
 		if (Parent())
 			return Parent()->SetRootProject(Project);
-		m_root = Project;
+		m_proj = Project;
 	}
 
 	// - Returns the instance's project if it is a root folder, otherwise return is null
 	// - Only used when a layer class must access the property
-	inline CSharedProject* _Project() const { return m_root; }
+	inline CSharedProject* _Project() const { return m_proj; }
 	
 private:
-	CSharedProject* m_root = 0;
+	CSharedProject* m_proj = 0;
 	LayerList_t m_layers;
-
-	void _InsertLayer(int Index, CBaseLayer* Layer);
 };
 
 #endif // CFolderLayer_H

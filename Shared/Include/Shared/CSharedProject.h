@@ -31,8 +31,9 @@ public:
 
 	inline QString Name() const { return m_name; }
 	inline void SetName(const QString& Name) { m_name = Name; }
-	inline const CFolderLayer& Root() { return m_root; }
+	inline CFolderLayer& Root() { return m_root; }
 	inline unsigned Framerate() const { return m_framerate; }
+	inline void SetFramerate(unsigned Fps) { m_framerate = Fps; }
 
 private:
 	QString m_name;

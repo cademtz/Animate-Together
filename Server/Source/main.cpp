@@ -3,7 +3,6 @@
 
 CServer* server;
 
-void NewConnection();
 void Close();
 
 int main(int argc, char *argv[])
@@ -12,6 +11,11 @@ int main(int argc, char *argv[])
 	a.connect(&a, &QCoreApplication::aboutToQuit, &Close);
 
 	server = new CServer(argc, argv);
+	CSharedProject* proj = new CSharedProject();
+	proj->SetName("My epic project");
+	proj->SetFramerate(33);
+	proj->Root().Append(new CFolderLayer("Folder A"));
+	proj->Root().Append(new CFolderLayer("Folder B"));
 	server->Listen();
 
 	return a.exec();

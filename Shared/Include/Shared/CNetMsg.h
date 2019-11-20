@@ -19,6 +19,7 @@
 #include "NetObjects/CNetObject.h"
 
 class CUser;
+class CSharedProject;
 
 // - CNetMsg wraps around raw serialized data for quickly handling networkable message data
 
@@ -58,7 +59,7 @@ public:
 		Msg_Ban,		// - User request to ban
 		Msg_Chat,		// - Chat message from server or user
 		Msg_Welcome,	// - Server is sending the MOTD
-		Msg_Stroke,		// - A client has made or continued a new stroke
+		Msg_ProjSetup,	// - Carries necessary data to initialize shared projects
 		Msg_Event,		// - Server or client has performed a specific action
 	};
 
@@ -186,9 +187,9 @@ public:
 	CJoinMsg(CNetMsg* Msg);
 	CJoinMsg(const CUser* User);
 
-	inline unsigned Handle() const { return m_handle; }
 	inline QString Name() const { return m_name; }
 	inline uint8_t Perms() const { return m_perms; }
+	inline unsigned Handle() const { return m_handle; }
 
 protected:
 	const CSerialize Serialize() const override;
@@ -197,6 +198,23 @@ private:
 	QString m_name;
 	uint8_t m_perms;
 	unsigned m_handle;
+};
+
+class CProjSetupMsg : public CBaseMsg
+{
+public:
+	CProjSetupMsg(CNetMsg* Msg);
+	CProjSetupMsg(const CSharedProject* Project);
+
+	inline QString Name() const { return m_name; }
+	inline unsigned Framerate() const { return m_framerate; }
+
+protected:
+	const CSerialize Serialize() const override;
+
+private:
+	QString m_name;
+	unsigned m_framerate;
 };
 
 #endif // CNetMsg_H

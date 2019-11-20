@@ -31,6 +31,7 @@ public:
 	inline const CWelcomeMsg& Motd() const { return m_motd; }
 	inline const QList<CClientSocket*>& Clients() const { return m_clients; }
 	inline CSharedProject* Project() const { return m_proj; }
+	inline void SetProject(CSharedProject* Proj) { m_proj = Proj; }
 
 	// - Sends a message to all joined users, unless specified otherwise
 	void SendAll(const CBaseMsg& Msg, bool JoinedOnly = true);

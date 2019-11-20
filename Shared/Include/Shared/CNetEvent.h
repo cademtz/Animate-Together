@@ -14,6 +14,8 @@
 
 #include "CNetMsg.h"
 
+class CBaseLayer;
+
 class CNetEvent : public CBaseMsg
 {
 public:
@@ -61,8 +63,30 @@ public:
 	CBaseLayerMsg() : CNetEvent(Event_BaseLayer) { }
 
 protected:
+	template<class T = CBaseLayer>
+	inline T* _Layer() const { return (T*)m_layer; }
+
+private:
+	CBaseLayer* m_layer;
+};
+
+class CNewLayerMsg : public CBaseLayerMsg
+{
+public:
+	
+	/*
+	
+	Receives and sends basic layer data (name, handle, type)
+	Structural issue: Cannot perform the action if given a handle with no way to use it
+	How I'm planning on changing that? No idea...
+	
+	*/
+	
+protected:
 	void _Flip(bool Revert) override { }
-	const CSerialize Serialize() const override { }
+
+private:
+	unsigned m_handle;
 };
 
 #endif // CNetEvent_H
