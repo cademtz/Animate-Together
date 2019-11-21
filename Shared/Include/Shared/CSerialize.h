@@ -17,8 +17,7 @@
 
 struct SerialStream
 {
-	const char* data;
-	int pos = 0;
+	const char* data, * pos = data;
 
 	template<typename T>
 	inline SerialStream& operator>>(T& Var);
@@ -54,7 +53,7 @@ public:
 
 	template <typename T>
 	static inline void FromStream(SerialStream& Stream, T& Data) {
-		Next(Stream.pos(), Data);
+		Next(Stream.pos, Data);
 	}
 
 	template<typename T, typename... VarArgs>

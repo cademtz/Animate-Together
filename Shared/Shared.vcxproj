@@ -96,14 +96,11 @@
       <SubType>
       </SubType>
     </ClCompile>
-    <ClCompile Include="Include\Shared\CNetMsg.cpp">
-      <SubType>
-      </SubType>
-    </ClCompile>
     <ClCompile Include="Include\NetObjects\CNetObject.cpp">
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Include\Shared\CNetMsg.cpp" />
     <ClCompile Include="Include\Shared\CSharedProject.cpp">
       <SubType>
       </SubType>
