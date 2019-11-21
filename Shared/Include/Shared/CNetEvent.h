@@ -15,6 +15,7 @@
 #include "CNetMsg.h"
 
 class CBaseLayer;
+class CSharedProject;
 
 class CNetEvent : public CBaseMsg
 {
@@ -22,7 +23,7 @@ public:
 	enum EEvent : uint8_t
 	{
 		Event_SharedProj = 0,
-		Event_BaseLayer,
+		Event_LayerAdd,
 	};
 
 	// - Performs the event. Every call toggles between revert and redo
@@ -34,9 +35,11 @@ public:
 
 	// - Returns true if the action was reverted or not performed
 	inline bool Undone() const { return !m_revert; }
+	inline CSharedProject* Project() const { return m_proj; }
 
 protected:
-	CNetEvent(EEvent EventType) : CBaseMsg(Msg_Event), m_eventtype(EventType) { }
+	CNetEvent(EEvent EventType, CSharedProject* Proj)
+		: CBaseMsg(Msg_Event), m_eventtype(EventType), m_proj(Proj) { }
 
 	// - When called, the action must be performed or reverted
 	// - 'Revert' determines whether or not to revert the action
@@ -45,12 +48,13 @@ protected:
 private:
 	EEvent m_eventtype;
 	bool m_revert = false;
+	CSharedProject* m_proj;
 };
 
 class CSharedProjectMsg : public CNetEvent
 {
 public:
-	CSharedProjectMsg() : CNetEvent(Event_SharedProj) { }
+	CSharedProjectMsg(CSharedProject* Proj) : CNetEvent(Event_SharedProj, Proj) { }
 
 protected:
 	void _Flip(bool Revert) override { }
@@ -60,33 +64,29 @@ protected:
 class CBaseLayerMsg : public CNetEvent
 {
 public:
-	CBaseLayerMsg() : CNetEvent(Event_BaseLayer) { }
+	CBaseLayerMsg(EEvent EventType, CBaseLayer* Layer);
+	CBaseLayerMsg(EEvent EventType, CSharedProject* Proj)
+		: CNetEvent(EventType, Proj), m_layer(nullptr) { }
+
+	template<class T = CBaseLayer>
+	inline T* Layer() const { return (T*)m_layer; }
 
 protected:
-	template<class T = CBaseLayer>
-	inline T* _Layer() const { return (T*)m_layer; }
+	inline void SetLayer(CBaseLayer* Layer) { m_layer = Layer; }
 
 private:
 	CBaseLayer* m_layer;
 };
 
-class CNewLayerMsg : public CBaseLayerMsg
+class CLayerAddMsg : public CBaseLayerMsg
 {
 public:
-	
-	/*
-	
-	Receives and sends basic layer data (name, handle, type)
-	Structural issue: Cannot perform the action if given a handle with no way to use it
-	How I'm planning on changing that? No idea...
-	
-	*/
-	
-protected:
-	void _Flip(bool Revert) override { }
+	CLayerAddMsg(CBaseLayer* Layer) : CBaseLayerMsg(Event_LayerAdd, Layer) { }
+	CLayerAddMsg(CSharedProject* Proj, CNetMsg* Msg);
 
-private:
-	unsigned m_handle;
+protected:
+	const CSerialize Serialize() const override;
+	void _Flip(bool Revert) override;
 };
 
 #endif // CNetEvent_H

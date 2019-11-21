@@ -92,6 +92,10 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Include\Shared\CNetEvent.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Include\Shared\CNetMsg.cpp">
       <SubType>
       </SubType>

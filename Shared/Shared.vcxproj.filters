@@ -96,6 +96,9 @@
     <ClCompile Include="Include\NetObjects\CUser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Include\Shared\CNetEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Include\Shared\CSocketMgr.h">

@@ -35,6 +35,11 @@ public:
 	inline unsigned Framerate() const { return m_framerate; }
 	inline void SetFramerate(unsigned Fps) { m_framerate = Fps; }
 
+	// - Finds a child layer by handle
+	// - Return is null if the layer is not listed
+	template<typename T = CBaseLayer>
+	inline T* FromHandle(const CNetObject& Obj) { return m_root.FindLayer(Obj); }
+
 private:
 	QString m_name;
 	CFolderLayer m_root;

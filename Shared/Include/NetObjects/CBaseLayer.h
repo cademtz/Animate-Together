@@ -20,7 +20,7 @@ class CFolderLayer;
 class CBaseLayer : public CNetObject
 {
 public:
-	enum EType
+	enum EType : uint8_t
 	{
 		Layer_Folder,
 		Layer_Raster,
