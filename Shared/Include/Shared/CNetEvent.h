@@ -44,6 +44,7 @@ protected:
 	// - When called, the action must be performed or reverted
 	// - 'Revert' determines whether or not to revert the action
 	virtual void _Flip(bool Revert) = 0;
+	void SetUndone(bool Undone) { m_revert = !Undone; }
 
 private:
 	EEvent m_eventtype;
@@ -83,10 +84,19 @@ class CLayerAddMsg : public CBaseLayerMsg
 public:
 	CLayerAddMsg(CBaseLayer* Layer) : CBaseLayerMsg(Event_LayerAdd, Layer) { }
 	CLayerAddMsg(CSharedProject* Proj, CNetMsg* Msg);
+	~CLayerAddMsg()
+	{
+		if (Undone())
+			delete Layer();
+	}
 
 protected:
 	const CSerialize Serialize() const override;
 	void _Flip(bool Revert) override;
+
+private:
+	CFolderLayer* m_parent;
+	int m_index = 0;
 };
 
 #endif // CNetEvent_H

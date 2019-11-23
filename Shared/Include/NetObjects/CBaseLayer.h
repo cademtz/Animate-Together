@@ -28,6 +28,7 @@ public:
 		Layer_Stick,
 		Layer_Audio
 	};
+	virtual ~CBaseLayer() { }
 
 	inline EType Type() const { return m_type; }
 	CFolderLayer* Root() const;
@@ -39,7 +40,6 @@ public:
 
 protected:
 	CBaseLayer(EType Type, CFolderLayer* Parent = nullptr) : m_type(Type), m_parent(Parent) { }
-	virtual ~CBaseLayer() { }
 
 private:
 	EType m_type;

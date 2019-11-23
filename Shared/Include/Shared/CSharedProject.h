@@ -38,7 +38,7 @@ public:
 	// - Finds a child layer by handle
 	// - Return is null if the layer is not listed
 	template<typename T = CBaseLayer>
-	inline T* FromHandle(const CNetObject& Obj) { return m_root.FindLayer(Obj); }
+	inline T* FindLayer(const CNetObject& Obj) { return m_root.FindLayer(Obj); }
 
 private:
 	QString m_name;

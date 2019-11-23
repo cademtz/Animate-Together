@@ -37,6 +37,9 @@ public:
 	// - Return is null if the layer is not listed
 	template<typename T = CBaseLayer>
 	inline T* FindLayer(const CNetObject& Obj) { return (T*)_FindLayer(Obj); }
+
+	// - Return is negative if the layer is not listed
+	inline int FindIndex(const CNetObject& Obj);
 	inline const LayerList_t& Layers() const { return m_layers; }
 
 	// TO DO: Events n stuff for these functions (kinda why the list isn't simply public)
