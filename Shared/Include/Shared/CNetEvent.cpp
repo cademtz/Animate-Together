@@ -26,7 +26,7 @@ CLayerAddMsg::CLayerAddMsg(CSharedProject* Proj, CNetMsg * Msg) : CBaseLayerMsg(
 	else // Get new layer's info and create it
 	{
 		QString name;
-		CBaseLayer::EType type;
+		uint8_t type;
 		s >> name >> type;
 		switch (type)
 		{
@@ -42,7 +42,7 @@ const CSerialize CLayerAddMsg::Serialize() const
 {
 	CSerialize data(Layer()->Handle(), Layer()->Parent()->Handle(), Undone());
 	if (!Undone()) // Send new layer's info
-		data.Add(Layer()->Name().utf16(), Layer()->Type());
+		data.Add(Layer()->Name().utf16(), (uint8_t)Layer()->Type());
 	return data;
 }
 

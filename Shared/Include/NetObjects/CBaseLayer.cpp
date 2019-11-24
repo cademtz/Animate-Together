@@ -24,6 +24,6 @@ CSharedProject * CBaseLayer::RootProject() const {
 	return Root()->_Project();
 }
 
-inline int CBaseLayer::Index() const {
+int CBaseLayer::Index() const {
 	return Parent()->IndexOf(this->Handle());
 }

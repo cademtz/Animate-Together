@@ -15,6 +15,7 @@
 #include "CNetMsg.h"
 
 class CBaseLayer;
+class CFolderLayer;
 class CSharedProject;
 
 class CNetEvent : public CBaseMsg
