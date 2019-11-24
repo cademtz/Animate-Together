@@ -7,7 +7,20 @@
 
 #include "CFolderLayer.h"
 
-void CFolderLayer::Append(CBaseLayer * Layer)
+int CFolderLayer::IndexOf(const CNetObject & Obj)
+{
+	if (Obj.Handle() == Handle())
+		return -1;
+
+	for (int i = 0; i < m_layers.size(); i++)
+	{
+		if (m_layers[i]->Handle() == Obj.Handle())
+			return i;
+	}
+	return -1;
+}
+
+ void CFolderLayer::Append(CBaseLayer * Layer)
 {
 	Layer->SetParent(this);
 	m_layers.append(Layer);

@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
 	proj->SetFramerate(33);
 	proj->Root().Append(new CFolderLayer("Folder A"));
 	proj->Root().Append(new CFolderLayer("Folder B"));
+	((CFolderLayer*)proj->Root().Layers().front())->Append(new CFolderLayer("Folder inafolder"));
 	server->Listen();
 
 	return a.exec();

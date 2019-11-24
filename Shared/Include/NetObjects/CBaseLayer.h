@@ -34,6 +34,7 @@ public:
 	CFolderLayer* Root() const;
 	CSharedProject* RootProject() const;
 	inline CFolderLayer* Parent() const { return m_parent; }
+	inline int Index() const;
 	inline void SetParent(CFolderLayer* Parent) { m_parent = Parent; }
 	inline QString Name() const { return m_name; }
 	inline void SetName(const QString& Name) { m_name = Name; }

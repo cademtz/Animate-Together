@@ -108,4 +108,9 @@ void CClientSocket::Joined()
 	for (auto client : m_parent->Clients()) // Send all users info to client
 		if (client != this)
 			SendMsg(CJoinMsg(client->User()));
+
+	CSharedProject* proj = m_parent->Project();
+	SendMsg(CProjSetupMsg(proj));
+	for (auto layer : proj->Root().Layers())
+		SendMsg(CLayerAddMsg(layer));
 }

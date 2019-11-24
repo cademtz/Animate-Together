@@ -34,9 +34,8 @@ CLayerAddMsg::CLayerAddMsg(CSharedProject* Proj, CNetMsg * Msg) : CBaseLayerMsg(
 			SetLayer(new CFolderLayer(name)); break;
 		}
 	}
-	/*
+	
 	m_index = m_parent->Index();
-	*/
 }
 
 const CSerialize CLayerAddMsg::Serialize() const
@@ -51,4 +50,6 @@ void CLayerAddMsg::_Flip(bool Revert)
 {
 	if (Revert)
 		Project()->Root().Remove(Layer());
+	else
+		m_parent->Insert(m_index, Layer());
 }

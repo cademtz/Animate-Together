@@ -23,3 +23,7 @@ CFolderLayer * CBaseLayer::Root() const
 CSharedProject * CBaseLayer::RootProject() const {
 	return Root()->_Project();
 }
+
+inline int CBaseLayer::Index() const {
+	return Parent()->IndexOf(this->Handle());
+}
