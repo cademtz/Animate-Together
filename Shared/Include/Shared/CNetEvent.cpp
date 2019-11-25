@@ -15,34 +15,38 @@ CLayerAddMsg::CLayerAddMsg(CSharedProject* Proj, CNetMsg * Msg) : CBaseLayerMsg(
 {
 	SerialStream s = CSerialize::Stream(Msg->Data());
 	CNetObject obj = 0, parent = 0;
+	uint8_t eventtype;
 	bool undone;
 
-	s >> obj >> parent >> undone;
-	SetUndone(undone);
+	s >> eventtype >> obj >> parent >> undone;
 	m_parent = Proj->FindLayer<CFolderLayer>(parent);
 
-	if (Undone())
+	if (undone)
+	{
 		SetLayer(Project()->FindLayer(obj));
+		m_index = Layer()->Index();
+	}
 	else // Get new layer's info and create it
 	{
 		QString name;
 		uint8_t type;
-		s >> name >> type;
+		s >> m_index >> name >> type;
 		switch (type)
 		{
 		case CBaseLayer::Layer_Folder:
 			SetLayer(new CFolderLayer(name)); break;
 		}
 	}
-	
-	m_index = m_parent->Index();
+
+	// Set to opposite of 'undone' because the client has not yet performed the event
+	SetUndone(!undone);
 }
 
 const CSerialize CLayerAddMsg::Serialize() const
 {
-	CSerialize data(Layer()->Handle(), Layer()->Parent()->Handle(), Undone());
+	CSerialize data(Type(), Layer()->Handle(), Layer()->Parent()->Handle(), Undone());
 	if (!Undone()) // Send new layer's info
-		data.Add(Layer()->Name().utf16(), (uint8_t)Layer()->Type());
+		data.Add(Layer()->Index(), Layer()->Name().utf16(), (uint8_t)Layer()->Type());
 	return data;
 }
 

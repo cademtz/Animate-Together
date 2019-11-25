@@ -30,11 +30,12 @@ public:
 	};
 	virtual ~CBaseLayer() { }
 
+	int Index() const;
 	inline EType Type() const { return m_type; }
 	CFolderLayer* Root() const;
 	CSharedProject* RootProject() const;
+	inline bool IsRoot() { return !m_parent; }
 	inline CFolderLayer* Parent() const { return m_parent; }
-	int Index() const;
 	inline void SetParent(CFolderLayer* Parent) { m_parent = Parent; }
 	inline QString Name() const { return m_name; }
 	inline void SetName(const QString& Name) { m_name = Name; }

@@ -30,13 +30,14 @@ public:
 	// - Performs the event. Every call toggles between revert and redo
 	inline void Perform()
 	{
-		_Flip(m_revert);
-		m_revert = !m_revert;
+		_Flip(!m_undone);
+		m_undone = !m_undone;
 	}
 
 	// - Returns true if the action was reverted or not performed
-	inline bool Undone() const { return !m_revert; }
+	inline bool Undone() const { return m_undone; }
 	inline CSharedProject* Project() const { return m_proj; }
+	inline uint8_t EventType() const { return m_eventtype; }
 
 protected:
 	CNetEvent(EEvent EventType, CSharedProject* Proj)
@@ -45,12 +46,27 @@ protected:
 	// - When called, the action must be performed or reverted
 	// - 'Revert' determines whether or not to revert the action
 	virtual void _Flip(bool Revert) = 0;
-	void SetUndone(bool Undone) { m_revert = !Undone; }
+	void SetUndone(bool Undone) { m_undone = Undone; }
 
 private:
-	EEvent m_eventtype;
-	bool m_revert = false;
+	uint8_t m_eventtype;
+	bool m_undone = true;
 	CSharedProject* m_proj;
+};
+
+class CNetEventInfo : public CBaseMsg
+{
+public:
+	CNetEventInfo(const CNetMsg * Msg) : CBaseMsg(Msg_Event) {
+		CSerialize::Deserialize(Msg->Data(), m_eventtype);
+	}
+
+	inline uint8_t EventType() const { return m_eventtype; }
+
+private:
+	const CSerialize Serialize() const override { return CSerialize(); }
+
+	uint8_t m_eventtype;
 };
 
 class CSharedProjectMsg : public CNetEvent

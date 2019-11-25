@@ -32,6 +32,15 @@ public:
 	CFolderLayer(QString Name = "New Folder") : CBaseLayer(Layer_Folder) {
 		SetName(Name);
 	}
+	~CFolderLayer()
+	{
+		for (auto layer : m_layers)
+			delete layer;
+	}
+
+	// - Creates a flattened list of all children
+	// - In order of parent before children including current layer
+	LayerList_t Layers1D();
 
 	// - Finds a child or the current layer by handle
 	// - Return is null if the layer is not listed
@@ -46,13 +55,11 @@ public:
 
 	// TO DO: Events n stuff for these functions (kinda why the list isn't simply public)
 
-	void Append(CBaseLayer* Layer);
-	void Insert(int Index, CBaseLayer* Layer);
-
 	// - Finds and removes a child layer by pointer
 	// - Returns true if Layer is listed
 	bool Remove(CBaseLayer* Layer);
-
+	void Append(CBaseLayer* Layer);
+	void Insert(int Index, CBaseLayer* Layer);
 
 protected:
 	friend CBaseLayer;
@@ -71,6 +78,7 @@ protected:
 	
 private:
 	CBaseLayer* _FindLayer(const CNetObject& Obj);
+	static void AppendLayers(CBaseLayer* Layer, LayerList_t& List);
 
 	CSharedProject* m_proj = 0;
 	LayerList_t m_layers;

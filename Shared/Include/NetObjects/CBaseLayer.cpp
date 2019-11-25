@@ -8,6 +8,10 @@
 #include "CBaseLayer.h"
 #include "CFolderLayer.h"
 
+int CBaseLayer::Index() const {
+	return Parent()->IndexOf(this->Handle());
+}
+
 CFolderLayer * CBaseLayer::Root() const
 {
 	CFolderLayer* folder;
@@ -22,8 +26,4 @@ CFolderLayer * CBaseLayer::Root() const
 
 CSharedProject * CBaseLayer::RootProject() const {
 	return Root()->_Project();
-}
-
-int CBaseLayer::Index() const {
-	return Parent()->IndexOf(this->Handle());
 }

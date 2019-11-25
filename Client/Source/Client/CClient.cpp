@@ -9,6 +9,7 @@
 #include <qcoreapplication.h>
 #include <qmessagebox.h>
 #include <Shared/CNetMsg.h>
+#include <Shared/CSharedProject.h>
 #include <NetObjects/CUser.h>
 #include "Widgets/MotdView/CMotdView.h"
 
@@ -59,11 +60,18 @@ void CClient::Connected()
 void CClient::Disconnected() 
 {
 	m_stage = ATNet::Stage_Closed;
+
 	for (auto user : m_users)
 		delete user;
 	m_users.clear();
+
 	if (m_self)
 		m_self = nullptr;
+	if (m_proj)
+	{
+		delete m_proj;
+		m_proj = nullptr;
+	}
 }
 
 void CClient::HandleMsg(CNetMsg * Msg)
@@ -108,11 +116,32 @@ void CClient::HandleMsg(CNetMsg * Msg)
 
 	switch (Msg->Type())
 	{
+	case CBaseMsg::Msg_ProjSetup:
+	{
+		CProjSetupMsg info(Msg);
+		m_proj = new CSharedProject();
+		m_proj->SetName(info.Name());
+		m_proj->SetFramerate(info.Framerate());
+		break;
+	}
+	case CBaseMsg::Msg_Event:
+	{
+		// TO DO: Separate the net event handler of course
+		CNetEventInfo type(Msg);
+		switch (type.EventType())
+		{
+		case CNetEvent::Event_LayerAdd:
+		{
+			CLayerAddMsg add(m_proj, Msg);
+			add.Perform();
+		}
+		}
+	}
 	case CBaseMsg::Msg_Welcome:
 	{
 		SendMsg(CChatMsg("Hello from animator!"));
 		CMotdView::Open(CWelcomeMsg(Msg));
-		return;
+		break;
 	}
 	case CBaseMsg::Msg_Join:
 	{

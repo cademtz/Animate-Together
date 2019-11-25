@@ -7,6 +7,13 @@
 
 #include "CFolderLayer.h"
 
+CFolderLayer::LayerList_t CFolderLayer::Layers1D()
+{
+	LayerList_t layers;
+	AppendLayers(this, layers);
+	return layers;
+}
+
 int CFolderLayer::IndexOf(const CNetObject & Obj)
 {
 	if (Obj.Handle() == Handle())
@@ -64,4 +71,16 @@ CBaseLayer * CFolderLayer::_FindLayer(const CNetObject & Obj)
 		}
 	}
 	return nullptr;
+}
+
+void CFolderLayer::AppendLayers(CBaseLayer * Layer, LayerList_t & List)
+{
+	if (!Layer)
+		return;
+
+	if (!Layer->IsRoot()) // Root layers should never be listed
+		List.append(Layer);
+	if (Layer->Type() == CBaseLayer::Layer_Folder)
+		for (auto layer : ((CFolderLayer*)Layer)->Layers())
+			AppendLayers(layer, List);
 }

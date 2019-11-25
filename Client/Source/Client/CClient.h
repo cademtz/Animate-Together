@@ -20,6 +20,7 @@ class CProject;
 class CNetMsg;
 class CBaseMsg;
 class CUser;
+class CSharedProject;
 
 class CClient : public CSocketMgr, public CEventHandler<CBaseMsg>
 {
@@ -44,7 +45,7 @@ private:
 	~CClient();
 
 	ATNet::EProtoStage m_stage;
-	CProject* m_proj;
+	CSharedProject* m_proj = 0;
 	QList<CUser*> m_users;
 	CUser* m_self = nullptr;
 
