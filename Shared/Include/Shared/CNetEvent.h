@@ -50,7 +50,7 @@ protected:
 
 private:
 	uint8_t m_eventtype;
-	bool m_undone = true;
+	bool m_undone = false;
 	CSharedProject* m_proj;
 };
 

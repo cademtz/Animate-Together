@@ -134,8 +134,19 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		{
 			CLayerAddMsg add(m_proj, Msg);
 			add.Perform();
+			auto layers = m_proj->Root().Layers1D();
+			for (auto layer : layers)
+			{
+				QString out = layer->Name();
+				CBaseLayer* parent = layer;
+				while ((parent = parent->Parent()) && parent != &m_proj->Root())
+					out.prepend(parent->Name() + " > ");
+				qInfo() << out;
+			}
+			break;
 		}
 		}
+		break;
 	}
 	case CBaseMsg::Msg_Welcome:
 	{

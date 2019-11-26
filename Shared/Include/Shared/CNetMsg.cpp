@@ -98,5 +98,5 @@ CProjSetupMsg::CProjSetupMsg(const CSharedProject * Project)
 
 const CSerialize CProjSetupMsg::Serialize() const
 {
-	return CSerialize(m_name.utf16(), m_framerate);
+	return CSerialize(Type(), m_name.utf16(), m_framerate);
 }

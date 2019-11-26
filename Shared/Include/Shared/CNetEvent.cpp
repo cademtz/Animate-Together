@@ -44,7 +44,7 @@ CLayerAddMsg::CLayerAddMsg(CSharedProject* Proj, CNetMsg * Msg) : CBaseLayerMsg(
 
 const CSerialize CLayerAddMsg::Serialize() const
 {
-	CSerialize data(Type(), Layer()->Handle(), Layer()->Parent()->Handle(), Undone());
+	CSerialize data(Type(), EventType(), Layer()->Handle(), Layer()->Parent()->Handle(), Undone());
 	if (!Undone()) // Send new layer's info
 		data.Add(Layer()->Index(), Layer()->Name().utf16(), (uint8_t)Layer()->Type());
 	return data;
