@@ -7,7 +7,7 @@
 
 #include "CFolderLayer.h"
 
-CFolderLayer::LayerList_t CFolderLayer::Layers1D()
+LayerList_t CFolderLayer::Layers1D()
 {
 	LayerList_t layers;
 	AppendLayers(this, layers);
@@ -27,7 +27,7 @@ int CFolderLayer::IndexOf(const CNetObject & Obj)
 	return -1;
 }
 
- void CFolderLayer::Append(CBaseLayer * Layer)
+void CFolderLayer::Append(CBaseLayer * Layer)
 {
 	Layer->SetParent(this);
 	m_layers.append(Layer);
@@ -50,6 +50,24 @@ bool CFolderLayer::Remove(CBaseLayer * Layer)
 		CFolderLayer* folder = (CFolderLayer*)layer;
 		if (folder->Remove(Layer))
 			return true;
+	}
+	return false;
+}
+
+bool CFolderLayer::_Contains(const CNetObject & Obj) const
+{
+	if (Obj.Handle() == this->Handle())
+		return true;
+	for (CBaseLayer* layer : m_layers)
+	{
+		if (layer->Handle() == Obj.Handle())
+			return layer;
+		if (layer->Type() == CBaseLayer::Layer_Folder)
+		{
+			CFolderLayer* folder = (CFolderLayer*)layer;
+			if (folder->_Contains(Obj))
+				return true;
+		}
 	}
 	return false;
 }

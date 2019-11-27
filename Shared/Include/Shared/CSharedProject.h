@@ -39,11 +39,18 @@ public:
 	// - Return is null if the layer is not listed
 	template<typename T = CBaseLayer>
 	inline T* FindLayer(const CNetObject& Obj) { return (T*)m_root.FindLayer(Obj); }
+	inline bool Contains(const CNetObject& Obj) { return m_root.Contains(Obj); }
+	inline bool Contains(const CBaseLayer* Layer) { return Contains(Layer->Handle()); }
+
+	inline const LayerList_t& Selected() const { return m_selected; }
+	inline bool IsSelected(CBaseLayer* Layer) const { return m_selected.contains(Layer); }
+	void SelectLayer(CBaseLayer* Layer, bool Select = true);
 
 private:
 	QString m_name;
 	CFolderLayer m_root;
 	unsigned m_framerate;
+	QList<CBaseLayer*> m_selected;
 };
 
 #endif // CSharedProject_H

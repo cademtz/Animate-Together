@@ -26,8 +26,6 @@ class CSharedProject;
 class CFolderLayer : public CBaseLayer
 {
 public:
-	typedef QList<CBaseLayer*> LayerList_t;
-
 	CFolderLayer(CSharedProject* Proj) : CBaseLayer(Layer_Folder), m_proj(Proj) { }
 	CFolderLayer(QString Name = "New Folder") : CBaseLayer(Layer_Folder) {
 		SetName(Name);
@@ -46,6 +44,8 @@ public:
 	// - Return is null if the layer is not listed
 	template<typename T = CBaseLayer>
 	inline T* FindLayer(const CNetObject& Obj) { return (T*)_FindLayer(Obj); }
+	inline bool Contains(const CNetObject& Obj) const { return _Contains(Obj); }
+	inline bool Contains(const CBaseLayer* Layer) const { return _Contains(Layer->Handle()); }
 
 	// - Finds the index of an immediate descendant layer
 	// - Return is negative if the layer is not listed
@@ -60,6 +60,8 @@ public:
 	bool Remove(CBaseLayer* Layer);
 	void Append(CBaseLayer* Layer);
 	void Insert(int Index, CBaseLayer* Layer);
+	inline bool IsOpen() const { return m_open; }
+	inline void SetOpen(bool Open) { m_open = Open; }
 
 protected:
 	friend CBaseLayer;
@@ -77,11 +79,13 @@ protected:
 	inline CSharedProject* _Project() const { return m_proj; }
 	
 private:
+	bool _Contains(const CNetObject& Obj) const;
 	CBaseLayer* _FindLayer(const CNetObject& Obj);
 	static void AppendLayers(CBaseLayer* Layer, LayerList_t& List);
 
 	CSharedProject* m_proj = 0;
 	LayerList_t m_layers;
+	bool m_open = false;
 };
 
 #endif // CFolderLayer_H

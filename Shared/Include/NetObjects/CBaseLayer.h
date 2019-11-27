@@ -16,6 +16,9 @@
 
 class CSharedProject;
 class CFolderLayer;
+class CBaseLayer;
+
+typedef QList<CBaseLayer*> LayerList_t;
 
 class CBaseLayer : public CNetObject
 {
