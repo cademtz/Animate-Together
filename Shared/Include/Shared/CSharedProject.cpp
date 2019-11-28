@@ -24,3 +24,9 @@ void CSharedProject::SelectLayer(CBaseLayer * Layer, bool Select)
 	else if (Contains(Layer)) // Only select if we own the layer
 		m_selected.push_back(Layer);
 }
+
+void CSharedProject::AddEvent(CNetEvent * Event)
+{
+	Event->Perform();
+	m_events.push_back(Event);
+}
