@@ -8,6 +8,8 @@
 #include "CBaseLayer.h"
 #include "CFolderLayer.h"
 
+CBaseLayer::Listeners_t CBaseLayer::m_listeners;
+
 int CBaseLayer::Index() const {
 	return Parent()->IndexOf(this->Handle());
 }

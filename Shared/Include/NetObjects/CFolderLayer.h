@@ -58,7 +58,7 @@ public:
 	// - Finds and removes a child layer by pointer
 	// - Returns true if Layer is listed
 	bool Remove(CBaseLayer* Layer);
-	void Append(CBaseLayer* Layer);
+	inline void Append(CBaseLayer* Layer) { Insert(m_layers.size(), Layer); }
 	void Insert(int Index, CBaseLayer* Layer);
 	inline bool IsOpen() const { return m_open; }
 	inline void SetOpen(bool Open) { m_open = Open; }

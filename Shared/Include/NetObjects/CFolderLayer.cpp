@@ -6,6 +6,7 @@
  */
 
 #include "CFolderLayer.h"
+#include "Shared/CSharedProject.h"
 
 LayerList_t CFolderLayer::Layers1D()
 {
@@ -27,31 +28,36 @@ int CFolderLayer::IndexOf(const CNetObject & Obj)
 	return -1;
 }
 
-void CFolderLayer::Append(CBaseLayer * Layer)
-{
-	Layer->SetParent(this);
-	m_layers.append(Layer);
-}
-
 void CFolderLayer::Insert(int Index, CBaseLayer * Layer)
 {
 	Layer->SetParent(this);
 	m_layers.insert(Index, Layer);
+	CreateEvent(CLayerAddMsg(Layer, true));
 }
 
 bool CFolderLayer::Remove(CBaseLayer * Layer)
 {
+	bool removed = false;
 	if (m_layers.removeOne(Layer))
-		return true;
-	for (CBaseLayer* layer : m_layers)
+		removed = true;
+	if (!removed)
 	{
-		if (layer->Type() != CBaseLayer::Layer_Folder)
-			continue;
-		CFolderLayer* folder = (CFolderLayer*)layer;
-		if (folder->Remove(Layer))
-			return true;
+		for (CBaseLayer* layer : m_layers)
+		{
+			if (layer->Type() != CBaseLayer::Layer_Folder)
+				continue;
+			CFolderLayer* folder = (CFolderLayer*)layer;
+			if (folder->Remove(Layer))
+			{
+				removed = true;
+				break;
+			}
+		}
 	}
-	return false;
+
+	if (removed)
+		CreateEvent(CLayerAddMsg(Layer, false));
+	return removed;
 }
 
 bool CFolderLayer::_Contains(const CNetObject & Obj) const

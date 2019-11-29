@@ -18,10 +18,10 @@ CLayerAddMsg::CLayerAddMsg(CSharedProject* Proj, CNetMsg * Msg) : CBaseLayerMsg(
 	uint8_t eventtype;
 	bool undone;
 
-	s >> eventtype >> obj >> parent >> undone;
+	s >> eventtype >> obj >> parent >> m_add >> undone;
 	m_parent = Proj->FindLayer<CFolderLayer>(parent);
 
-	if (undone)
+	if (m_add == undone) // Performed an add or reverted a remove
 	{
 		SetLayer(Project()->FindLayer(obj));
 		m_index = Layer()->Index();
@@ -44,7 +44,7 @@ CLayerAddMsg::CLayerAddMsg(CSharedProject* Proj, CNetMsg * Msg) : CBaseLayerMsg(
 
 const CSerialize CLayerAddMsg::Serialize() const
 {
-	CSerialize data(Type(), EventType(), Layer()->Handle(), Layer()->Parent()->Handle(), Undone());
+	CSerialize data(Type(), EventType(), Layer()->Handle(), Layer()->Parent()->Handle(), m_add, Undone());
 	if (!Undone()) // Send new layer's info
 		data.Add(Layer()->Index(), Layer()->Name().utf16(), (uint8_t)Layer()->Type());
 	return data;
@@ -52,7 +52,7 @@ const CSerialize CLayerAddMsg::Serialize() const
 
 void CLayerAddMsg::_Flip(bool Revert)
 {
-	if (Revert)
+	if (Revert == m_add)
 		Project()->Root().Remove(Layer());
 	else
 		m_parent->Insert(m_index, Layer());

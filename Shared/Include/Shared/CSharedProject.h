@@ -46,16 +46,13 @@ public:
 	inline bool IsSelected(CBaseLayer* Layer) const { return m_selected.contains(Layer); }
 	void SelectLayer(CBaseLayer* Layer, bool Select = true);
 
-	// - Adds and performs a net event
+	// - Performs a net event and adds its pointer in the 'Events' list
 	void AddEvent(CNetEvent* Event);
-
-protected:
-	friend class CBaseLayer;
-
-	// - Adds an event that is already performed
-	void NewEvent(CNetEvent* Event) { m_events.push_back(Event); }
+	inline const QList<CNetEvent*>& Events() const { return m_events; }
 
 private:
+	void OnLayerEvent(CNetEvent* Event);
+
 	QString m_name;
 	CFolderLayer m_root;
 	unsigned m_framerate;

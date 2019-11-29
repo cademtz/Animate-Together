@@ -9,8 +9,8 @@
 
 CSharedProject::Listeners_t CSharedProject::m_listeners;
 
-CSharedProject::CSharedProject() : m_root(this)
-{
+CSharedProject::CSharedProject() : m_root(this) {
+	CBaseLayer::Listen([this](CNetEvent* Event) { OnLayerEvent(Event); });
 }
 
 void CSharedProject::SelectLayer(CBaseLayer * Layer, bool Select)
@@ -28,5 +28,10 @@ void CSharedProject::SelectLayer(CBaseLayer * Layer, bool Select)
 void CSharedProject::AddEvent(CNetEvent * Event)
 {
 	Event->Perform();
+	m_events.push_back(Event);
+}
+
+void CSharedProject::OnLayerEvent(CNetEvent* Event)
+{
 	m_events.push_back(Event);
 }

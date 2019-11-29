@@ -13,6 +13,8 @@
 
 #include <qstring.h>
 #include "CNetObject.h"
+#include "Shared/CEventHandler.h"
+#include "Shared/CNetEvent.h"
 
 class CSharedProject;
 class CFolderLayer;
@@ -20,7 +22,7 @@ class CBaseLayer;
 
 typedef QList<CBaseLayer*> LayerList_t;
 
-class CBaseLayer : public CNetObject
+class CBaseLayer : public CNetObject, public CEventHandler<CNetEvent>
 {
 public:
 	enum EType : uint8_t

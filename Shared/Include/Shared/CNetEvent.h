@@ -99,13 +99,17 @@ private:
 class CLayerAddMsg : public CBaseLayerMsg
 {
 public:
-	CLayerAddMsg(CBaseLayer* Layer) : CBaseLayerMsg(Event_LayerAdd, Layer) { }
+	// - Creates an add or remove event dependind on 'Add'
+	CLayerAddMsg(CBaseLayer * Layer, bool Add) : CBaseLayerMsg(Event_LayerAdd, Layer), m_add(Add) { }
 	CLayerAddMsg(CSharedProject* Proj, CNetMsg* Msg);
 	~CLayerAddMsg()
 	{
 		if (Undone())
 			delete Layer();
 	}
+
+	// - Returns true if the event describes an added layer, false if it's a removed layer
+	inline bool IsAdd() const { return m_add; }
 
 protected:
 	const CSerialize Serialize() const override;
@@ -114,6 +118,7 @@ protected:
 private:
 	CFolderLayer* m_parent;
 	int m_index = 0;
+	bool m_add;
 };
 
 #endif // CNetEvent_H
