@@ -122,6 +122,7 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		m_proj = new CSharedProject();
 		m_proj->SetName(info.Name());
 		m_proj->SetFramerate(info.Framerate());
+		CreateEvent(info);
 		break;
 	}
 	case CBaseMsg::Msg_Event:
@@ -139,7 +140,7 @@ void CClient::HandleMsg(CNetMsg * Msg)
 			{
 				QString out = layer->Name();
 				CBaseLayer* parent = layer;
-				while ((parent = parent->Parent()) && parent != &m_proj->Root())
+				while ((parent = parent->Parent()) && !parent->IsRoot())
 					out.prepend(parent->Name() + " > ");
 				qInfo() << out;
 			}

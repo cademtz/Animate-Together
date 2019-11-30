@@ -238,7 +238,19 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Graphics\GraphicsFolder\CGraphicsFolder.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\GraphicsLayer\CGraphicsLayer.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Graphics\GraphicsStroke\CGraphicsStroke.cpp" />
+    <ClCompile Include="Source\Graphics\TimelineScene\CTimelineScene.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Interface\Connect\CConnect.cpp" />
     <ClCompile Include="Source\Graphics\FrameLayout\CFrameLayout.cpp">
       <SubType>
@@ -407,6 +419,14 @@
       <SubType>
       </SubType>
     </ClInclude>
+    <ClInclude Include="Source\Graphics\GraphicsFolder\CGraphicsFolder.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\GraphicsLayer\CGraphicsLayer.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Source\Graphics\GraphicsStroke\CGraphicsStroke.h">
       <SubType>
       </SubType>
@@ -428,6 +448,10 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="Source\Graphics\LayerLayout\CLayerLayout.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\TimelineScene\CTimelineScene.h">
       <SubType>
       </SubType>
     </ClInclude>

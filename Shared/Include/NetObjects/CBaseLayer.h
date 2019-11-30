@@ -22,7 +22,7 @@ class CBaseLayer;
 
 typedef QList<CBaseLayer*> LayerList_t;
 
-class CBaseLayer : public CNetObject, public CEventHandler<CNetEvent>
+class CBaseLayer : public CNetObject, public CEventHandler<CBaseLayerMsg>
 {
 public:
 	enum EType : uint8_t
@@ -44,6 +44,8 @@ public:
 	inline void SetParent(CFolderLayer* Parent) { m_parent = Parent; }
 	inline QString Name() const { return m_name; }
 	inline void SetName(const QString& Name) { m_name = Name; }
+	inline bool IsVisible() const { return m_visible; }
+	inline void SetVisible(bool Visible) { m_visible = Visible; }
 
 protected:
 	CBaseLayer(EType Type, CFolderLayer* Parent = nullptr) : m_type(Type), m_parent(Parent) { }
@@ -52,6 +54,7 @@ private:
 	EType m_type;
 	CFolderLayer* m_parent = 0;
 	QString m_name;
+	bool m_visible = true;
 };
 
 #endif // CBaseLayer_H
