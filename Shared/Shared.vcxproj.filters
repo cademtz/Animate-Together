@@ -40,9 +40,6 @@
     <ClInclude Include="Include\Shared\CJsonConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Shared\CEventHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Shared\CSharedProject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -68,6 +65,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\NetObjects\CBaseFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Shared\CEventHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

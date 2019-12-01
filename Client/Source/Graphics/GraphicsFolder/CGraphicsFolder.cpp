@@ -16,10 +16,9 @@ CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder)
 
 	m_layer = new CGraphicsLayer(Folder, this);
 	m_layout->addItem(m_layer);
-
-	// TO DO: Make changes to CEventHandler to allow removing a listener 
 }
 
 void CGraphicsFolder::OnLayerEvent(CBaseLayerMsg * Event)
 {
+
 }

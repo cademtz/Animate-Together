@@ -12,24 +12,30 @@
 #endif
 
 #include <qgraphicswidget.h>
+#include <qgraphicslayoutitem.h>
 #include "Graphics/GraphicsTypes.h"
 
 class CBaseLayer;
+class CBaseLayerMsg;
 class QGraphicsLinearLayout;
 
 class CGraphicsLayer : public QGraphicsWidget
 {
 public:
 	CGraphicsLayer(CBaseLayer* Layer, QGraphicsItem* Parent = nullptr);
+	~CGraphicsLayer();
 
 	inline CBaseLayer* Layer() const { return m_layer; }
 	inline void SetLayer(CBaseLayer* Layer) { m_layer = Layer; }
 
 	int type() const override { return (int)e_graphicstype::Layer; }
-	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
+	void OnLayerEvent(CBaseLayerMsg* Event);
+
+	unsigned m_listener;
 	CBaseLayer* m_layer;
+	QGraphicsSimpleTextItem* m_label;
 	QGraphicsLinearLayout* m_layout;
 };
 

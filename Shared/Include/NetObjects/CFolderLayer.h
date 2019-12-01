@@ -60,8 +60,6 @@ public:
 	bool Remove(CBaseLayer* Layer);
 	inline void Append(CBaseLayer* Layer) { Insert(m_layers.size(), Layer); }
 	void Insert(int Index, CBaseLayer* Layer);
-	inline bool IsOpen() const { return m_open; }
-	inline void SetOpen(bool Open) { m_open = Open; }
 
 protected:
 	friend CBaseLayer;
@@ -85,7 +83,6 @@ private:
 
 	CSharedProject* m_proj = 0;
 	LayerList_t m_layers;
-	bool m_open = false;
 };
 
 #endif // CFolderLayer_H

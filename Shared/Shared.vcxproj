@@ -35,11 +35,11 @@
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="Include\Shared\CEventHandler.h" />
     <ClInclude Include="Include\NetObjects\CFolderLayer.h">
       <SubType>
       </SubType>
     </ClInclude>
+    <ClInclude Include="Include\Shared\CEventHandler.h" />
     <ClInclude Include="Include\Shared\CJsonConfig.h">
       <SubType>
       </SubType>

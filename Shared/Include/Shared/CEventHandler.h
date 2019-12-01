@@ -32,9 +32,41 @@ public:
 			fn(&Event);
 	}
 
-	// - Adds a callback to the listener list
+	// - Adds a callback and returns a handle used to later remove it
 	// - Listeners are called when a certain class's event is created
-	static inline void Listen(Callback_t Func) { Listeners().push_back(Func); }
+	static unsigned Listen(Callback_t Func)
+	{
+		unsigned index = 0;
+		for (auto& listener : m_listeners)
+		{
+			if (!listener)
+			{
+				listener = Func;
+				return index;
+			}
+			index++;
+		}
+
+		m_listeners.push_back(Func);
+		return index;
+	}
+
+	static void EndListen(unsigned Handle)
+	{
+		if (Handle == m_listeners.size() - 1)
+			return m_listeners.pop_back();
+		
+		unsigned index = 0;
+		for (auto& listener : m_listeners)
+		{
+			if (index == Handle)
+			{
+				listener = nullptr;
+				return;
+			}
+			index++;
+		}
+	}
 };
 
 #endif // CEventHandler_H

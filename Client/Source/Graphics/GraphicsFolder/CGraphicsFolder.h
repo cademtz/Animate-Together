@@ -28,6 +28,7 @@ private:
 	CGraphicsLayer* m_layer;
 	QGraphicsWidget* m_layerlist;
 	QGraphicsLinearLayout* m_layout;
+	bool m_open;
 };
 
 #endif // CGraphicsFolder_H
