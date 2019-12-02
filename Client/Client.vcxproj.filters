@@ -294,6 +294,9 @@
     <ClInclude Include="Source\Graphics\TimelineScene\CTimelineScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Graphics\LayoutWrap\CLayoutWrap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Source\Interface\ColorPicker\ColorPicker.h">

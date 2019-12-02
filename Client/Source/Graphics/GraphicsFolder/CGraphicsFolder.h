@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include <NetObjects/CNetObject.h>
 #include "Graphics/GraphicsLayer/CGraphicsLayer.h"
 
 class CFolderLayer;
@@ -20,15 +21,24 @@ class CGraphicsFolder : public QGraphicsWidget
 {
 public:
 	CGraphicsFolder(CFolderLayer* Folder);
+	~CGraphicsFolder();
+
+	inline CFolderLayer* Folder() const { return m_folder; }
 	int	type() const override { return (int)e_graphicstype::FolderLayer; }
 
 private:
-	void OnLayerEvent(CBaseLayerMsg* Event);
+	void InsertLayer(const CNetObject& Layer);
+	void RemoveLayer(const CBaseLayer* Layer);
 
-	CGraphicsLayer* m_layer;
+	void OnLayerEvent(CBaseLayerMsg* Event);
+	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+
+	CFolderLayer* m_folder;
+	CGraphicsLayer* m_item;
 	QGraphicsWidget* m_layerlist;
-	QGraphicsLinearLayout* m_layout;
-	bool m_open;
+	QGraphicsLinearLayout* m_layout, * m_listlayout;
+	bool m_open = true;
+	unsigned m_listener;
 };
 
 #endif // CGraphicsFolder_H

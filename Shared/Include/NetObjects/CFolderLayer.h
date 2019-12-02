@@ -47,6 +47,16 @@ public:
 	inline bool Contains(const CNetObject& Obj) const { return _Contains(Obj); }
 	inline bool Contains(const CBaseLayer* Layer) const { return _Contains(Layer->Handle()); }
 
+	// - Returns true if the layer exists strictly in the folder's list
+	inline bool IsDirectChild(const CNetObject& Obj) const
+	{
+		for (auto layer : m_layers)
+			if (layer->Handle() == Obj.Handle())
+				return true;
+		return false;
+	}
+	inline bool IsDirectChild(const CBaseLayer* Layer) const { return IsDirectChild(Layer->Handle()); }
+
 	// - Finds the index of an immediate descendant layer
 	// - Return is negative if the layer is not listed
 	int IndexOf(const CNetObject& Obj);

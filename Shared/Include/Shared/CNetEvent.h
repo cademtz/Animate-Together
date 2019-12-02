@@ -111,6 +111,9 @@ public:
 	// - Returns true if the event describes an added layer, false if it's a removed layer
 	inline bool IsAdd() const { return m_add; }
 
+	// - Returns true if the layer was last added or removed
+	inline bool WasAdded() const { return m_add != Undone(); }
+
 protected:
 	const CSerialize Serialize() const override;
 	void _Flip(bool Revert) override;

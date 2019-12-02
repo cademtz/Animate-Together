@@ -9,16 +9,97 @@
 #include <qgraphicslinearlayout.h>
 #include <NetObjects/CFolderLayer.h>
 
-CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder)
+CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder) : m_folder(Folder)
 {
 	m_layout = new QGraphicsLinearLayout(Qt::Vertical);
 	setLayout(m_layout);
 
-	m_layer = new CGraphicsLayer(Folder, this);
-	m_layout->addItem(m_layer);
+	m_item = new CGraphicsLayer(m_folder, this);
+	m_layout->addItem(m_item);
+
+	m_layerlist = new QGraphicsWidget(this);
+	m_listlayout = new QGraphicsLinearLayout(Qt::Vertical);
+	m_listlayout->setContentsMargins(15, 0, 0, 0);
+	m_layerlist->setLayout(m_listlayout);
+
+	for (auto layer : m_folder->Layers())
+		InsertLayer(*layer);
+
+	m_layerlist->setVisible(m_open);
+	m_layout->addItem(m_layerlist);
+
+	m_listener = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
+}
+
+CGraphicsFolder::~CGraphicsFolder()
+{
+	CBaseLayer::EndListen(m_listener);
+}
+
+void CGraphicsFolder::InsertLayer(const CNetObject & Layer)
+{
+	CBaseLayer* layer = m_folder->FindLayer(Layer);
+	if (!layer)
+		return; // This folder does not own specified layer
+
+	QGraphicsLayoutItem* item;
+	if (layer->Type() == CBaseLayer::Layer_Folder)
+		item = new CGraphicsFolder((CFolderLayer*)layer);
+	else
+		item = new CGraphicsLayer(layer);
+	m_listlayout->insertItem(layer->Index(), item);
+}
+
+void CGraphicsFolder::RemoveLayer(const CBaseLayer* Layer)
+{
+	for (auto item : m_layerlist->childItems())
+	{
+		bool found = false;
+		switch (item->type())
+		{
+		case (int)e_graphicstype::FolderLayer:
+		{
+			CGraphicsFolder* folder = (CGraphicsFolder*)item;
+			if (folder->Folder() == Layer)
+			{
+				delete folder;
+				found = true;
+			}
+			break;
+		}
+		case (int)e_graphicstype::Layer:
+		{
+			CGraphicsLayer* layer = (CGraphicsLayer*)item;
+			if (layer->Layer() == Layer)
+			{
+				delete layer;
+				found = true;
+			}
+			break;
+		}
+		}
+		if (found)
+			break;
+	}
 }
 
 void CGraphicsFolder::OnLayerEvent(CBaseLayerMsg * Event)
 {
+	switch (Event->EventType())
+	{
+	case CNetEvent::Event_LayerAdd:
+	{
+		CLayerAddMsg* add = (CLayerAddMsg*)Event;
+		if (!m_folder->IsDirectChild(add->Layer()))
+			break;
+		if (add->WasAdded())
+			InsertLayer(*add->Layer());
+		else
+			RemoveLayer(add->Layer());
+	}
+	}
+}
 
+void CGraphicsFolder::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event) {
+	m_layerlist->setVisible(m_open = !m_open);
 }

@@ -14,6 +14,7 @@
 #include <qgraphicswidget.h>
 #include <qgraphicslayoutitem.h>
 #include "Graphics/GraphicsTypes.h"
+#include "Graphics/LayoutWrap/CLayoutWrap.h"
 
 class CBaseLayer;
 class CBaseLayerMsg;
@@ -35,7 +36,7 @@ private:
 
 	unsigned m_listener;
 	CBaseLayer* m_layer;
-	QGraphicsSimpleTextItem* m_label;
+	CLayoutWrap<QGraphicsSimpleTextItem>* m_label;
 	QGraphicsLinearLayout* m_layout;
 };
 
