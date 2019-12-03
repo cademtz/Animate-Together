@@ -27,15 +27,25 @@ CGraphicsLayer::CGraphicsLayer(CBaseLayer * Layer, QGraphicsItem * Parent)
 	Maybe tomorrow.
 
 	Update: Okay so first attempt. Fingers crossed.
+	Update: Okay so it failed. I'll figure it out tomorrow (again)
 	*/
-	m_label = new CLayoutWrap<QGraphicsSimpleTextItem>(m_layer->Name());
+
+	m_label = new CLayoutWrap<QGraphicsSimpleTextItem>();
 	m_layout->addItem(m_label);
+
+	SetLayer(Layer);
 
 	m_listener = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
 }
 
 CGraphicsLayer::~CGraphicsLayer() {
 	CBaseLayer::EndListen(m_listener);
+}
+
+void CGraphicsLayer::SetLayer(CBaseLayer * Layer)
+{
+	m_layer = Layer;
+	m_label->setText(m_layer->Name());
 }
 
 void CGraphicsLayer::OnLayerEvent(CBaseLayerMsg * Event)

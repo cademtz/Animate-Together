@@ -33,6 +33,7 @@ public:
 	// - Value is always null while not joined to a server
 	inline static const CUser* LocalUser() { return Client().m_self; }
 	static const CUser* FromHandle(CNetObject Object);
+	static inline CSharedProject* Project() { return Client().m_proj; }
 
 private:
 	static inline CClient& Client()

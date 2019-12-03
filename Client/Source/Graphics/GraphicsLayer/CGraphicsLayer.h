@@ -27,7 +27,7 @@ public:
 	~CGraphicsLayer();
 
 	inline CBaseLayer* Layer() const { return m_layer; }
-	inline void SetLayer(CBaseLayer* Layer) { m_layer = Layer; }
+	void SetLayer(CBaseLayer* Layer);
 
 	int type() const override { return (int)e_graphicstype::Layer; }
 

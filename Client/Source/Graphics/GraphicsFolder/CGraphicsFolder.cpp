@@ -9,7 +9,7 @@
 #include <qgraphicslinearlayout.h>
 #include <NetObjects/CFolderLayer.h>
 
-CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder) : m_folder(Folder)
+CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder, QGraphicsItem* Parent) : QGraphicsWidget(Parent), m_folder(Folder)
 {
 	m_layout = new QGraphicsLinearLayout(Qt::Vertical);
 	setLayout(m_layout);
@@ -22,11 +22,7 @@ CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder) : m_folder(Folder)
 	m_listlayout->setContentsMargins(15, 0, 0, 0);
 	m_layerlist->setLayout(m_listlayout);
 
-	for (auto layer : m_folder->Layers())
-		InsertLayer(*layer);
-
-	m_layerlist->setVisible(m_open);
-	m_layout->addItem(m_layerlist);
+	SetFolder(Folder);
 
 	m_listener = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
 }
@@ -34,6 +30,21 @@ CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder) : m_folder(Folder)
 CGraphicsFolder::~CGraphicsFolder()
 {
 	CBaseLayer::EndListen(m_listener);
+}
+
+void CGraphicsFolder::SetFolder(CFolderLayer * Folder)
+{
+	m_folder = Folder;
+	m_open = true;
+
+	while (m_layerlist->children().size())
+		delete m_layerlist->children().back();
+
+	for (auto layer : m_folder->Layers())
+		InsertLayer(*layer);
+
+	m_layerlist->setVisible(m_open);
+	m_layout->addItem(m_layerlist);
 }
 
 void CGraphicsFolder::InsertLayer(const CNetObject & Layer)

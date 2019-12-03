@@ -30,8 +30,8 @@ public:
 	// - Performs the event. Every call toggles between revert and redo
 	inline void Perform()
 	{
-		_Flip(!m_undone);
 		m_undone = !m_undone;
+		_Flip(m_undone);
 	}
 
 	// - Returns true if the action was reverted or not performed

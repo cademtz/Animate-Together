@@ -21,7 +21,7 @@ CLayerAddMsg::CLayerAddMsg(CSharedProject* Proj, CNetMsg * Msg) : CBaseLayerMsg(
 	s >> eventtype >> obj >> parent >> m_add >> undone;
 	m_parent = Proj->FindLayer<CFolderLayer>(parent);
 
-	if (WasAdded()) // Performed an add or reverted a remove
+	if (!WasAdded())
 	{
 		SetLayer(Project()->FindLayer(obj));
 		m_index = Layer()->Index();
@@ -56,4 +56,5 @@ void CLayerAddMsg::_Flip(bool Revert)
 		m_parent->Insert(m_index, Layer());
 	else
 		Project()->Root().Remove(Layer());
+	CBaseLayer::CreateEvent(*this);
 }

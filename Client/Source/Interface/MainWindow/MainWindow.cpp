@@ -5,6 +5,7 @@
 #include <qpainter.h>
 #include <qlayout.h>
 #include <qevent.h>
+#include <qgraphicsview.h>
 
 #include "Client/CClient.h"
 #include "Projects/CProject.h"
@@ -15,6 +16,7 @@
 #include "Widgets/MiniPalette/CMiniPalette.h"
 #include "Interface/ColorPicker/ColorPicker.h"
 #include "Interface/Login/CLogin.h"
+#include "Graphics/TimelineScene/CTimelineScene.h"
 
 QString MainWindow::m_globalstyle;
 
@@ -71,6 +73,9 @@ MainWindow::MainWindow(QWidget *parent)
 	ui.tool_stack->insertWidget(0, m_titlebar);
 	ui.tool_stack->addWidget(m_timeline);
 	resize(width(), height() + m_titlebar->height() + m_toolbar->height() + m_timeline->minimumHeight());
+
+	QGraphicsView* view = new QGraphicsView(&CTimelineScene::Scene());
+	view->show();
 
 	CUndoStack::Listen([this](const CUndoAction* Undo) { UndoStackEvent(Undo); });
 	CClient::Listen([this](const CBaseMsg* Msg) { ClientEvent(Msg); });

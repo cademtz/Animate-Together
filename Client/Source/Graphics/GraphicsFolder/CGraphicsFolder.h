@@ -20,10 +20,11 @@ class CBaseLayerMsg;
 class CGraphicsFolder : public QGraphicsWidget
 {
 public:
-	CGraphicsFolder(CFolderLayer* Folder);
+	CGraphicsFolder(CFolderLayer* Folder, QGraphicsItem* Parent = nullptr);
 	~CGraphicsFolder();
 
 	inline CFolderLayer* Folder() const { return m_folder; }
+	void SetFolder(CFolderLayer* Folder);
 	int	type() const override { return (int)e_graphicstype::FolderLayer; }
 
 private:

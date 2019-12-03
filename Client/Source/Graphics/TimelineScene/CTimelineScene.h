@@ -16,11 +16,13 @@
 
 class CBaseMsg;
 class CBaseLayerMsg;
+class CSharedProject;
+class CGraphicsFolder;
 
 class CTimelineScene : public QGraphicsScene
 {
 public:
-	inline const CTimelineScene& Scene() const
+	static inline CTimelineScene& Scene()
 	{
 		static CTimelineScene scene;
 		return scene;
@@ -30,8 +32,14 @@ private:
 	CTimelineScene();
 	~CTimelineScene() { }
 
+	// - The root folder item is reset to the specified Project's root
+	// - If 'Project' is left default or null, all graphical layers get destroyed
+	void ResetScene(CSharedProject* Project = nullptr);
+
 	void OnClientEvent(CBaseMsg* Msg);
 	void OnLayerEvent(CBaseLayerMsg* Msg);
+
+	CGraphicsFolder* m_root;
 };
 
 #endif // CTimelineScene_H
