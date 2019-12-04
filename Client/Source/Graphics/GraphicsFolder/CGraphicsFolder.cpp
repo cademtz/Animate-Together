@@ -21,6 +21,7 @@ CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder, QGraphicsItem* Parent) :
 	m_listlayout = new QGraphicsLinearLayout(Qt::Vertical);
 	m_listlayout->setContentsMargins(15, 0, 0, 0);
 	m_layerlist->setLayout(m_listlayout);
+	m_listlayout->setSpacing(0);
 
 	SetFolder(Folder);
 
