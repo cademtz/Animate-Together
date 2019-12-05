@@ -25,6 +25,8 @@ CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder, QGraphicsItem* Parent) :
 
 	SetFolder(Folder);
 
+	adjustSize();
+
 	m_listener = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
 }
 

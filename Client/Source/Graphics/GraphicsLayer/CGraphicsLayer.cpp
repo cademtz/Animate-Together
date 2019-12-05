@@ -24,6 +24,8 @@ CGraphicsLayer::CGraphicsLayer(CBaseLayer * Layer, QGraphicsItem * Parent)
 	// Keep everything aligned if certain icons aren't visible
 	QSizePolicy policy = m_layout->sizePolicy();
 	policy.setRetainSizeWhenHidden(true);
+	policy.setVerticalPolicy(QSizePolicy::Minimum);
+	policy.setHorizontalPolicy(QSizePolicy::Minimum);
 	m_layout->setSizePolicy(policy);
 
 	/*
@@ -38,12 +40,14 @@ CGraphicsLayer::CGraphicsLayer(CBaseLayer * Layer, QGraphicsItem * Parent)
 	*/
 
 	QGraphicsWidget* test = new QGraphicsWidget(this);
-	m_label = new QGraphicsSimpleTextItem(test);
+	m_label = new QGraphicsTextItem(test);
+	m_label->setTextInteractionFlags(Qt::TextEditable | Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 	test->setGeometry(QRectF(test->pos(), m_label->boundingRect().size()));
 	setGeometry(QRectF(pos(), m_label->boundingRect().size()));
 	m_layout->addItem(test);
 
 	SetLayer(Layer);
+	adjustSize();
 
 	m_listener = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
 }
@@ -55,7 +59,7 @@ CGraphicsLayer::~CGraphicsLayer() {
 void CGraphicsLayer::SetLayer(CBaseLayer * Layer)
 {
 	m_layer = Layer;
-	m_label->setText(m_layer->Name());
+	m_label->setPlainText(m_layer->Name());
 }
 
 void CGraphicsLayer::OnLayerEvent(CBaseLayerMsg * Event)

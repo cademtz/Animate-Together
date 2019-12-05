@@ -56,5 +56,4 @@ void CLayerAddMsg::_Flip(bool Revert)
 		m_parent->Insert(m_index, Layer());
 	else
 		Project()->Root().Remove(Layer());
-	CBaseLayer::CreateEvent(*this);
 }

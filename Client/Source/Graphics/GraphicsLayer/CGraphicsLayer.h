@@ -36,7 +36,7 @@ private:
 
 	unsigned m_listener;
 	CBaseLayer* m_layer;
-	QGraphicsSimpleTextItem* m_label;
+	QGraphicsTextItem* m_label;
 	QGraphicsLinearLayout* m_layout;
 };
 
