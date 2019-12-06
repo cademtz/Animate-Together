@@ -29,7 +29,8 @@ private:
 public:
 	static void CreateEvent(TEventClass& Event) {
 		for (auto fn : Listeners())
-			fn(&Event);
+			if (fn)
+				fn(&Event);
 	}
 
 	// - Adds a callback and returns a handle used to later remove it

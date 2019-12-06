@@ -7,8 +7,9 @@
 
 #include "CGraphicsLayer.h"
 #include <qgraphicslinearlayout.h>
-#include <qstyle.h>
+#include <qmenu.h>
 #include "NetObjects/CBaseLayer.h"
+#include "Client/CClient.h"
 
 CGraphicsLayer::CGraphicsLayer(CBaseLayer * Layer, QGraphicsItem * Parent)
 	: QGraphicsWidget(Parent), m_layer(Layer)
@@ -64,4 +65,12 @@ void CGraphicsLayer::SetLayer(CBaseLayer * Layer)
 
 void CGraphicsLayer::OnLayerEvent(CBaseLayerMsg * Event)
 {
+}
+
+void CGraphicsLayer::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
+{
+	QMenu menu;
+	QAction* remove = menu.addAction(tr("Remove"));
+	if (menu.exec() == remove)
+		CClient::Send(CLayerAddMsg(m_layer, false));
 }

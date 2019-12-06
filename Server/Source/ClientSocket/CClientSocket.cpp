@@ -78,6 +78,32 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 		m_parent->SendAll(CChatMsg(chat.Text(), m_user));
 		break;
 	}
+	case CBaseMsg::Msg_Event:
+	{
+		CNetEventInfo eventinfo(Msg);
+		switch (eventinfo.EventType())
+		{
+		case CNetEvent::Event_LayerAdd:
+		{
+			if (!(m_user->Perms() & CUser::Perm_Guest))
+				break;
+
+			CLayerAddMsg add(m_parent->Project(), Msg);
+			add.Perform();
+			m_parent->SendAll(add);
+
+			auto layers = add.Project()->Root().Layers1D();
+			for (auto layer : layers)
+			{
+				QString out = layer->Name();
+				CBaseLayer* parent = layer;
+				while ((parent = parent->Parent()) && !parent->IsRoot())
+					out.prepend(parent->Name() + " > ");
+				qInfo() << out;
+			}
+		}
+		}
+	}
 	}
 }
 

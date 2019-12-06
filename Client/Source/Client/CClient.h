@@ -34,6 +34,7 @@ public:
 	inline static const CUser* LocalUser() { return Client().m_self; }
 	static const CUser* FromHandle(CNetObject Object);
 	static inline CSharedProject* Project() { return Client().m_proj; }
+	static inline void Send(const CBaseMsg& Msg) { Client().SendMsg(Msg); }
 
 private:
 	static inline CClient& Client()

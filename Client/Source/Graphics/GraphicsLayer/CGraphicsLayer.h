@@ -33,6 +33,7 @@ public:
 
 private:
 	void OnLayerEvent(CBaseLayerMsg* Event);
+	void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
 	unsigned m_listener;
 	CBaseLayer* m_layer;

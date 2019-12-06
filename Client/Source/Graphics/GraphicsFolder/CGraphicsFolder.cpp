@@ -11,6 +11,11 @@
 
 CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder, QGraphicsItem* Parent) : QGraphicsWidget(Parent), m_folder(Folder)
 {
+	setAutoFillBackground(true);
+	QPalette pal = palette();
+	pal.setBrush(QPalette::Window, QColor(0xC0C0C0));
+	setPalette(pal);
+
 	m_layout = new QGraphicsLinearLayout(Qt::Vertical);
 	setLayout(m_layout);
 
@@ -104,11 +109,9 @@ void CGraphicsFolder::OnLayerEvent(CBaseLayerMsg * Event)
 	case CNetEvent::Event_LayerAdd:
 	{
 		CLayerAddMsg* add = (CLayerAddMsg*)Event;
-		if (!m_folder->IsDirectChild(add->Layer()))
-			break;
-		if (add->WasAdded())
+		if (add->WasAdded() && m_folder->IsDirectChild(add->Layer()))
 			InsertLayer(*add->Layer());
-		else
+		else if (!add->WasAdded())
 			RemoveLayer(add->Layer());
 	}
 	}
