@@ -15,6 +15,7 @@
 #include "CNetObject.h"
 #include "Shared/CEventHandler.h"
 #include "Shared/CNetEvent.h"
+#include "Shared/CSerialize.h"
 
 class CSharedProject;
 class CFolderLayer;
@@ -49,6 +50,7 @@ public:
 
 protected:
 	CBaseLayer(EType Type, CFolderLayer* Parent = nullptr) : m_type(Type), m_parent(Parent) { }
+	CBaseLayer(EType Type, SerialStream& Data);
 
 private:
 	EType m_type;
