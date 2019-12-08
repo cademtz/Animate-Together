@@ -16,7 +16,6 @@
 #include <qtcpsocket.h>
 #include "Config.h"
 #include "CSerialize.h"
-#include "NetObjects/CNetObject.h"
 
 class CUser;
 class CSharedProject;
@@ -60,6 +59,7 @@ public:
 		Msg_Chat,		// - Chat message from server or user
 		Msg_Welcome,	// - Server is sending the MOTD
 		Msg_ProjSetup,	// - Carries necessary data to initialize shared projects
+		Msg_Object,		// - Carrries data to initialize a net object	
 		Msg_Event,		// - Server or client has performed a specific action
 	};
 
@@ -199,6 +199,30 @@ private:
 	uint8_t m_perms;
 	unsigned m_handle;
 };
+
+class CBaseObjectMsg : public CBaseMsg
+{
+public:
+	enum EObject : uint8_t
+	{
+		Object_Project,
+		Object_Folder,
+	};
+
+	CBaseObjectMsg(CNetMsg* Msg) : CBaseMsg(Msg_Object) {
+		CSerialize::Deserialize(Msg->Data(), m_obj, m_type);
+	}
+	const CSerialize Serialize() const override { return CSerialize(m_obj, m_type); }
+
+protected:
+	CBaseObjectMsg(const CNetObject& Obj, EObject Type)
+		: CBaseMsg(Msg_Object), m_obj(Obj.Handle()), m_type(Type) { }
+
+private:
+	unsigned m_obj;
+	uint8_t m_type;
+};
+
 
 class CProjSetupMsg : public CBaseMsg
 {

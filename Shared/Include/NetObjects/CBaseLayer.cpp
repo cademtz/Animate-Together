@@ -30,12 +30,3 @@ CFolderLayer * CBaseLayer::Root() const
 CSharedProject * CBaseLayer::RootProject() const {
 	return Root()->_Project();
 }
-
-// Extremely gross, needs a whole separate method for doing it a not-easily-screwed-up way
-CBaseLayer::CBaseLayer(EType Type, SerialStream& Data)
-	: CNetObject(*(unsigned*)Data.data), m_type(Type)
-{
-	CNetObject obj = 0;
-	int type;
-	Data >> obj >> type >> m_name;
-}

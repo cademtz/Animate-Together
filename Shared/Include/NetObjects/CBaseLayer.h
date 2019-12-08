@@ -50,7 +50,6 @@ public:
 
 protected:
 	CBaseLayer(EType Type, CFolderLayer* Parent = nullptr) : m_type(Type), m_parent(Parent) { }
-	CBaseLayer(EType Type, SerialStream& Data);
 
 private:
 	EType m_type;
