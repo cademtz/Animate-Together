@@ -64,7 +64,7 @@ public:
 	inline uint8_t EventType() const { return m_eventtype; }
 
 private:
-	const CSerialize Serialize() const override { return CSerialize(); }
+	CSerialize Serialize() const override { return CSerialize(); }
 
 	uint8_t m_eventtype;
 };
@@ -76,7 +76,7 @@ public:
 
 protected:
 	void _Flip(bool Revert) override { }
-	const CSerialize Serialize() const override { }
+	CSerialize Serialize() const override { }
 };
 
 class CBaseLayerMsg : public CNetEvent
@@ -115,7 +115,7 @@ public:
 	inline bool WasAdded() const { return m_add != Undone(); }
 
 protected:
-	const CSerialize Serialize() const override;
+	CSerialize Serialize() const override;
 	void _Flip(bool Revert) override;
 
 private:

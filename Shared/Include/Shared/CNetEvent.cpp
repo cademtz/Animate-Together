@@ -42,7 +42,7 @@ CLayerAddMsg::CLayerAddMsg(CSharedProject* Proj, CNetMsg * Msg) : CBaseLayerMsg(
 	SetUndone(!undone);
 }
 
-const CSerialize CLayerAddMsg::Serialize() const
+CSerialize CLayerAddMsg::Serialize() const
 {
 	CSerialize data(Type(), EventType(), Layer()->Handle(), Layer()->Parent()->Handle(), m_add, Undone());
 	if (!Undone()) // Send new layer's info

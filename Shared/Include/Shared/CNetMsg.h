@@ -69,7 +69,7 @@ public:
 		Socket->write(Serialize().Bytes());
 	}
 
-	virtual const CSerialize Serialize() const = 0;
+	virtual CSerialize Serialize() const = 0;
 	virtual ~CBaseMsg() { }
 
 protected:
@@ -88,7 +88,7 @@ public:
 	inline QString Text() const { return m_text; }
 
 protected:
-	const CSerialize Serialize() const override;
+	CSerialize Serialize() const override;
 		
 private:
 	QString m_text;
@@ -109,7 +109,7 @@ public:
 	inline unsigned Minor() const { return m_minor; }
 
 protected:
-	const CSerialize Serialize() const override;
+	CSerialize Serialize() const override;
 
 private:
 	QString m_prefix = AT_PROTO_PREFIX;
@@ -136,7 +136,7 @@ public:
 	inline QString Pass() const { return m_pass; }
 
 protected:
-	const CSerialize Serialize() const override;
+	CSerialize Serialize() const override;
 
 private:
 	uint8_t m_flags = 0;
@@ -154,7 +154,7 @@ public:
 	inline void SetText(const QString& String) { m_text = String; }
 
 protected:
-	const CSerialize Serialize() const override;
+	CSerialize Serialize() const override;
 
 private:
 	CNetObject m_user = CNetObject(0);
@@ -174,7 +174,7 @@ public:
 	inline void SetMotd(QString Motd, bool IsUrl = false) { m_motd = Motd, m_url = IsUrl; }
 
 protected:
-	const CSerialize Serialize() const override;
+	CSerialize Serialize() const override;
 
 private:
 	bool m_url;
@@ -192,7 +192,7 @@ public:
 	inline unsigned Handle() const { return m_handle; }
 
 protected:
-	const CSerialize Serialize() const override;
+	CSerialize Serialize() const override;
 
 private:
 	QString m_name;
@@ -212,7 +212,9 @@ public:
 	CBaseObjectMsg(CNetMsg* Msg) : CBaseMsg(Msg_Object) {
 		CSerialize::Deserialize(Msg->Data(), m_obj, m_type);
 	}
-	const CSerialize Serialize() const override { return CSerialize(m_obj, m_type); }
+	CSerialize Serialize() const override { return CSerialize(m_obj, m_type); }
+
+	const CNetObject& Object() const { return m_obj; }
 
 protected:
 	CBaseObjectMsg(const CNetObject& Obj, EObject Type)
@@ -222,7 +224,6 @@ private:
 	unsigned m_obj;
 	uint8_t m_type;
 };
-
 
 class CProjSetupMsg : public CBaseMsg
 {
@@ -234,7 +235,7 @@ public:
 	inline unsigned Framerate() const { return m_framerate; }
 
 protected:
-	const CSerialize Serialize() const override;
+	CSerialize Serialize() const override;
 
 private:
 	QString m_name;

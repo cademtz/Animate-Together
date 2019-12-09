@@ -24,7 +24,7 @@ CServerMsg::CServerMsg(CNetMsg * Msg) : CBaseMsg(Msg_Server) {
 	CSerialize::Deserialize(Msg->Data(), m_text);
 }
 
-const CSerialize CServerMsg::Serialize() const {
+CSerialize CServerMsg::Serialize() const {
 	return CSerialize(Type(), m_text.utf16());
 }
 
@@ -39,7 +39,7 @@ bool CProtocolMsg::Compatible()
 		Minor() == AT_PROTO_MINOR;
 }
 
-const CSerialize CProtocolMsg::Serialize() const {
+CSerialize CProtocolMsg::Serialize() const {
 	return CSerialize(Type(), m_prefix, m_major, m_minor);
 }
 
@@ -47,7 +47,7 @@ CLoginMsg::CLoginMsg(CNetMsg * Msg) : CBaseMsg(Msg_Login) {
 	CSerialize::Deserialize(Msg->Data(), m_flags, m_name, m_pass);
 }
 
-const CSerialize CLoginMsg::Serialize() const {
+CSerialize CLoginMsg::Serialize() const {
 	return CSerialize(Type(), m_flags, m_name.utf16(), m_pass);
 }
 
@@ -62,7 +62,7 @@ CChatMsg::CChatMsg(QString Text, const CUser* Sender)
 		m_user = Sender->Handle();
 }
 
-const CSerialize CChatMsg::Serialize() const {
+CSerialize CChatMsg::Serialize() const {
 	return CSerialize(Type(), m_user, m_text.utf16());
 }
 
@@ -70,7 +70,7 @@ CWelcomeMsg::CWelcomeMsg(CNetMsg * Msg) : CBaseMsg(Msg_Welcome) {
 	CSerialize::Deserialize(Msg->Data(), m_url, m_motd);
 }
 
-const CSerialize CWelcomeMsg::Serialize() const {
+CSerialize CWelcomeMsg::Serialize() const {
 	return CSerialize(Type(), m_url, m_motd.utf16());
 }
 
@@ -82,7 +82,7 @@ CJoinMsg::CJoinMsg(const CUser* User)
 	: CBaseMsg(Msg_Join), m_name(User->Name()), m_perms(User->Perms()), m_handle(User->Handle()) {
 }
 
-const CSerialize CJoinMsg::Serialize() const {
+CSerialize CJoinMsg::Serialize() const {
 	return CSerialize(Type(), m_name.utf16(), m_perms, m_handle);
 }
 
@@ -96,7 +96,6 @@ CProjSetupMsg::CProjSetupMsg(const CSharedProject * Project)
 {
 }
 
-const CSerialize CProjSetupMsg::Serialize() const
-{
+CSerialize CProjSetupMsg::Serialize() const {
 	return CSerialize(Type(), m_name.utf16(), m_framerate);
 }
