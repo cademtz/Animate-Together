@@ -8,7 +8,13 @@
 #include "CFolderLayer.h"
 #include "Shared/CSharedProject.h"
 
-LayerList_t CFolderLayer::Layers1D()
+CFolderLayer::CFolderLayer(CSharedProject * Proj, const CSerialize & Data)
+	: CBaseLayer(Layer_Folder), m_proj(Proj)
+{
+
+}
+
+ LayerList_t CFolderLayer::Layers1D()
 {
 	LayerList_t layers;
 	AppendLayers(this, layers);

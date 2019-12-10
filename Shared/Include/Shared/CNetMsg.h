@@ -16,6 +16,7 @@
 #include <qtcpsocket.h>
 #include "Config.h"
 #include "CSerialize.h"
+#include "NetObjects/CNetObject.h"
 
 class CUser;
 class CSharedProject;
@@ -198,31 +199,6 @@ private:
 	QString m_name;
 	uint8_t m_perms;
 	unsigned m_handle;
-};
-
-class CBaseObjectMsg : public CBaseMsg
-{
-public:
-	enum EObject : uint8_t
-	{
-		Object_Project,
-		Object_Folder,
-	};
-
-	CBaseObjectMsg(CNetMsg* Msg) : CBaseMsg(Msg_Object) {
-		CSerialize::Deserialize(Msg->Data(), m_obj, m_type);
-	}
-	CSerialize Serialize() const override { return CSerialize(m_obj, m_type); }
-
-	const CNetObject& Object() const { return m_obj; }
-
-protected:
-	CBaseObjectMsg(const CNetObject& Obj, EObject Type)
-		: CBaseMsg(Msg_Object), m_obj(Obj.Handle()), m_type(Type) { }
-
-private:
-	unsigned m_obj;
-	uint8_t m_type;
 };
 
 class CProjSetupMsg : public CBaseMsg

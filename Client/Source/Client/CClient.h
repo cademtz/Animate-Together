@@ -32,7 +32,7 @@ public:
 	// - Returns the client's own user info
 	// - Value is always null while not joined to a server
 	inline static const CUser* LocalUser() { return Client().m_self; }
-	static const CUser* FromHandle(CNetObject Object);
+	static const CUser* FromHandle(const CNetObject& Object);
 	static inline CSharedProject* Project() { return Client().m_proj; }
 	static inline void Send(const CBaseMsg& Msg) { Client().SendMsg(Msg); }
 

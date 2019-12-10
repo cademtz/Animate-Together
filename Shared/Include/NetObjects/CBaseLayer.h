@@ -28,6 +28,7 @@ class CBaseLayer : public CNetObject, public CEventHandler<CBaseLayerMsg>
 public:
 	enum EType : uint8_t
 	{
+		Layer_Null = 0, // - Reserved for class to describe not-yet deserialized layer data
 		Layer_Folder,
 		Layer_Raster,
 		Layer_Vector,
@@ -37,7 +38,7 @@ public:
 	virtual ~CBaseLayer() { }
 
 	int Index() const;
-	inline EType Type() const { return m_type; }
+	inline EType Type() const { return (EType)m_type; }
 	CFolderLayer* Root() const;
 	CSharedProject* RootProject() const;
 	inline bool IsRoot() { return !m_parent; }
@@ -50,9 +51,13 @@ public:
 
 protected:
 	CBaseLayer(EType Type, CFolderLayer* Parent = nullptr) : m_type(Type), m_parent(Parent) { }
+	CBaseLayer(EType Type, CSharedProject* Proj, const CSerialize& Data);
+
+	void SerializeCustom(CSerialize& Data) const override { Data.Add(m_parent->Handle(), m_name, m_type); }
+	void DeserializeCustom(SerialStream& Data) override;
 
 private:
-	EType m_type;
+	uint8_t m_type;
 	CFolderLayer* m_parent = 0;
 	QString m_name;
 	bool m_visible = true;

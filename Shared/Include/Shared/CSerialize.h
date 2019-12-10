@@ -13,7 +13,6 @@
 
 #include <qstring.h>
 #include <qendian.h>
-#include "NetObjects/CNetObject.h"
 
 struct SerialStream
 {
@@ -35,6 +34,7 @@ public:
 
 	inline const QByteArray Bytes() const { return m_bytes; }
 	static SerialStream Stream(const char* Data) { return { Data }; }
+	inline SerialStream Stream() const { return { m_bytes.constData() }; }
 
 	// - Sets instance's data to use existing serialized bytes
 	inline void SetSerialized(QByteArray Bytes) {
@@ -42,7 +42,7 @@ public:
 	}
 
 	template<typename... VarArgs>
-	inline void Deserialize(VarArgs&... Args) {
+	inline void Deserialize(VarArgs&... Args) const {
 		Next(m_bytes.data() + sizeof(m_bytes.size()), Args...);
 	}
 
@@ -95,8 +95,6 @@ public:
 		for (T item : List)
 			Add(item);
 	}
-
-	inline void Add(const CNetObject& Obj) { Add(Obj.Handle()); }
 
 private:
 
@@ -158,13 +156,6 @@ private:
 			Next(Pos, item);
 			List.append(item);
 		}
-	}
-
-	static inline void Next(const char*& Pos, CNetObject& Obj)
-	{
-		unsigned handle;
-		Next(Pos, handle);
-		Obj = CNetObject(handle);
 	}
 
 	template<typename T>

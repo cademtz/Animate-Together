@@ -8,6 +8,7 @@
 #include "CBaseLayer.h"
 #include "CFolderLayer.h"
 #include "CNetObject.h"
+#include "Shared/CSharedProject.h"
 
 CBaseLayer::Listeners_t CBaseLayer::m_listeners;
 
@@ -29,4 +30,17 @@ CFolderLayer * CBaseLayer::Root() const
 
 CSharedProject * CBaseLayer::RootProject() const {
 	return Root()->_Project();
+}
+
+CBaseLayer::CBaseLayer(EType Type, CSharedProject * Proj, const CSerialize & Data) : m_type(Type)
+{
+
+}
+
+void CBaseLayer::DeserializeCustom(SerialStream & Data)
+{
+	unsigned parent;
+	EType type;
+	Data >> parent >> m_name >> type;
+	assert(m_type == type);
 }

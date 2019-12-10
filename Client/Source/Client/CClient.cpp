@@ -38,7 +38,7 @@ void CClient::Close() {
 	Client().Socket()->close();
 }
 
-const CUser * CClient::FromHandle(CNetObject Object)
+const CUser * CClient::FromHandle(const CNetObject& Object)
 {
 	for (auto user : Client().m_users)
 		if (user->Handle() == Object.Handle())

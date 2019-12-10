@@ -30,6 +30,7 @@ public:
 	CFolderLayer(QString Name = "New Folder") : CBaseLayer(Layer_Folder) {
 		SetName(Name);
 	}
+	CFolderLayer(CSharedProject* Proj, const CSerialize& Data);
 	~CFolderLayer()
 	{
 		for (auto layer : m_layers)
