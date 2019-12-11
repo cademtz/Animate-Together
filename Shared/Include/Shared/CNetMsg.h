@@ -150,7 +150,7 @@ public:
 	CChatMsg(CNetMsg* Msg);
 	CChatMsg(QString Text, const CUser* User = 0);
 
-	inline const CNetObject& User() const { return m_user; }
+	inline const CNetObject User() const { return m_user; }
 	inline const QString& Text() const { return m_text; }
 	inline void SetText(const QString& String) { m_text = String; }
 
@@ -158,7 +158,7 @@ protected:
 	CSerialize Serialize() const override;
 
 private:
-	CNetObject m_user = CNetObject(0);
+	unsigned m_user;
 	QString m_text;
 };
 

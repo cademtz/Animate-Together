@@ -27,10 +27,10 @@ class CFolderLayer : public CBaseLayer
 {
 public:
 	CFolderLayer(CSharedProject* Proj) : CBaseLayer(Layer_Folder), m_proj(Proj) { }
+	CFolderLayer(CSharedProject* Proj, SerialStream& Data) : CBaseLayer(Layer_Folder, Proj, Data) { }
 	CFolderLayer(QString Name = "New Folder") : CBaseLayer(Layer_Folder) {
 		SetName(Name);
 	}
-	CFolderLayer(CSharedProject* Proj, const CSerialize& Data);
 	~CFolderLayer()
 	{
 		for (auto layer : m_layers)
@@ -44,7 +44,7 @@ public:
 	// - Finds a child or the current layer by handle
 	// - Return is null if the layer is not listed
 	template<typename T = CBaseLayer>
-	inline T* FindLayer(const CNetObject& Obj) { return (T*)_FindLayer(Obj); }
+	inline T* FindLayer(const CNetObject& Obj, EType Type = Layer_Null) { return (T*)_FindLayer(Obj, Type); }
 	inline bool Contains(const CNetObject& Obj) const { return _Contains(Obj); }
 	inline bool Contains(const CBaseLayer* Layer) const { return _Contains(Layer->Handle()); }
 
@@ -89,7 +89,7 @@ protected:
 	
 private:
 	bool _Contains(const CNetObject& Obj) const;
-	CBaseLayer* _FindLayer(const CNetObject& Obj);
+	CBaseLayer* _FindLayer(const CNetObject& Obj, EType Type);
 	static void AppendLayers(CBaseLayer* Layer, LayerList_t& List);
 
 	CSharedProject* m_proj = 0;

@@ -57,7 +57,7 @@ public:
 	}
 
 	template<typename T, typename... VarArgs>
-	inline void Add(const T& First, const VarArgs... Args)
+	inline void Add(const T& First, const VarArgs&... Args)
 	{
 		Add(First);
 		Add(Args...);
@@ -135,7 +135,7 @@ private:
 	{
 		int size;
 		Next(Pos, size);
-		Data = CSerialize(Pos, size);
+		Data = CSerialize(QByteArray(Pos, size));
 		Pos += size;
 	}
 

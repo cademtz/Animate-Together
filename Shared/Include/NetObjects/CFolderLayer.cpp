@@ -8,12 +8,6 @@
 #include "CFolderLayer.h"
 #include "Shared/CSharedProject.h"
 
-CFolderLayer::CFolderLayer(CSharedProject * Proj, const CSerialize & Data)
-	: CBaseLayer(Layer_Folder), m_proj(Proj)
-{
-
-}
-
  LayerList_t CFolderLayer::Layers1D()
 {
 	LayerList_t layers;
@@ -84,19 +78,21 @@ bool CFolderLayer::_Contains(const CNetObject & Obj) const
 	return false;
 }
 
-CBaseLayer * CFolderLayer::_FindLayer(const CNetObject & Obj)
+CBaseLayer * CFolderLayer::_FindLayer(const CNetObject & Obj, EType Type)
 {
 	if (Handle() == Obj.Handle())
 		return this;
 
 	for (CBaseLayer* layer : m_layers)
 	{
+		if (Type != Layer_Null && Type != layer->Type())
+			continue;
 		if (layer->Handle() == Obj.Handle())
 			return layer;
-		if (layer->Type() == CBaseLayer::Layer_Folder)
+		if (layer->Type() == Layer_Folder)
 		{
 			CFolderLayer* folder = (CFolderLayer*)layer;
-			if (CBaseLayer* found = folder->_FindLayer(Obj))
+			if (CBaseLayer* found = folder->_FindLayer(Obj, Type))
 				return found;
 		}
 	}

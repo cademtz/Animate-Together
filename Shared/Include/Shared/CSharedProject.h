@@ -38,7 +38,7 @@ public:
 	// - Finds a child layer by handle
 	// - Return is null if the layer is not listed
 	template<typename T = CBaseLayer>
-	inline T* FindLayer(const CNetObject& Obj) { return (T*)m_root.FindLayer(Obj); }
+	inline T* FindLayer(const CNetObject& Obj, CBaseLayer::EType Type = CBaseLayer::Layer_Null) { return (T*)m_root.FindLayer(Obj, Type); }
 	inline bool Contains(const CNetObject& Obj) { return m_root.Contains(Obj); }
 	inline bool Contains(const CBaseLayer* Layer) { return Contains(Layer->Handle()); }
 

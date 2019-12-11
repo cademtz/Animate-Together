@@ -18,7 +18,7 @@ class CNetObject
 {
 public:
 	inline CNetObject(unsigned Handle) : m_handle(Handle) { }
-	CNetObject(SerialStream& Data) { Data >> m_handle; }
+	inline CNetObject(SerialStream& Data) { Data >> m_handle; }
 	inline CNetObject(const CNetObject& Other) : m_handle(Other.m_handle) { }
 
 	inline unsigned Handle() const { return m_handle; }
@@ -30,8 +30,7 @@ public:
 	}
 
 	// - Directly appends the serialized object to 'Data'
-	inline void Serialize(CSerialize& Data) const
-	{
+	inline void Serialize(CSerialize& Data) const {
 		Data.Add(m_handle);
 	}
 
@@ -39,21 +38,12 @@ public:
 
 protected:
 	inline CNetObject() : m_handle(_NewHandle()) { }
-	void Deserialize(const CSerialize& Data)
-	{
-		SerialStream stream = Data.Stream();
-		stream >> m_handle;
-		DeserializeCustom(stream);
-	}
 
-	// - If overriden, adding to `Data` will extend CNetObject's returned data in 'Serialize'
+	// - If overriden, adding to 'Data' will extend CNetObject's returned data in 'Serialize'
 	virtual void SerializeCustom(CSerialize& Data) const { }
 
-	// - If overriden, calling 'Deserialize' on the object will further run this
-	virtual void DeserializeCustom(SerialStream& Data) { }
-
 private:
-	unsigned m_handle;
+	unsigned m_handle = 0;
 	static unsigned m_nexthandle;
 
 	static inline unsigned _NewHandle() { return m_nexthandle++; }

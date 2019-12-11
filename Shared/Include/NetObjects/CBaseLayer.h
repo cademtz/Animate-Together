@@ -35,6 +35,7 @@ public:
 		Layer_Stick,
 		Layer_Audio
 	};
+	CBaseLayer(EType Type, CSharedProject* Proj, SerialStream& Data);
 	virtual ~CBaseLayer() { }
 
 	int Index() const;
@@ -51,10 +52,8 @@ public:
 
 protected:
 	CBaseLayer(EType Type, CFolderLayer* Parent = nullptr) : m_type(Type), m_parent(Parent) { }
-	CBaseLayer(EType Type, CSharedProject* Proj, const CSerialize& Data);
 
-	void SerializeCustom(CSerialize& Data) const override { Data.Add(m_parent->Handle(), m_name, m_type); }
-	void DeserializeCustom(SerialStream& Data) override;
+	void SerializeCustom(CSerialize& Data) const override;
 
 private:
 	uint8_t m_type;

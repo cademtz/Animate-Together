@@ -7,10 +7,19 @@
 
 #include "CBaseLayer.h"
 #include "CFolderLayer.h"
-#include "CNetObject.h"
 #include "Shared/CSharedProject.h"
 
 CBaseLayer::Listeners_t CBaseLayer::m_listeners;
+
+CBaseLayer::CBaseLayer(EType Type, CSharedProject * Proj, SerialStream& Data) : CNetObject(Data), m_type(Type)
+{
+	unsigned parent;
+	uint8_t type;
+	Data >> parent >> m_name >> type;
+
+	assert(m_type == type);
+	m_parent = Proj->FindLayer<CFolderLayer>(parent, Layer_Folder);
+}
 
 int CBaseLayer::Index() const {
 	return Parent()->IndexOf(this->Handle());
@@ -32,15 +41,6 @@ CSharedProject * CBaseLayer::RootProject() const {
 	return Root()->_Project();
 }
 
-CBaseLayer::CBaseLayer(EType Type, CSharedProject * Proj, const CSerialize & Data) : m_type(Type)
-{
-
-}
-
-void CBaseLayer::DeserializeCustom(SerialStream & Data)
-{
-	unsigned parent;
-	EType type;
-	Data >> parent >> m_name >> type;
-	assert(m_type == type);
+void CBaseLayer::SerializeCustom(CSerialize & Data) const {
+	Data.Add(m_parent->Handle(), m_name, m_type);
 }
