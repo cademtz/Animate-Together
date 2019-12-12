@@ -6,6 +6,7 @@
  */
 
 #include "CGraphicsLayer.h"
+#include <qgraphicssceneevent.h>
 #include <qgraphicslinearlayout.h>
 #include <qmenu.h>
 #include "NetObjects/CBaseLayer.h"
@@ -71,6 +72,6 @@ void CGraphicsLayer::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
 	QMenu menu;
 	QAction* remove = menu.addAction(tr("Remove"));
-	if (menu.exec() == remove)
+	if (menu.exec(event->screenPos()) == remove)
 		CClient::Send(CLayerAddMsg(m_layer, false));
 }
