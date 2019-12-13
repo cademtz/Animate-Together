@@ -22,11 +22,11 @@ public:
 	// @ OnChange:	A callback with a pointer to the ColorPicker when the color updates
 	// @ Live:		When true, OnChange is called every time the color updates
 	static bool Open(QColor Color, std::function<void(ColorPicker*)> OnChange, bool Live = false);
-	~ColorPicker() { bExists = false; }
+	~ColorPicker() { m_exists = false; }
 
 	void PaintPreview();
 	void PaintHues();
-	void PaintHueSlider();
+	void PaintSlideBox();
 
 	QColor m_color, m_oldcolor;
 
@@ -34,10 +34,10 @@ private:
 	Ui::ColorPicker ui;
 	bool m_ok = false, m_live;
 	std::function<void(ColorPicker*)> m_callback;
-	static bool bExists;
+	static bool m_exists;
 
-	CQuickPaint* m_preview, * m_hueslide;
-	CColorBox* m_hues;
+	CQuickPaint* m_preview, * m_slidebox;
+	CColorBox* m_freebox;
 
 	ColorPicker(QColor Color, std::function<void(ColorPicker*)> OnChange, bool Live);
 

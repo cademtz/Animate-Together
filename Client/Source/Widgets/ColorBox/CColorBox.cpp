@@ -9,14 +9,13 @@
 #include <qpainter.h>
 #include <qevent.h>
 
-CColorBox::CColorBox(QColor Color, QWidget * Parent) : QWidget(Parent), m_colormode(ColorMode_SaturationValue)
-{
-	updateColor(Color);
+CColorBox::CColorBox(QColor Color, QWidget * Parent) : QWidget(Parent) {
+	UpdateColor(Color);
 }
 
-void CColorBox::updateColormode(e_colormode Colormode)
+void CColorBox::SetColormode(EColorMode Vert, EColorMode Hor)
 {
-	m_colormode = Colormode;
+	m_vert = Vert, m_hor = Hor;
 	update();
 }
 
@@ -32,19 +31,71 @@ void CColorBox::paintEvent(QPaintEvent * Event)
 }
 
 void CColorBox::mousePressEvent(QMouseEvent * Event) {
-	updateColor(Event->pos());
+	UpdateColor(Event->pos());
 }
 void CColorBox::mouseMoveEvent(QMouseEvent * Event) {
-	updateColor(Event->pos());
+	UpdateColor(Event->pos());
 }
 void CColorBox::mouseReleaseEvent(QMouseEvent * Event) {
-	updateColor(Event->pos());
+	UpdateColor(Event->pos());
 }
 void CColorBox::resizeEvent(QResizeEvent * Event) {
-	updateColor(m_color);
+	UpdateColor(m_color);
 }
 
-void CColorBox::updateColor(QPoint Cursor)
+int CColorBox::FromMode(EColorMode Mode) const
+{
+	switch (Mode)
+	{
+	case Mode_Hue:
+		return m_base.hue();
+	case Mode_Sat:
+		return m_base.saturation();
+	case Mode_Val:
+		return m_base.value();
+	}
+	return 0;
+}
+
+
+QColor CColorBox::ColorAt(int X, int Y)
+{
+	if (X < 0)
+		X = 0;
+	else if (X > width())
+		X = width();
+	if (Y < 0)
+		Y = 0;
+	else if (Y > height())
+		Y = height();
+
+	float fx = float(X) / width(), fy = float(Y) / height();
+	int h = m_base.hue(), s = m_base.saturation(), v = m_base.value();
+
+	switch (m_vert)
+	{
+	case Mode_Hue:
+		h = 255 * fy; break;
+	case Mode_Sat:
+		s = 255 * fy; break;
+	case Mode_Val:
+		v = 255 - 255 * fy; break;
+	}
+
+	switch (m_hor)
+	{
+	case Mode_Hue:
+		h = 255 * fx; break;
+	case Mode_Sat:
+		s = 25 * fx; break;
+	case Mode_Val:
+		v = 25 * fx; break;
+	}
+
+	return QColor(h, s, v);
+}
+
+void CColorBox::UpdateColor(QPoint Cursor)
 {
 	int w = width(), h = height();
 	if (Cursor.x() < 0)
@@ -66,23 +117,22 @@ void CColorBox::updateColor(QPoint Cursor)
 		m_callback(this);
 }
 
-void CColorBox::updateColor(QColor Color)
+void CColorBox::UpdateColor(QColor Color)
 {
 	if (Color.hue() == -1)
 		Color = QColor::fromHsv(0, m_base.saturation(), m_base.value(), m_base.alpha());
 	m_base = m_color = Color;
-	switch (m_colormode)
-	{
-	case ColorMode_SaturationValue:
-		m_cursor.setX((float(m_base.saturation()) / 255) * width());
-		m_cursor.setY(((float(m_base.value()) - 255) / -255) * height());
-		break;
-	default:
-		m_cursor = QPoint(0, 0);
-	}
+	m_cursor.setX((float(m_base.saturation()) / 255) * width());
+	m_cursor.setY(((float(m_base.value()) - 255) / -255) * height());
 
 	m_gradient = QImage(size(), QImage::Format::Format_RGB888);
 	for (int y = 0; y < height(); y++)
 		for (int x = 0; x < width(); x++)
 			m_gradient.setPixel(x, y, QColor::fromHsv(m_base.hue(), 255 * (float(x) / width()), 255 - 255 * (float(y) / height())).rgb());
+	update();
+}
+
+void CColorBox::UpdateCursor()
+{
+
 }

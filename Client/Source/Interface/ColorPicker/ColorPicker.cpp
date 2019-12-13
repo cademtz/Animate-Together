@@ -8,11 +8,11 @@
 #include "Widgets/ColorBox/CColorBox.h"
 #include "Brushes/Brushes.h"
 
-bool ColorPicker::bExists = false;
+bool ColorPicker::m_exists = false;
 
 bool ColorPicker::Open(QColor Color, std::function<void(ColorPicker*)> OnChange, bool Live)
 {
-	if (bExists)
+	if (m_exists)
 		return false;
 	new ColorPicker(Color, OnChange, Live);
 	return true;
@@ -21,10 +21,10 @@ bool ColorPicker::Open(QColor Color, std::function<void(ColorPicker*)> OnChange,
 ColorPicker::ColorPicker(QColor Color, std::function<void(ColorPicker*)> OnChange, bool Live)
 	: QWidget(&MainWindow::Get()), m_color(Color), m_oldcolor(Color), m_callback(OnChange), m_live(Live)
 {
-	bExists = true;
+	m_exists = true;
 	ui.setupUi(this);
 
-	setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
+	setAttribute(Qt::WA_DeleteOnClose);
 	setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 	setWindowModality(Qt::ApplicationModal);
 	setFixedSize(size());
@@ -47,19 +47,18 @@ ColorPicker::ColorPicker(QColor Color, std::function<void(ColorPicker*)> OnChang
 	connect(ui.spin_alpha, QOverload<int>::of(&QSpinBox::valueChanged), this, &ColorPicker::UpdateColor);
 
 	m_preview = new CQuickPaint([this]() { PaintPreview(); }, this);
-	m_hues = new CColorBox(m_color, ui.f_huebox);
-	m_hueslide = new CQuickPaint([this]() { PaintHueSlider(); }, this);
+	m_freebox = new CColorBox(m_color, ui.f_freebox);
+	m_slidebox = new CQuickPaint([this]() { PaintSlideBox(); }, this);
 	m_preview->setStyleSheet("border: 1px solid black;");
-	m_hues->setStyleSheet(m_preview->styleSheet());
-	m_hueslide->setStyleSheet(m_preview->styleSheet());
+	m_freebox->setStyleSheet(m_preview->styleSheet());
+	m_slidebox->setStyleSheet(m_preview->styleSheet());
 	
 	ui.l_preview->addWidget(m_preview);
-	//ui.f_huebox->addWidget(m_hues);
-	ui.l_hueslide->addWidget(m_hueslide);
+	ui.l_slidebox->addWidget(m_slidebox);
 
 	ui.btn_cancel->setShortcut(Qt::Key_Escape);
-	m_hues->onChange([this](CColorBox* c) { OnColorBox(c); });
-	m_hues->setGeometry(1, 1, 255, 255);
+	m_freebox->onChange([this](CColorBox* c) { OnColorBox(c); });
+	m_freebox->setGeometry(1, 1, 255, 255);
 	show();
 }
 
@@ -70,7 +69,7 @@ void ColorPicker::UpdateColor()
 		m_callback(this);
 
 	m_preview->update();
-	m_hues->setColor(m_color);
+	m_freebox->SetColor(m_color);
 }
 
 void ColorPicker::PaintPreview()
@@ -88,18 +87,18 @@ void ColorPicker::PaintPreview()
 
 void ColorPicker::PaintHues()
 {
-	QPainter paint(m_hues);
-	QImage img = QImage(m_hues->size().width() - 2, m_hues->size().height() - 2, QImage::Format::Format_RGB888);
+	QPainter paint(m_freebox);
+	QImage img = QImage(m_freebox->size().width() - 2, m_freebox->size().height() - 2, QImage::Format::Format_RGB888);
 	for (int y = 0; y < img.height(); y++)
 		for (int x = 0; x < img.width(); x++)
 			img.setPixel(x, y, QColor::fromHsv(m_color.hue(), 255 * (float(x) / img.width()), 255 - 255 * (float(y) / img.height())).rgb());
 	paint.drawImage(1, 1, img);
 }
 
-void ColorPicker::PaintHueSlider()
+void ColorPicker::PaintSlideBox()
 {
-	QPainter paint(m_hueslide);
-	QImage img = QImage(m_hueslide->size().width() - 2, m_hueslide->size().height() - 2, QImage::Format::Format_RGB888);
+	QPainter paint(m_slidebox);
+	QImage img = QImage(m_slidebox->size().width() - 2, m_slidebox->size().height() - 2, QImage::Format::Format_RGB888);
 	for (int y = 0; y < img.height(); y++)
 		for (int x = 0; x < img.width(); x++)
 			img.setPixel(x, y, QColor::fromHsv(360.f * x / img.width(), 220, 220).rgb());
@@ -125,16 +124,16 @@ void ColorPicker::RevertColor()
 
 void ColorPicker::OnColorBox(CColorBox * ColorBox)
 {
-	m_color = ColorBox->color();
+	m_color = ColorBox->Color();
 	m_color.setAlpha(ui.spin_alpha->value());
 
 	ui.spin_red->blockSignals(true);
 	ui.spin_green->blockSignals(true);
 	ui.spin_blue->blockSignals(true);
 
-	ui.spin_red->setValue(ColorBox->color().red());
-	ui.spin_green->setValue(ColorBox->color().green());
-	ui.spin_blue->setValue(ColorBox->color().blue());
+	ui.spin_red->setValue(ColorBox->Color().red());
+	ui.spin_green->setValue(ColorBox->Color().green());
+	ui.spin_blue->setValue(ColorBox->Color().blue());
 
 	ui.spin_red->blockSignals(false);
 	ui.spin_green->blockSignals(false);

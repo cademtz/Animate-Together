@@ -125,9 +125,9 @@ QPushButton:hover:pressed {
      <height>21</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="l_hueslide"/>
+   <layout class="QVBoxLayout" name="l_slidebox"/>
   </widget>
-  <widget class="QFrame" name="f_huebox">
+  <widget class="QFrame" name="f_freebox">
    <property name="geometry">
     <rect>
      <x>10</x>
