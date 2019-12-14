@@ -48,17 +48,23 @@ ColorPicker::ColorPicker(QColor Color, std::function<void(ColorPicker*)> OnChang
 
 	m_preview = new CQuickPaint([this]() { PaintPreview(); }, this);
 	m_freebox = new CColorBox(m_color, ui.f_freebox);
-	m_slidebox = new CQuickPaint([this]() { PaintSlideBox(); }, this);
+	//m_slidebox = new CQuickPaint([this]() { PaintSlideBox(); }, this);
+	m_colorslide = new CColorBox(Qt::red);
 	m_preview->setStyleSheet("border: 1px solid black;");
 	m_freebox->setStyleSheet(m_preview->styleSheet());
-	m_slidebox->setStyleSheet(m_preview->styleSheet());
+	//m_slidebox->setStyleSheet(m_preview->styleSheet());
 	
 	ui.l_preview->addWidget(m_preview);
-	ui.l_slidebox->addWidget(m_slidebox);
+	//ui.l_slidebox->addWidget(m_slidebox);
+	ui.l_slidebox->addWidget(m_colorslide);
 
 	ui.btn_cancel->setShortcut(Qt::Key_Escape);
-	m_freebox->onChange([this](CColorBox* c) { OnColorBox(c); });
+	m_freebox->OnChange([this](CColorBox* c) { OnColorBox(c); });
 	m_freebox->setGeometry(1, 1, 255, 255);
+	m_colorslide->SetDirection(false, true);
+	m_colorslide->SetColormode(CColorBox::Mode_Hue, CColorBox::Mode_Hue);
+	m_colorslide->OnChange([this](CColorBox* c) { OnSlideBox(c); });
+
 	show();
 }
 
@@ -97,12 +103,12 @@ void ColorPicker::PaintHues()
 
 void ColorPicker::PaintSlideBox()
 {
-	QPainter paint(m_slidebox);
+	/*QPainter paint(m_slidebox);
 	QImage img = QImage(m_slidebox->size().width() - 2, m_slidebox->size().height() - 2, QImage::Format::Format_RGB888);
 	for (int y = 0; y < img.height(); y++)
 		for (int x = 0; x < img.width(); x++)
 			img.setPixel(x, y, QColor::fromHsv(360.f * x / img.width(), 220, 220).rgb());
-	paint.drawImage(1, 1, img);
+	paint.drawImage(1, 1, img);*/
 }
 
 void ColorPicker::Confirm()
@@ -140,4 +146,11 @@ void ColorPicker::OnColorBox(CColorBox * ColorBox)
 	ui.spin_blue->blockSignals(false);
 
 	m_preview->repaint();
+}
+
+void ColorPicker::OnSlideBox(CColorBox * SlideBox)
+{
+	QColor color = m_freebox->Color();
+	color.setHsvF(SlideBox->Color().hueF(), color.saturationF(), color.valueF(), color.alphaF());
+	m_freebox->SetColor(color);
 }

@@ -36,8 +36,8 @@ private:
 	std::function<void(ColorPicker*)> m_callback;
 	static bool m_exists;
 
-	CQuickPaint* m_preview, * m_slidebox;
-	CColorBox* m_freebox;
+	CQuickPaint* m_preview;// , *m_slidebox;
+	CColorBox* m_freebox, * m_colorslide;
 
 	ColorPicker(QColor Color, std::function<void(ColorPicker*)> OnChange, bool Live);
 
@@ -46,6 +46,7 @@ protected:
 	void Confirm();
 	void RevertColor();
 	void OnColorBox(CColorBox* ColorBox);
+	void OnSlideBox(CColorBox* SlideBox);
 };
 
 #endif // ColorPicker_H

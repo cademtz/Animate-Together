@@ -27,16 +27,31 @@ public:
 
 	CColorBox(QColor Color, QWidget* Parent = nullptr);
 
-	inline QColor Color() const { return m_color; }
+	inline const QColor& Color() const { return m_color; }
 	inline EColorMode VerticalColorMode() const { return m_vert; }
 	inline EColorMode HorizontalColorMode() const { return m_hor; }
+	inline bool Up() const { return m_up; }
+	inline bool Left() const { return m_left; }
 
-	// - Changes the base color and repaints
+	// - Sets the base color and repaints
 	inline void SetColor(QColor Color) { UpdateColor(Color); }
-	// - Changes the colormode and repaints
-	void SetColormode(EColorMode Vert, EColorMode Hor);
+
+	// - Sets the colormode and repaints
+	inline void SetColormode(EColorMode Vert, EColorMode Hor)
+	{
+		m_vert = Vert, m_hor = Hor;
+		update();
+	}
+
+	// - Sets the vertical and horizontal direction and repaints
+	inline void SetDirection(bool Up, bool Left)
+	{
+		m_up = Up, m_left = Left;
+		update();
+	}
+
 	// - Sets a callback to be called when the color is changed by the user
-	inline void onChange(std::function<void(CColorBox*)> Callback) { m_callback = Callback; }
+	inline void OnChange(std::function<void(CColorBox*)> Callback) { m_callback = Callback; }
 
 protected:
 	void paintEvent(QPaintEvent* Event);
@@ -47,9 +62,10 @@ protected:
 
 
 private:
-	EColorMode m_vert = Mode_Sat, m_hor = Mode_Val;
+	EColorMode m_vert = Mode_Val, m_hor = Mode_Sat;
+	bool m_up = true, m_left = false;
 	QPoint m_cursor;
-	QColor m_color, m_base;
+	QColor m_color = Qt::white, m_base;
 	QImage m_gradient;
 
 	std::function<void(CColorBox*)> m_callback = nullptr;
@@ -59,6 +75,7 @@ private:
 	inline int VertVal() const { return FromMode(m_vert); }
 
 	QColor ColorAt(int X, int Y);
+	QPoint PosAt(const QColor& Color);
 
 	void UpdateColor(QPoint Cursor);
 	void UpdateColor(QColor Color);
