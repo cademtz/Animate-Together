@@ -14,22 +14,32 @@
 #pragma once
 #endif
 
-#include "NetObject.h"
+#include "CNetObject.h"
+#include "Shared/CSerialize.h"
+
+class CBaseLayer;
 
 class CBaseFrame : public CNetObject
 {
 public:
-	virtual bool IsEmpty() = 0;
+	template <typename T = CBaseFrame>
+	inline T* Clone() const { return (T*)NewClone(); }
+	template<typename T = CBaseFrame>
+	inline T* Parent() const { return (T*)m_parent; }
+	inline bool IsKey() const { return m_parent; }
+
+	virtual bool IsEmpty() const = 0;
 
 protected:
-	// - Creates a hold frame
-	CBaseFrame(CBaseFrame* KeyParent) : m_parent(KeyParent) { }
+	// - Creates a hold frame if 'KeyParent' is set
+	CBaseFrame(CBaseFrame* KeyParent = nullptr) : m_parent(KeyParent) { }
+	void SerializeCustom(CSerialize& Data) const override;
 
-	template<typename T = CBaseFrame>
-	inline T* Parent() const { return m_parent; }
+	virtual CBaseFrame* NewClone() = 0;
 
 private:
 	CBaseFrame* m_parent;
+	CBaseLayer* m_layer;
 };
 
 #endif // CBaseFrame_H

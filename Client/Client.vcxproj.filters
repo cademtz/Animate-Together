@@ -116,9 +116,6 @@
     <ClCompile Include="Source\Graphics\GraphicsStroke\CGraphicsStroke.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Projects\Frame\CFrame.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Graphics\GraphicsLayer\CGraphicsLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -126,6 +123,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\GraphicsFolder\CGraphicsFolder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Projects\Frame\CFrame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -282,9 +282,6 @@
     <ClInclude Include="Source\Graphics\GraphicsStroke\CGraphicsStroke.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Projects\Frame\CFrame.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Graphics\GraphicsLayer\CGraphicsLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -295,6 +292,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\LayoutWrap\CLayoutWrap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Projects\Frame\CFrame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

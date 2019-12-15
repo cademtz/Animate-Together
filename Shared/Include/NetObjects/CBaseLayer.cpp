@@ -41,6 +41,14 @@ CSharedProject * CBaseLayer::RootProject() const {
 	return Root()->_Project();
 }
 
+int CBaseLayer::IndexOf(const CNetObject & Obj) const
+{
+	//for (CBaseFrame* frame : m_frames)
+		//if (frame->Handle() == Obj.Handle())
+			//
+	return -1;
+}
+
 void CBaseLayer::SerializeCustom(CSerialize & Data) const {
 	Data.Add(m_parent->Handle(), m_name, m_type);
 }

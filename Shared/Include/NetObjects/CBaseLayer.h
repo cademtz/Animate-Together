@@ -19,6 +19,7 @@
 
 class CSharedProject;
 class CFolderLayer;
+class CBaseFrame;
 class CBaseLayer;
 
 typedef QList<CBaseLayer*> LayerList_t;
@@ -49,6 +50,8 @@ public:
 	inline void SetName(const QString& Name) { m_name = Name; }
 	inline bool IsVisible() const { return m_visible; }
 	inline void SetVisible(bool Visible) { m_visible = Visible; }
+	//int IndexOf(const CBaseFrame* Frame) const { return IndexOf(Frame->Handle()); }
+	int IndexOf(const CNetObject& Obj) const;
 
 protected:
 	CBaseLayer(EType Type, CFolderLayer* Parent = nullptr) : m_type(Type), m_parent(Parent) { }
@@ -60,6 +63,7 @@ private:
 	CFolderLayer* m_parent = 0;
 	QString m_name;
 	bool m_visible = true;
+	QList<CBaseFrame*> m_frames;
 };
 
 #endif // CBaseLayer_H
