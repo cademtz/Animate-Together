@@ -22,24 +22,39 @@ class CBaseLayer;
 class CBaseFrame : public CNetObject
 {
 public:
+	// - Returns the key that a hold frame is holding
+	// - Value will be the frame itself if it is a key
+	template<typename T = CBaseFrame>
+	inline T* Key() { return (T*)FindKey(); }
+	template<typename T = CBaseFrame>
+	inline const T* Key() const { return Key<T>(); }
+
+	template<typename T = CBaseLayer>
+	inline T* Parent() { return m_parent; }
+	template<typename T = CBaseLayer>
+	inline const T* Parent() const { return m_parent; }
+
+	inline bool IsKey() const { return m_isKey; }
+	virtual bool IsEmpty() const = 0;
+	int Index() const;
+
 	template <typename T = CBaseFrame>
 	inline T* Clone() const { return (T*)NewClone(); }
-	template<typename T = CBaseFrame>
-	inline T* Parent() const { return (T*)m_parent; }
-	inline bool IsKey() const { return m_parent; }
-
-	virtual bool IsEmpty() const = 0;
 
 protected:
-	// - Creates a hold frame if 'KeyParent' is set
-	CBaseFrame(CBaseFrame* KeyParent = nullptr) : m_parent(KeyParent) { }
+	// - If 'IsKey' is false, a hold frame is created
+	CBaseFrame(bool IsKey) : m_isKey(IsKey) { }
 	void SerializeCustom(CSerialize& Data) const override;
 
 	virtual CBaseFrame* NewClone() = 0;
+	CBaseFrame* FindKey();
+
+	friend CBaseLayer;
+	inline void SetParent(CBaseLayer* Layer) { m_parent = Layer; }
 
 private:
-	CBaseFrame* m_parent;
-	CBaseLayer* m_layer;
+	bool m_isKey;
+	CBaseLayer* m_parent;
 };
 
 #endif // CBaseFrame_H

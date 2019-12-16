@@ -40,11 +40,14 @@ public:
 	// - Creates a flattened list of all children
 	// - In order of parent before children including current layer
 	LayerList_t Layers1D();
+	ConstLayerList_t Layers1D() const;
 
 	// - Finds a child or the current layer by handle
 	// - Return is null if the layer is not listed
 	template<typename T = CBaseLayer>
 	inline T* FindLayer(const CNetObject& Obj, EType Type = Layer_Null) { return (T*)_FindLayer(Obj, Type); }
+	template<typename T = CBaseLayer>
+	inline const T* FindLayer(const CNetObject& Obj, EType Type = Layer_Null) const { return (const T*)_FindLayer(Obj, Type); }
 	inline bool Contains(const CNetObject& Obj) const { return _Contains(Obj); }
 	inline bool Contains(const CBaseLayer* Layer) const { return _Contains(Layer->Handle()); }
 
@@ -62,7 +65,8 @@ public:
 	// - Return is negative if the layer is not listed
 	int IndexOf(const CNetObject& Obj);
 	inline int IndexOf(const CBaseLayer* Layer) { return IndexOf(Layer->Handle()); }
-	inline const LayerList_t& Layers() const { return m_layers; }
+	inline const LayerList_t& Layers() { return m_layers; }
+	inline const ConstLayerList_t& Layers() const { return (ConstLayerList_t&)m_layers; }
 
 	// TO DO: Events n stuff for these functions (kinda why the list isn't simply public)
 
@@ -85,12 +89,15 @@ protected:
 
 	// - Returns the instance's project if it is a root folder, otherwise return is null
 	// - Only used when a layer class must access the property
-	inline CSharedProject* _Project() const { return m_proj; }
+	inline CSharedProject* Project() { return m_proj; }
+	inline const CSharedProject* Project() const { return m_proj; }
 	
 private:
 	bool _Contains(const CNetObject& Obj) const;
 	CBaseLayer* _FindLayer(const CNetObject& Obj, EType Type);
+	inline const CBaseLayer* _FindLayer(const CNetObject& Obj, EType Type) const { return _FindLayer(Obj, Type); }
 	static void AppendLayers(CBaseLayer* Layer, LayerList_t& List);
+	static void AppendConstLayers(const CBaseLayer* Layer, ConstLayerList_t& List);
 
 	CSharedProject* m_proj = 0;
 	LayerList_t m_layers;

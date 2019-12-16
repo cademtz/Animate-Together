@@ -6,6 +6,7 @@
  */
 
 #include "CBaseLayer.h"
+#include "CBaseFrame.h"
 #include "CFolderLayer.h"
 #include "Shared/CSharedProject.h"
 
@@ -25,7 +26,7 @@ int CBaseLayer::Index() const {
 	return Parent()->IndexOf(this->Handle());
 }
 
-CFolderLayer * CBaseLayer::Root() const
+CFolderLayer * CBaseLayer::Root()
 {
 	CFolderLayer* folder;
 	if (Type() == Layer_Folder)
@@ -37,16 +38,27 @@ CFolderLayer * CBaseLayer::Root() const
 	return folder;
 }
 
-CSharedProject * CBaseLayer::RootProject() const {
-	return Root()->_Project();
+CSharedProject * CBaseLayer::RootProject() {
+	return Root()->Project();
 }
 
 int CBaseLayer::IndexOf(const CNetObject & Obj) const
 {
-	//for (CBaseFrame* frame : m_frames)
-		//if (frame->Handle() == Obj.Handle())
-			//
+	for (int i = 0; i < m_frames.size(); i++)
+		if (m_frames[i]->Handle() == Obj.Handle())
+			return i;
 	return -1;
+}
+
+CBaseFrame * CBaseLayer::LastKey(int Index)
+{
+	if (!m_frames.size())
+		return nullptr;
+
+	for (auto it = m_frames.begin() + Index; it != m_frames.begin(); it--)
+		if ((*it)->IsKey())
+			return *it;
+	return m_frames.front();
 }
 
 void CBaseLayer::SerializeCustom(CSerialize & Data) const {

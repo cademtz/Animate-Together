@@ -76,6 +76,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Include\NetObjects\CBaseFrame.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Include\NetObjects\CBaseLayer.cpp">
       <SubType>
       </SubType>

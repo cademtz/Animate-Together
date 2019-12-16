@@ -13,6 +13,7 @@
 
 #include <qstring.h>
 #include "CNetObject.h"
+#include "CBaseFrame.h"
 #include "Shared/CEventHandler.h"
 #include "Shared/CNetEvent.h"
 #include "Shared/CSerialize.h"
@@ -23,6 +24,7 @@ class CBaseFrame;
 class CBaseLayer;
 
 typedef QList<CBaseLayer*> LayerList_t;
+typedef QList<const CBaseLayer*> ConstLayerList_t;
 
 class CBaseLayer : public CNetObject, public CEventHandler<CBaseLayerMsg>
 {
@@ -41,17 +43,24 @@ public:
 
 	int Index() const;
 	inline EType Type() const { return (EType)m_type; }
-	CFolderLayer* Root() const;
-	CSharedProject* RootProject() const;
-	inline bool IsRoot() { return !m_parent; }
+	CFolderLayer* Root();
+	inline const CFolderLayer* Root() const { return Root(); }
+	CSharedProject* RootProject();
+	inline const CSharedProject* RootProject() const { return RootProject(); }
+	inline bool IsRoot() const { return !m_parent; }
 	inline CFolderLayer* Parent() const { return m_parent; }
 	inline void SetParent(CFolderLayer* Parent) { m_parent = Parent; }
 	inline QString Name() const { return m_name; }
 	inline void SetName(const QString& Name) { m_name = Name; }
 	inline bool IsVisible() const { return m_visible; }
 	inline void SetVisible(bool Visible) { m_visible = Visible; }
-	//int IndexOf(const CBaseFrame* Frame) const { return IndexOf(Frame->Handle()); }
+
+	// ----- Frame functions ----- //
+
+	int IndexOf(const CBaseFrame* Frame) const { return IndexOf(Frame->Handle()); }
 	int IndexOf(const CNetObject& Obj) const;
+	CBaseFrame* LastKey(int Index);
+	const CBaseFrame* LastKey(int Index) const { return LastKey(Index); }
 
 protected:
 	CBaseLayer(EType Type, CFolderLayer* Parent = nullptr) : m_type(Type), m_parent(Parent) { }

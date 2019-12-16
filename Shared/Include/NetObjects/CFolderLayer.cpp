@@ -15,6 +15,13 @@
 	return layers;
 }
 
+ConstLayerList_t CFolderLayer::Layers1D() const
+{
+	ConstLayerList_t layers;
+	AppendConstLayers(this, layers);
+	return layers;
+}
+
 int CFolderLayer::IndexOf(const CNetObject & Obj)
 {
 	if (Obj.Handle() == Handle())
@@ -109,4 +116,16 @@ void CFolderLayer::AppendLayers(CBaseLayer * Layer, LayerList_t & List)
 	if (Layer->Type() == CBaseLayer::Layer_Folder)
 		for (auto layer : ((CFolderLayer*)Layer)->Layers())
 			AppendLayers(layer, List);
+}
+
+void CFolderLayer::AppendConstLayers(const CBaseLayer * Layer, ConstLayerList_t & List)
+{
+	if (!Layer)
+		return;
+
+	if (!Layer->IsRoot()) // Root layers should never be listed
+		List.append(Layer);
+	if (Layer->Type() == CBaseLayer::Layer_Folder)
+		for (auto layer : ((CFolderLayer*)Layer)->Layers())
+			AppendConstLayers(layer, List);
 }

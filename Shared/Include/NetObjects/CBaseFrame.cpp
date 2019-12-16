@@ -8,7 +8,15 @@
 #include "CBaseFrame.h"
 #include "CBaseLayer.h"
 
-void CBaseFrame::SerializeCustom(CSerialize & Data) const
+int CBaseFrame::Index() const {
+	return m_parent->IndexOf(this);
+}
+
+void CBaseFrame::SerializeCustom(CSerialize & Data) const {
+	Data.Add(m_parent->Handle(), m_isKey, IsEmpty());
+}
+
+CBaseFrame * CBaseFrame::FindKey()
 {
-	Data.Add(m_parent ? m_parent->Handle() : 0, IsEmpty());
+	return m_isKey ? this : m_parent->LastKey(Index());
 }
