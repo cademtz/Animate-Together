@@ -32,14 +32,15 @@ public:
 
 private:
 	Ui::ColorPicker ui;
-	bool m_ok = false, m_live;
+	bool m_ok = false, m_live, m_block = false;
 	std::function<void(ColorPicker*)> m_callback;
 	static bool m_exists;
 
-	CQuickPaint* m_preview;// , *m_slidebox;
-	CColorBox* m_freebox, * m_colorslide;
+	CQuickPaint* m_preview;
+	CColorBox* m_freebox, * m_slidebox;
 
 	ColorPicker(QColor Color, std::function<void(ColorPicker*)> OnChange, bool Live);
+	void BlockUpdates(bool Block);
 
 protected:
 	void UpdateColor();

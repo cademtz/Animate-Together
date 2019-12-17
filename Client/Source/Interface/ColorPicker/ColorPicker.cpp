@@ -48,24 +48,29 @@ ColorPicker::ColorPicker(QColor Color, std::function<void(ColorPicker*)> OnChang
 
 	m_preview = new CQuickPaint([this]() { PaintPreview(); }, this);
 	m_freebox = new CColorBox(m_color, ui.f_freebox);
-	//m_slidebox = new CQuickPaint([this]() { PaintSlideBox(); }, this);
-	m_colorslide = new CColorBox(Qt::red);
+	m_slidebox = new CColorBox(Qt::red);
 	m_preview->setStyleSheet("border: 1px solid black;");
 	m_freebox->setStyleSheet(m_preview->styleSheet());
-	//m_slidebox->setStyleSheet(m_preview->styleSheet());
 	
 	ui.l_preview->addWidget(m_preview);
-	//ui.l_slidebox->addWidget(m_slidebox);
-	ui.l_slidebox->addWidget(m_colorslide);
+	ui.l_slidebox->addWidget(m_slidebox);
 
 	ui.btn_cancel->setShortcut(Qt::Key_Escape);
 	m_freebox->OnChange([this](CColorBox* c) { OnColorBox(c); });
 	m_freebox->setGeometry(1, 1, 255, 255);
-	m_colorslide->SetDirection(false, true);
-	m_colorslide->SetColormode(CColorBox::Mode_Hue, CColorBox::Mode_Hue);
-	m_colorslide->OnChange([this](CColorBox* c) { OnSlideBox(c); });
+	m_slidebox->SetDirection(false, true);
+	m_slidebox->SetColormode(CColorBox::Mode_Hue, CColorBox::Mode_Hue);
+	m_slidebox->OnChange([this](CColorBox* c) { OnSlideBox(c); });
 
 	show();
+}
+
+void ColorPicker::BlockUpdates(bool Block)
+{
+	m_block = Block;
+	ui.spin_red->blockSignals(Block);
+	ui.spin_green->blockSignals(Block);
+	ui.spin_blue->blockSignals(Block);
 }
 
 void ColorPicker::UpdateColor()
@@ -130,27 +135,40 @@ void ColorPicker::RevertColor()
 
 void ColorPicker::OnColorBox(CColorBox * ColorBox)
 {
+	if (m_block)
+		return;
+
 	m_color = ColorBox->Color();
 	m_color.setAlpha(ui.spin_alpha->value());
 
-	ui.spin_red->blockSignals(true);
-	ui.spin_green->blockSignals(true);
-	ui.spin_blue->blockSignals(true);
+	BlockUpdates(true);
 
 	ui.spin_red->setValue(ColorBox->Color().red());
 	ui.spin_green->setValue(ColorBox->Color().green());
 	ui.spin_blue->setValue(ColorBox->Color().blue());
+	m_slidebox->SetColor(QColor::fromHsvF(m_color.hueF(), 1, 1));
 
-	ui.spin_red->blockSignals(false);
-	ui.spin_green->blockSignals(false);
-	ui.spin_blue->blockSignals(false);
+	BlockUpdates(false);
 
 	m_preview->repaint();
 }
 
 void ColorPicker::OnSlideBox(CColorBox * SlideBox)
 {
-	QColor color = m_freebox->Color();
-	color.setHsvF(SlideBox->Color().hueF(), color.saturationF(), color.valueF(), color.alphaF());
-	m_freebox->SetColor(color);
+	if (m_block)
+		return;
+
+	BlockUpdates(true);
+
+	m_color = m_freebox->Color();
+	m_color.setHsvF(SlideBox->Color().hueF(), m_color.saturationF(), m_color.valueF(), m_color.alphaF());
+
+	m_freebox->SetColor(m_color);
+	ui.spin_red->setValue(m_color.red());
+	ui.spin_green->setValue(m_color.green());
+	ui.spin_blue->setValue(m_color.blue());
+
+	BlockUpdates(false);
+
+	m_preview->repaint();
 }
