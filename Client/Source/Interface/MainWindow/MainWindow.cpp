@@ -74,8 +74,10 @@ MainWindow::MainWindow(QWidget *parent)
 	ui.tool_stack->addWidget(m_timeline);
 	resize(width(), height() + m_titlebar->height() + m_toolbar->height() + m_timeline->minimumHeight());
 
+#ifdef _DEBUG
 	QGraphicsView* view = new QGraphicsView(&CTimelineScene::Scene());
 	view->show();
+#endif
 
 	CUndoStack::Listen([this](const CUndoAction* Undo) { UndoStackEvent(Undo); });
 	CClient::Listen([this](const CBaseMsg* Msg) { ClientEvent(Msg); });

@@ -35,6 +35,7 @@ private:
 
 	QFile m_file;
 	QJsonObject m_obj;
+	bool m_change = false;
 };
 
 class CServerCfg : private CJsonConfig
