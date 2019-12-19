@@ -70,9 +70,11 @@ public:
 
 	// TO DO: Events n stuff for these functions (kinda why the list isn't simply public)
 
-	// - Finds and removes a child layer by pointer
-	// - Returns true if Layer is listed
+	// - Returns true if 'Layer' is listed
 	bool Remove(CBaseLayer* Layer);
+
+	// - Returns true if 'Layer' is listed and operation succeeds
+	bool Move(int Index, CBaseLayer* Layer);
 	inline void Append(CBaseLayer* Layer) { Insert(m_layers.size(), Layer); }
 	void Insert(int Index, CBaseLayer* Layer);
 

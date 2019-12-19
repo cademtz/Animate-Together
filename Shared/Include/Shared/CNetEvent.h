@@ -25,6 +25,7 @@ public:
 	{
 		Event_SharedProj = 0,
 		Event_LayerAdd,
+		Event_LayerEdit,
 	};
 
 	// - Performs the event. Every call toggles between revert and redo
@@ -122,6 +123,37 @@ private:
 	CFolderLayer* m_parent;
 	int m_index = 0;
 	bool m_add;
+};
+
+class CLayerEditMsg : public CBaseLayerMsg
+{
+public:
+	enum EEditFlags : uint8_t
+	{
+		Edit_Name = (1 << 0),
+		Edit_Owner = (1 << 1),
+		Edit_Index = (1 << 2), // - Layer was moved
+	};
+	CLayerEditMsg(CBaseLayer* Layer) : CBaseLayerMsg(Event_LayerEdit, Layer) { }
+	CLayerEditMsg(CSharedProject* Proj, CNetMsg* Msg);
+
+	inline EEditFlags Edited() const { return (EEditFlags)m_edits; }
+	inline const QString& NewName() const { return m_name; }
+	inline const CNetObject& NewOwner() const { return m_owner; }
+	inline int NewIndex() const { return m_index; }
+	void SetNewName(const QString& Name) { m_name = Name, m_edits &= Edit_Name; }
+	void SetNewOwner(const CNetObject& Handle) { m_owner = Handle, m_edits &= Edit_Owner; }
+	void SetNewIndex(int Index) { m_index = Index, m_edits &= Edit_Index; }
+
+protected:
+	CSerialize Serialize() const override;
+	void _Flip(bool Revert) override;
+
+private:
+	uint8_t m_edits;
+	QString m_name;
+	CNetObject m_owner = 0;
+	int m_index;
 };
 
 #endif // CNetEvent_H

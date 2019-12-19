@@ -54,6 +54,9 @@ public:
 	inline void SetName(const QString& Name) { m_name = Name; }
 	inline bool IsVisible() const { return m_visible; }
 	inline void SetVisible(bool Visible) { m_visible = Visible; }
+	inline const CNetObject& Owner() const { return m_owner; }
+	inline void SetOwner(const CNetObject& Owner) { m_owner = Owner; }
+	inline bool IsPrivate() const { return m_owner.Handle() != 0; }
 
 	// ----- Frame functions ----- //
 
@@ -72,6 +75,7 @@ private:
 	CFolderLayer* m_parent = 0;
 	QString m_name;
 	bool m_visible = true;
+	CNetObject m_owner = 0;
 	QList<CBaseFrame*> m_frames;
 };
 

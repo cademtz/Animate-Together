@@ -149,25 +149,18 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		}
 		break;
 	}
-	case CBaseMsg::Msg_Welcome:
-	{
-		SendMsg(CChatMsg("Hello from animator!"));
-		CMotdView::Open(CWelcomeMsg(Msg));
-		break;
-	}
 	case CBaseMsg::Msg_Join:
 	{
 		CJoinMsg join(Msg);
 		m_users.push_back(new CUser(join));
 		break;
 	}
-	case CBaseMsg::Msg_Chat:
-	{
-		CChatMsg chat(Msg);
-		CreateEvent(chat);
-		QMessageBox(QMessageBox::NoIcon, FromHandle(chat.User())->Name(), chat.Text()).exec();
+	case CBaseMsg::Msg_Welcome:
+		CMotdView::Open(CWelcomeMsg(Msg));
 		break;
-	}
+	case CBaseMsg::Msg_Chat:
+		CreateEvent(CChatMsg(Msg));
+		break;
 	}
 }
 

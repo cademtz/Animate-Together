@@ -35,6 +35,16 @@ int CFolderLayer::IndexOf(const CNetObject & Obj)
 	return -1;
 }
 
+bool CFolderLayer::Move(int Index, CBaseLayer * Layer)
+{
+	if (m_layers.removeOne(Layer) && Index <= m_layers.size())
+	{
+		m_layers.insert(Index, Layer);
+		return true;
+	}
+	return false;
+}
+
 void CFolderLayer::Insert(int Index, CBaseLayer * Layer)
 {
 	Layer->SetParent(this);

@@ -67,3 +67,62 @@ void CLayerAddMsg::_Flip(bool Revert)
 	else
 		Project()->Root().Remove(Layer());
 }
+
+CLayerEditMsg::CLayerEditMsg(CSharedProject * Proj, CNetMsg * Msg) : CBaseLayerMsg(Event_LayerEdit, Proj)
+{
+	uint8_t type, eventtype;
+	bool undone;
+	unsigned layer;
+
+	SerialStream s = CSerialize::Stream(Msg->Data());
+	s >> type >> eventtype >> undone >> layer >> m_edits;
+
+	SetLayer(Proj->FindLayer(layer));
+	SetUndone(!undone);
+
+	if (m_edits & Edit_Name)
+		s >> m_name;
+	if (m_edits & Edit_Owner)
+	{
+		unsigned owner;
+		s >> owner;
+		m_owner = owner;
+	}
+	if (m_edits & Edit_Index)
+		s >> m_index;
+}
+
+CSerialize CLayerEditMsg::Serialize() const
+{
+	CSerialize data(Type(), EventType(), Undone(), Layer()->Handle(), m_edits);
+	if (m_edits & Edit_Name)
+		data.Add(m_name);
+	if (m_edits & Edit_Owner)
+		data.Add(m_owner.Handle());
+	if (m_edits & Edit_Index)
+		data.Add(m_index);
+	return data;
+}
+
+void CLayerEditMsg::_Flip(bool Revert)
+{
+	// No need to check 'Revert' since data is simply swapped
+	if (m_edits & Edit_Name)
+	{
+		QString name = Layer()->Name();
+		Layer()->SetName(m_name);
+		m_name = name;
+	}
+	if (m_edits & Edit_Owner)
+	{
+		CNetObject owner = Layer()->Owner();
+		Layer()->SetOwner(m_owner);
+		m_owner = owner;
+	}
+	if (m_edits & Edit_Index)
+	{
+		int index = Layer()->Index();
+		Layer()->Parent()->Move(m_index, Layer());
+		m_index = index;
+	}
+}

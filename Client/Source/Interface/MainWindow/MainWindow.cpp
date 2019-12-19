@@ -13,6 +13,7 @@
 #include "Widgets/ToolBar/CToolBar.h"
 #include "Widgets/TitleBar/CTitleBar.h"
 #include "Widgets/Timeline/CTimeline.h"
+#include "Widgets/ChatPanel/CChatPanel.h"
 #include "Widgets/MiniPalette/CMiniPalette.h"
 #include "Interface/ColorPicker/ColorPicker.h"
 #include "Interface/Login/CLogin.h"
@@ -76,6 +77,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 #ifdef _DEBUG
 	QGraphicsView* view = new QGraphicsView(&CTimelineScene::Scene());
+	CChatPanel* chat = new CChatPanel();
+	chat->show();
 	view->show();
 #endif
 
