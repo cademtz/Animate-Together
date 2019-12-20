@@ -44,14 +44,17 @@ CChatPanel::CChatPanel(QWidget * Parent)
 
 void CChatPanel::HandleMsg(CBaseMsg * const Msg)
 {
+	QScrollBar* scroll = m_browser->verticalScrollBar();
+	bool atEnd = scroll->sliderPosition() == scroll->maximum();
+	QTextCharFormat plain;
+	plain.setFont(QFont("Tahoma", 8));
+
 	switch (Msg->Type())
 	{
 	case CBaseMsg::Msg_Chat:
 	{
 		auto chat = (CChatMsg* const)Msg;
-		QScrollBar* scroll = m_browser->verticalScrollBar();
-		bool atEnd = scroll->sliderPosition() == scroll->maximum();
-
+		
 		QTextCursor edit = QTextCursor(m_doc);
 		edit.movePosition(QTextCursor::End);
 
@@ -60,14 +63,46 @@ void CChatPanel::HandleMsg(CBaseMsg * const Msg)
 		bold = plain;
 		bold.setFontWeight(70);
 
-		edit.setCharFormat(bold);
 		edit.insertText(CClient::FromHandle(chat->User())->Name(), bold);
 		edit.insertText(": " + chat->Text() + '\n', plain);
+		break;
+	}
+	case CBaseMsg::Msg_Join:
+	{
+		auto join = (CJoinMsg* const)Msg;
 
-		if (atEnd)
-			scroll->setSliderPosition(scroll->maximum());
+		QTextCursor edit = QTextCursor(m_doc);
+		edit.movePosition(QTextCursor::End);
+
+		QTextCharFormat bold;
+		plain.setForeground(QColor(20, 80, 170));
+		bold = plain;
+		bold.setFontWeight(70);
+
+		edit.insertText(join->Name() + ' ', bold);
+		edit.insertText(tr("joined the server") + '\n', plain);
+		break;
+	}
+	case CBaseMsg::Msg_Leave:
+	{
+		auto left = (CLeaveMsg* const)Msg;
+
+		QTextCursor edit = QTextCursor(m_doc);
+		edit.movePosition(QTextCursor::End);
+
+		QTextCharFormat bold;
+		plain.setForeground(QColor(20, 80, 170));
+		bold = plain;
+		bold.setFontWeight(70);
+
+		edit.insertText(CClient::FromHandle(left->UserHandle())->Name() + ' ', bold);
+		edit.insertText(tr("left the server") + '\n', plain);
+		break;
 	}
 	}
+
+	if (atEnd)
+		scroll->setSliderPosition(scroll->maximum());
 }
 
 void CChatPanel::OnSend()

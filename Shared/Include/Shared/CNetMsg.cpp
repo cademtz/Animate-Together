@@ -99,3 +99,6 @@ CProjSetupMsg::CProjSetupMsg(const CSharedProject * Project)
 CSerialize CProjSetupMsg::Serialize() const {
 	return CSerialize(Type(), m_name.utf16(), m_framerate);
 }
+
+CLeaveMsg::CLeaveMsg(const CUser * User)
+	: CBaseMsg(Msg_Leave), m_handle(User->Handle()) { }

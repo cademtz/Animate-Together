@@ -55,6 +55,7 @@ public:
 		Msg_Protocol,	// - Sender's protocol info
 		Msg_Login,		// - Sender requesting or sending login info
 		Msg_Join,		// - Server accepts login and sends public user info
+		Msg_Leave,		// - Server notifies clients upon a user leaving
 		Msg_Kick,		// - User request to kick
 		Msg_Ban,		// - User request to ban
 		Msg_Chat,		// - Chat message from server or user
@@ -198,6 +199,23 @@ protected:
 private:
 	QString m_name;
 	uint8_t m_perms;
+	unsigned m_handle;
+};
+
+class CLeaveMsg : public CBaseMsg
+{
+public:
+	CLeaveMsg(CNetMsg* Msg) : CBaseMsg(Msg_Leave) {
+		CSerialize::Deserialize(Msg->Data(), m_handle);
+	}
+	CLeaveMsg(const CUser* User);
+
+	inline unsigned UserHandle() const { return m_handle; }
+
+protected:
+	CSerialize Serialize() const override { return CSerialize(Type(), m_handle); }
+
+private:
 	unsigned m_handle;
 };
 

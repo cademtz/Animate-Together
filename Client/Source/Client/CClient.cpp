@@ -153,7 +153,23 @@ void CClient::HandleMsg(CNetMsg * Msg)
 	{
 		CJoinMsg join(Msg);
 		m_users.push_back(new CUser(join));
+		CreateEvent(join);
 		break;
+	}
+	case CBaseMsg::Msg_Leave:
+	{
+		CLeaveMsg left(Msg);
+		CreateEvent(left);
+
+		CUser* ragequit = nullptr;
+		for (auto it = m_users.begin(); it != m_users.end(); it++)
+		{
+			if (left.UserHandle() == (*it)->Handle())
+			{
+				m_users.erase(it);
+				break;
+			}
+		}
 	}
 	case CBaseMsg::Msg_Welcome:
 		CMotdView::Open(CWelcomeMsg(Msg));
