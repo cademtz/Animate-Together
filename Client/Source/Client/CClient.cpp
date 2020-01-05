@@ -170,6 +170,7 @@ void CClient::HandleMsg(CNetMsg * Msg)
 				break;
 			}
 		}
+		break;
 	}
 	case CBaseMsg::Msg_Welcome:
 		CMotdView::Open(CWelcomeMsg(Msg));

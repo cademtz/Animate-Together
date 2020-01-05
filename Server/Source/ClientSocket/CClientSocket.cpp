@@ -109,9 +109,12 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 
 void CClientSocket::Disconnected()
 {
+	// Code here is not called because server already connects the 'disconnected' signal
+	/*
 	qInfo() << (m_user ? m_user->Name() : "") << " Disconnected" << "(IP: " << Socket()->peerAddress() << ')';
 	if (m_user)
 		m_parent->SendAll(CLeaveMsg(m_user));
+	*/
 }
 
 CClientSocket::ELogin CClientSocket::CheckLogin(const CLoginMsg& Login)

@@ -9,6 +9,7 @@
 #include <qtcpsocket.h>
 #include <Shared/CNetMsg.h>
 #include <Shared/Protocol.h>
+#include <NetObjects/CUser.h>
 #include <Shared/CJsonConfig.h>
 #include "ClientSocket/CClientSocket.h"
 
@@ -77,16 +78,19 @@ void CServer::ClientConnect()
 void CServer::ClientDisconnect()
 {
 	QTcpSocket* sock = (QTcpSocket*)QObject::sender();
-	for (int i = 0; i < m_clients.size(); i++)
+	CClientSocket* client = GetClient(sock);
+	if (!client)
 	{
-		if (m_clients[i]->Socket() == sock)
-		{
-			delete m_clients[i];
-			m_clients.removeAt(i);
-			break;
-		}
+		qInfo() << "Unidentified socket disconnected (IP: " << sock->peerAddress() << ')';
+		return;
 	}
-	qInfo() << sock->peerAddress() << " Disconnected";
+
+	qInfo() << (client->User() ? client->User()->Name() : "") << " Disconnected" << "(IP: " << sock->peerAddress() << ')';
+	if (client->User())
+		SendAll(CLeaveMsg(client->User()));
+
+	delete client;
+	m_clients.removeOne(client);
 }
 
 CClientSocket * CServer::GetClient(QTcpSocket * Socket)
