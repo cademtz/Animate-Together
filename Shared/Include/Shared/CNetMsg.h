@@ -61,7 +61,7 @@ public:
 		Msg_Chat,		// - Chat message from server or user
 		Msg_Welcome,	// - Server is sending the MOTD
 		Msg_ProjSetup,	// - Carries necessary data to initialize shared projects
-		Msg_Object,		// - Carrries data to initialize a net object	
+		Msg_Object,		// - Carrries data to initialize a net object
 		Msg_Event,		// - Server or client has performed a specific action
 	};
 

@@ -66,6 +66,19 @@ void CGraphicsLayer::SetLayer(CBaseLayer * Layer)
 
 void CGraphicsLayer::OnLayerEvent(CBaseLayerMsg * Event)
 {
+	if (Event->Layer() != m_layer)
+		return;
+
+	switch (Event->Type())
+	{
+	case CNetEvent::Event_LayerEdit:
+	{
+		CLayerEditMsg* edit = (CLayerEditMsg*)Event;
+		if (edit->Edited() & CLayerEditMsg::Edit_Name)
+			m_label->setPlainText(edit->NewName());
+		break;
+	}
+	}
 }
 
 void CGraphicsLayer::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)

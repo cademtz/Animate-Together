@@ -22,16 +22,14 @@ ConstLayerList_t CFolderLayer::Layers1D() const
 	return layers;
 }
 
-int CFolderLayer::IndexOf(const CNetObject & Obj)
+int CFolderLayer::IndexOf(const CNetObject & Obj) const
 {
 	if (Obj.Handle() == Handle())
 		return -1;
 
 	for (int i = 0; i < m_layers.size(); i++)
-	{
 		if (m_layers[i]->Handle() == Obj.Handle())
 			return i;
-	}
 	return -1;
 }
 

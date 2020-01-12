@@ -49,57 +49,68 @@ void CGraphicsFolder::SetFolder(CFolderLayer * Folder)
 		delete m_layerlist->children().back();
 
 	for (auto layer : m_folder->Layers())
-		InsertLayer(*layer);
+		InsertLayer(layer);
 
 	m_layerlist->setVisible(m_open);
 	m_layout->addItem(m_layerlist);
 }
 
-void CGraphicsFolder::InsertLayer(const CNetObject & Layer)
-{
-	CBaseLayer* layer = m_folder->FindLayer(Layer);
-	if (!layer)
-		return; // This folder does not own specified layer
-
-	QGraphicsLayoutItem* item;
-	if (layer->Type() == CBaseLayer::Layer_Folder)
-		item = new CGraphicsFolder((CFolderLayer*)layer);
-	else
-		item = new CGraphicsLayer(layer);
-	m_listlayout->insertItem(layer->Index(), item);
-}
-
-void CGraphicsFolder::RemoveLayer(const CBaseLayer* Layer)
+QGraphicsWidget * CGraphicsFolder::FindLayerWidget(const CBaseLayer * Layer)
 {
 	for (auto item : m_layerlist->childItems())
 	{
-		bool found = false;
+		QGraphicsWidget* found = nullptr;
 		switch (item->type())
 		{
 		case (int)e_graphicstype::FolderLayer:
 		{
 			CGraphicsFolder* folder = (CGraphicsFolder*)item;
 			if (folder->Folder() == Layer)
-			{
-				delete folder;
-				found = true;
-			}
+				found = folder;
 			break;
 		}
 		case (int)e_graphicstype::Layer:
 		{
 			CGraphicsLayer* layer = (CGraphicsLayer*)item;
 			if (layer->Layer() == Layer)
-			{
-				delete layer;
-				found = true;
-			}
+				found = layer;
 			break;
 		}
 		}
 		if (found)
-			break;
+			return found;
 	}
+	return nullptr;
+}
+
+void CGraphicsFolder::InsertLayer(CBaseLayer* Layer)
+{
+	if (!Layer || !m_folder->IsDirectChild(Layer->Handle()))
+		return; // This folder does not own specified layer
+
+	QGraphicsLayoutItem* item;
+	if (Layer->Type() == CBaseLayer::Layer_Folder)
+		item = new CGraphicsFolder((CFolderLayer*)Layer);
+	else
+		item = new CGraphicsLayer(Layer);
+	m_listlayout->insertItem(Layer->Index(), item);
+}
+
+void CGraphicsFolder::RemoveLayer(const CBaseLayer* Layer)
+{
+	QGraphicsWidget* item = FindLayerWidget(Layer);
+	if (item)
+		delete item;
+}
+
+void CGraphicsFolder::MoveLayer(int Index, const CBaseLayer * Layer)
+{
+	QGraphicsWidget* item = FindLayerWidget(Layer);
+	if (!item)
+		return;
+
+	m_listlayout->removeItem(item);
+	m_listlayout->insertItem(Index, item);
 }
 
 void CGraphicsFolder::OnLayerEvent(CBaseLayerMsg * Event)
@@ -110,9 +121,17 @@ void CGraphicsFolder::OnLayerEvent(CBaseLayerMsg * Event)
 	{
 		CLayerAddMsg* add = (CLayerAddMsg*)Event;
 		if (add->WasAdded() && m_folder->IsDirectChild(add->Layer()))
-			InsertLayer(*add->Layer());
+			InsertLayer(add->Layer());
 		else if (!add->WasAdded())
 			RemoveLayer(add->Layer());
+		break;
+	}
+	case CNetEvent::Event_LayerEdit:
+	{
+		CLayerEditMsg* edit = (CLayerEditMsg*)Event;
+		if (edit->Edited() & CLayerEditMsg::Edit_Index && m_folder->IsDirectChild(edit->Layer()))
+			MoveLayer(edit->NewIndex(), edit->Layer());
+		break;
 	}
 	}
 }

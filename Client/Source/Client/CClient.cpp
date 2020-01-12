@@ -146,6 +146,12 @@ void CClient::HandleMsg(CNetMsg * Msg)
 			}
 			break;
 		}
+		case CNetEvent::Event_LayerEdit:
+		{
+			CLayerEditMsg edit(m_proj, Msg);
+			edit.Perform();
+			CreateEvent(edit);
+		}
 		}
 		break;
 	}

@@ -28,8 +28,10 @@ public:
 	int	type() const override { return (int)e_graphicstype::FolderLayer; }
 
 private:
-	void InsertLayer(const CNetObject& Layer);
+	QGraphicsWidget* FindLayerWidget(const CBaseLayer* Layer);
+	void InsertLayer(CBaseLayer* Layer);
 	void RemoveLayer(const CBaseLayer* Layer);
+	void MoveLayer(int Index, const CBaseLayer* Layer);
 
 	void OnLayerEvent(CBaseLayerMsg* Event);
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;

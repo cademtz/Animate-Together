@@ -51,20 +51,17 @@ public:
 	inline bool Contains(const CNetObject& Obj) const { return _Contains(Obj); }
 	inline bool Contains(const CBaseLayer* Layer) const { return _Contains(Layer->Handle()); }
 
-	// - Returns true if the layer exists strictly in the folder's list
-	inline bool IsDirectChild(const CNetObject& Obj) const
-	{
-		for (auto layer : m_layers)
-			if (layer->Handle() == Obj.Handle())
-				return true;
-		return false;
-	}
-	inline bool IsDirectChild(const CBaseLayer* Layer) const { return IsDirectChild(Layer->Handle()); }
+	template<typename T = CBaseLayer>
+	inline T* FindDirectChild(const CNetObject& Obj, EType Type = Layer_Null) { return _FindDirectChild(Obj, Type); }
+	template<typename T = CBaseLayer>
+	inline const T* FindDirectChild(const CNetObject& Obj, EType Type = Layer_Null) const { return _FindDirectChild(Obj, Type); }
+	inline bool IsDirectChild(const CNetObject& Obj) const { return FindDirectChild(Obj); }
+	inline bool IsDirectChild(const CBaseLayer* Layer) const { return Layer->Parent() == this; }
 
 	// - Finds the index of an immediate descendant layer
 	// - Return is negative if the layer is not listed
-	int IndexOf(const CNetObject& Obj);
-	inline int IndexOf(const CBaseLayer* Layer) { return IndexOf(Layer->Handle()); }
+	int IndexOf(const CNetObject& Obj) const;
+	inline int IndexOf(const CBaseLayer* Layer) const { return IndexOf(Layer->Handle()); }
 	inline const LayerList_t& Layers() { return m_layers; }
 	inline const ConstLayerList_t& Layers() const { return (ConstLayerList_t&)m_layers; }
 
@@ -98,6 +95,13 @@ private:
 	bool _Contains(const CNetObject& Obj) const;
 	CBaseLayer* _FindLayer(const CNetObject& Obj, EType Type);
 	inline const CBaseLayer* _FindLayer(const CNetObject& Obj, EType Type) const { return _FindLayer(Obj, Type); }
+	inline CBaseLayer* _FindDirectChild(const CNetObject& Obj, EType Type) const
+	{
+		for (auto layer : m_layers)
+			if (layer->Handle() == Obj.Handle())
+				return layer;
+		return nullptr;
+	}
 	static void AppendLayers(CBaseLayer* Layer, LayerList_t& List);
 	static void AppendConstLayers(const CBaseLayer* Layer, ConstLayerList_t& List);
 

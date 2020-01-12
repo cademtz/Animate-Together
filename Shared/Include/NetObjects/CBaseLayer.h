@@ -48,7 +48,8 @@ public:
 	CSharedProject* RootProject();
 	inline const CSharedProject* RootProject() const { return RootProject(); }
 	inline bool IsRoot() const { return !m_parent; }
-	inline CFolderLayer* Parent() const { return m_parent; }
+	inline CFolderLayer* Parent() { return m_parent; }
+	inline const CFolderLayer* Parent() const { return m_parent; }
 	inline void SetParent(CFolderLayer* Parent) { m_parent = Parent; }
 	inline QString Name() const { return m_name; }
 	inline void SetName(const QString& Name) { m_name = Name; }
