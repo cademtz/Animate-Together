@@ -9,7 +9,7 @@
 #include <qgraphicssceneevent.h>
 #include <qgraphicslinearlayout.h>
 #include <qmenu.h>
-#include "NetObjects/CBaseLayer.h"
+#include "NetObjects/CFolderLayer.h"
 #include "Client/CClient.h"
 
 CGraphicsLayer::CGraphicsLayer(CBaseLayer * Layer, QGraphicsItem * Parent)
@@ -84,7 +84,44 @@ void CGraphicsLayer::OnLayerEvent(CBaseLayerMsg * Event)
 void CGraphicsLayer::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
 	QMenu menu;
-	QAction* remove = menu.addAction(tr("Remove"));
-	if (menu.exec(event->screenPos()) == remove)
+	QAction* remove = menu.addAction(tr("Remove")),
+		* moveup = menu.addAction(tr("Move up")),
+		* movedown = menu.addAction(tr("Move down"));
+
+	if (!m_layer->Parent())
+	{
+		moveup->setDisabled(true);
+		movedown->setDisabled(true);
+	}
+
+	QAction* action = menu.exec(event->screenPos());
+	if (action == remove)
 		CClient::Send(CLayerAddMsg(m_layer, false));
+	else if (action == moveup || action == movedown)
+	{
+		bool cool = false;
+		int index = m_layer->Index();
+		CFolderLayer* parent = m_layer->Parent();
+		if (parent)
+		{
+			int newindex = index + (action == moveup ? -1 : 1);
+			if (newindex >= 0 && newindex <= parent->Layers().size() - 1)
+			{
+				index = newindex;
+				cool = true;
+			}
+			else if (parent->Parent())
+			{
+				index = parent->Index() + (newindex > 0);
+				parent = parent->Parent();
+				cool = true;
+			}
+		}
+		if (cool)
+		{
+			CLayerEditMsg move(m_layer);
+			move.SetNewPlace(index, parent);
+			CClient::Send(move);
+		}
+	}
 }

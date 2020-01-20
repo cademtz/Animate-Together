@@ -101,6 +101,16 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 					out.prepend(parent->Name() + " > ");
 				qInfo() << out;
 			}
+			break;
+		}
+		case CNetEvent::Event_LayerEdit:
+		{
+			if (!(m_user->Perms() & CUser::Perm_Guest))
+				break;
+			CLayerEditMsg edit(m_parent->Project(), Msg);
+			edit.Perform();
+			m_parent->SendAll(edit);
+			break;
 		}
 		}
 	}

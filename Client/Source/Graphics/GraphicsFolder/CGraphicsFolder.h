@@ -15,6 +15,7 @@
 #include "Graphics/GraphicsLayer/CGraphicsLayer.h"
 
 class CFolderLayer;
+class CBaseMsg;
 class CBaseLayerMsg;
 
 class CGraphicsFolder : public QGraphicsWidget
@@ -31,8 +32,9 @@ private:
 	QGraphicsWidget* FindLayerWidget(const CBaseLayer* Layer);
 	void InsertLayer(CBaseLayer* Layer);
 	void RemoveLayer(const CBaseLayer* Layer);
-	void MoveLayer(int Index, const CBaseLayer* Layer);
+	void MoveLayer(int Index, CBaseLayer* Layer);
 
+	void OnClientEvent(CBaseMsg* Msg);
 	void OnLayerEvent(CBaseLayerMsg* Event);
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
@@ -41,7 +43,7 @@ private:
 	QGraphicsWidget* m_layerlist;
 	QGraphicsLinearLayout* m_layout, * m_listlayout;
 	bool m_open = true;
-	unsigned m_listener;
+	unsigned m_listenlayer, m_listenclient;
 };
 
 #endif // CGraphicsFolder_H

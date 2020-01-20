@@ -6,6 +6,7 @@
  */
 
 #include "CGraphicsFolder.h"
+#include "Client/CClient.h"
 #include <qgraphicslinearlayout.h>
 #include <NetObjects/CFolderLayer.h>
 
@@ -32,12 +33,14 @@ CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder, QGraphicsItem* Parent) :
 
 	adjustSize();
 
-	m_listener = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
+	m_listenlayer = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
+	m_listenclient = CClient::Listen([this](CBaseMsg* Event) { OnClientEvent(Event); });
 }
 
 CGraphicsFolder::~CGraphicsFolder()
 {
-	CBaseLayer::EndListen(m_listener);
+	CBaseLayer::EndListen(m_listenlayer);
+	CClient::EndListen(m_listenclient);
 }
 
 void CGraphicsFolder::SetFolder(CFolderLayer * Folder)
@@ -88,29 +91,40 @@ void CGraphicsFolder::InsertLayer(CBaseLayer* Layer)
 	if (!Layer || !m_folder->IsDirectChild(Layer->Handle()))
 		return; // This folder does not own specified layer
 
-	QGraphicsLayoutItem* item;
+	QGraphicsWidget* item;
 	if (Layer->Type() == CBaseLayer::Layer_Folder)
 		item = new CGraphicsFolder((CFolderLayer*)Layer);
 	else
 		item = new CGraphicsLayer(Layer);
+	//item->setFlag(QGraphicsItem::ItemIsMovable);
 	m_listlayout->insertItem(Layer->Index(), item);
 }
 
 void CGraphicsFolder::RemoveLayer(const CBaseLayer* Layer)
 {
-	QGraphicsWidget* item = FindLayerWidget(Layer);
-	if (item)
+	if (QGraphicsWidget* item = FindLayerWidget(Layer))
 		delete item;
 }
 
-void CGraphicsFolder::MoveLayer(int Index, const CBaseLayer * Layer)
+void CGraphicsFolder::MoveLayer(int Index, CBaseLayer * Layer)
 {
-	QGraphicsWidget* item = FindLayerWidget(Layer);
-	if (!item)
-		return;
+	if (QGraphicsWidget* item = FindLayerWidget(Layer))
+	{
+		m_listlayout->removeItem(item);
+		m_listlayout->insertItem(Index, item);
+	}
+	else
+		InsertLayer(Layer);
+}
 
-	m_listlayout->removeItem(item);
-	m_listlayout->insertItem(Index, item);
+void CGraphicsFolder::OnClientEvent(CBaseMsg * Msg)
+{
+	if (Msg->Type() == CBaseMsg::Msg_Event)
+	{
+		CNetEvent* netevent = (CNetEvent*)Msg;
+		if (netevent->EventType() == CNetEvent::Event_LayerEdit)
+			OnLayerEvent((CLayerEditMsg*)netevent);
+	}
 }
 
 void CGraphicsFolder::OnLayerEvent(CBaseLayerMsg * Event)
@@ -129,8 +143,13 @@ void CGraphicsFolder::OnLayerEvent(CBaseLayerMsg * Event)
 	case CNetEvent::Event_LayerEdit:
 	{
 		CLayerEditMsg* edit = (CLayerEditMsg*)Event;
-		if (edit->Edited() & CLayerEditMsg::Edit_Index && m_folder->IsDirectChild(edit->Layer()))
-			MoveLayer(edit->NewIndex(), edit->Layer());
+		if (edit->Edited() & CLayerEditMsg::Edit_Place)
+		{
+			if (m_folder->IsDirectChild(edit->Layer()))
+				MoveLayer(edit->NewIndex(), edit->Layer());
+			else
+				RemoveLayer(edit->Layer());
+		}
 		break;
 	}
 	}

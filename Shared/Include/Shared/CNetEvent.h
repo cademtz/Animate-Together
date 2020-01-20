@@ -100,7 +100,7 @@ private:
 class CLayerAddMsg : public CBaseLayerMsg
 {
 public:
-	// - Creates an add or remove event dependind on 'Add'
+	// - Creates an add or remove event depending on 'Add'
 	CLayerAddMsg(CBaseLayer * Layer, bool Add) : CBaseLayerMsg(Event_LayerAdd, Layer), m_add(Add) { }
 	CLayerAddMsg(CSharedProject* Proj, CNetMsg* Msg);
 	~CLayerAddMsg()
@@ -132,28 +132,34 @@ public:
 	{
 		Edit_Name = (1 << 0),
 		Edit_Owner = (1 << 1),
-		Edit_Index = (1 << 2), // - Layer was moved
+		Edit_Place = (1 << 2), // - Layer was moved
 	};
-	CLayerEditMsg(CBaseLayer* Layer) : CBaseLayerMsg(Event_LayerEdit, Layer) { }
+	CLayerEditMsg(CBaseLayer* Layer);
 	CLayerEditMsg(CSharedProject* Proj, CNetMsg* Msg);
 
 	inline EEditFlags Edited() const { return (EEditFlags)m_edits; }
 	inline const QString& NewName() const { return m_name; }
-	inline const CNetObject& NewOwner() const { return m_owner; }
+	inline const QString& OldName() const { return m_oldname; }
+	inline const unsigned NewOwner() const { return m_owner; }
+	inline const unsigned OldOwner() const { return m_oldowner; }
 	inline int NewIndex() const { return m_index; }
-	void SetNewName(const QString& Name) { m_name = Name, m_edits &= Edit_Name; }
-	void SetNewOwner(const CNetObject& Handle) { m_owner = Handle, m_edits &= Edit_Owner; }
-	void SetNewIndex(int Index) { m_index = Index, m_edits &= Edit_Index; }
+	inline int OldIndex() const { return m_oldindex; }
+	inline CFolderLayer* NewParent() const { m_parent; }
+	inline CFolderLayer* OldParent() const { m_oldparent; }
+	void SetNewName(const QString& Name) { m_name = Name, m_edits |= Edit_Name; }
+	void SetNewOwner(const unsigned Handle) { m_owner = Handle, m_edits |= Edit_Owner; }
+	void SetNewPlace(int Index, CFolderLayer* Parent) { m_index = Index, m_parent = Parent, m_edits |= Edit_Place; }
 
 protected:
 	CSerialize Serialize() const override;
 	void _Flip(bool Revert) override;
 
 private:
-	uint8_t m_edits;
-	QString m_name;
-	CNetObject m_owner = 0;
-	int m_index;
+	uint8_t m_edits = 0;
+	QString m_name, m_oldname;
+	unsigned m_owner, m_oldowner;
+	CFolderLayer* m_parent, * m_oldparent;
+	int m_index, m_oldindex;
 };
 
 #endif // CNetEvent_H

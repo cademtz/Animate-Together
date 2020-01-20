@@ -68,6 +68,9 @@ void CLayerAddMsg::_Flip(bool Revert)
 		Project()->Root().Remove(Layer());
 }
 
+CLayerEditMsg::CLayerEditMsg(CBaseLayer * Layer)
+	: CBaseLayerMsg(Event_LayerEdit, Layer), m_oldindex(Layer->Index()), m_oldname(Layer->Name()), m_oldowner(Layer->Parent()->Handle()) { }
+
 CLayerEditMsg::CLayerEditMsg(CSharedProject * Proj, CNetMsg * Msg) : CBaseLayerMsg(Event_LayerEdit, Proj)
 {
 	uint8_t type, eventtype;
@@ -75,11 +78,12 @@ CLayerEditMsg::CLayerEditMsg(CSharedProject * Proj, CNetMsg * Msg) : CBaseLayerM
 	unsigned layer;
 
 	SerialStream s = CSerialize::Stream(Msg->Data());
-	s >> type >> eventtype >> undone >> layer >> m_edits;
+	s >> eventtype >> undone >> layer >> m_edits;
 
 	SetLayer(Proj->FindLayer(layer));
 	SetUndone(!undone);
 
+	m_oldindex = Layer()->Index(), m_oldname = Layer()->Name(), m_oldowner = Layer()->Parent()->Handle(), m_oldparent = Layer()->Parent();
 	if (m_edits & Edit_Name)
 		s >> m_name;
 	if (m_edits & Edit_Owner)
@@ -88,8 +92,12 @@ CLayerEditMsg::CLayerEditMsg(CSharedProject * Proj, CNetMsg * Msg) : CBaseLayerM
 		s >> owner;
 		m_owner = owner;
 	}
-	if (m_edits & Edit_Index)
-		s >> m_index;
+	if (m_edits & Edit_Place)
+	{
+		unsigned parent;
+		s >> m_index >> parent;
+		m_parent = Proj->FindLayer<CFolderLayer>(parent, CBaseLayer::Layer_Folder);
+	}
 }
 
 CSerialize CLayerEditMsg::Serialize() const
@@ -98,31 +106,21 @@ CSerialize CLayerEditMsg::Serialize() const
 	if (m_edits & Edit_Name)
 		data.Add(m_name);
 	if (m_edits & Edit_Owner)
-		data.Add(m_owner.Handle());
-	if (m_edits & Edit_Index)
-		data.Add(m_index);
+		data.Add(m_owner);
+	if (m_edits & Edit_Place)
+		data.Add(m_index, m_parent->Handle());
 	return data;
 }
 
 void CLayerEditMsg::_Flip(bool Revert)
 {
-	// No need to check 'Revert' since data is simply swapped
 	if (m_edits & Edit_Name)
-	{
-		QString name = Layer()->Name();
-		Layer()->SetName(m_name);
-		m_name = name;
-	}
+		Layer()->SetName(Revert ? m_oldname : m_name);
 	if (m_edits & Edit_Owner)
+		Layer()->SetOwner(Revert ? m_oldowner : m_owner);
+	if (m_edits & Edit_Place)
 	{
-		CNetObject owner = Layer()->Owner();
-		Layer()->SetOwner(m_owner);
-		m_owner = owner;
-	}
-	if (m_edits & Edit_Index)
-	{
-		int index = Layer()->Index();
-		Layer()->Parent()->Move(m_index, Layer());
-		m_index = index;
+		Layer()->Parent()->Remove(Layer());
+		(Revert ? m_oldparent : m_parent)->Insert(m_index, Layer());
 	}
 }
