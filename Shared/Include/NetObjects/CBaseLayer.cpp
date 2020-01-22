@@ -61,6 +61,12 @@ CBaseFrame * CBaseLayer::LastKey(int Index)
 	return m_frames.front();
 }
 
+void CBaseLayer::InsertFrame(int Index, CBaseFrame * Frame)
+{
+	Frame->SetParent(this);
+	m_frames.insert(Index, Frame);
+}
+
 void CBaseLayer::SerializeCustom(CSerialize & Data) const {
 	Data.Add(m_parent->Handle(), m_name, m_type);
 }

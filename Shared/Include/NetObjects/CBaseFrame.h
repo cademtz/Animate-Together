@@ -18,6 +18,7 @@
 #include "Shared/CSerialize.h"
 
 class CBaseLayer;
+class CSharedProject;
 
 class CBaseFrame : public CNetObject
 {
@@ -44,9 +45,10 @@ public:
 protected:
 	// - If 'IsKey' is false, a hold frame is created
 	CBaseFrame(bool IsKey) : m_isKey(IsKey) { }
+	CBaseFrame(CSharedProject* Proj, SerialStream& Data);
 	void SerializeCustom(CSerialize& Data) const override;
 
-	virtual CBaseFrame* NewClone() = 0;
+	virtual CBaseFrame* NewClone() const = 0;
 	CBaseFrame* FindKey();
 
 	friend CBaseLayer;

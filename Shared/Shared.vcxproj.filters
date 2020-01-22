@@ -70,6 +70,9 @@
     <ClInclude Include="Include\Shared\CEventHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\NetObjects\CRasterFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Include\Shared\CSocketMgr.cpp">

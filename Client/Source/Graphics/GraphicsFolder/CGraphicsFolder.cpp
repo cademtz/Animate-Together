@@ -24,6 +24,9 @@ CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder, QGraphicsItem* Parent) :
 	m_layout->addItem(m_item);
 
 	m_layerlist = new QGraphicsWidget(this);
+	pal = m_layerlist->palette();
+	pal.setBrush(QPalette::Window, QColor(0x404040));
+	setPalette(pal);
 	m_listlayout = new QGraphicsLinearLayout(Qt::Vertical);
 	m_listlayout->setContentsMargins(15, 0, 0, 0);
 	m_layerlist->setLayout(m_listlayout);

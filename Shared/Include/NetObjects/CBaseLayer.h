@@ -1,5 +1,9 @@
 /*	Description:
- * 		A shared class that contains the internal functions and variables needed for all layer types
+ * 		A shared class that contains the internal functions and variables needed for all layer types.
+ *
+ *		Details:
+ *			All frames stored in a layer are assumed to be owned by it.
+ *			Destruction of a layer will destroy all its frames.
  *
  *	Author: Hold on!
  *	Created: 11/6/2019 5:02:50 PM
@@ -39,7 +43,11 @@ public:
 		Layer_Audio
 	};
 	CBaseLayer(EType Type, CSharedProject* Proj, SerialStream& Data);
-	virtual ~CBaseLayer() { }
+	virtual ~CBaseLayer()
+	{
+		for (CBaseFrame* frame : m_frames)
+			delete frame;
+	}
 
 	int Index() const;
 	inline EType Type() const { return (EType)m_type; }
@@ -61,10 +69,14 @@ public:
 
 	// ----- Frame functions ----- //
 
+	const QList<CBaseFrame*>& Frames() { return m_frames; }
+	const QList<const CBaseFrame*>& Frames() const { return (QList<const CBaseFrame*>&)m_frames; }
 	int IndexOf(const CBaseFrame* Frame) const { return IndexOf(Frame->Handle()); }
 	int IndexOf(const CNetObject& Obj) const;
 	CBaseFrame* LastKey(int Index);
 	const CBaseFrame* LastKey(int Index) const { return LastKey(Index); }
+	void InsertFrame(int Index, CBaseFrame* Frame);
+	inline void AppendFrame(CBaseFrame* Frame) { InsertFrame(m_frames.size(), Frame); }
 
 protected:
 	CBaseLayer(EType Type, CFolderLayer* Parent = nullptr) : m_type(Type), m_parent(Parent) { }

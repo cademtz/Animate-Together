@@ -29,6 +29,7 @@ CGraphicsLayer::CGraphicsLayer(CBaseLayer * Layer, QGraphicsItem * Parent)
 	policy.setVerticalPolicy(QSizePolicy::Minimum);
 	policy.setHorizontalPolicy(QSizePolicy::Minimum);
 	m_layout->setSizePolicy(policy);
+	setContentsMargins(0, 0, 0, 0);
 
 	/*
 	Normal QGraphics items cannot be used in layouts,
@@ -41,13 +42,21 @@ CGraphicsLayer::CGraphicsLayer(CBaseLayer * Layer, QGraphicsItem * Parent)
 	Update: Well the only option is to parent them individualy to a whole new widget item just for themselves
 	*/
 
-	QGraphicsWidget* test = new QGraphicsWidget(this);
-	m_label = new QGraphicsTextItem(test);
-	m_label->setTextInteractionFlags(Qt::TextEditable | Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-	test->setGeometry(QRectF(test->pos(), m_label->boundingRect().size()));
-	setGeometry(QRectF(pos(), m_label->boundingRect().size()));
-	m_layout->addItem(test);
+	m_container = new QGraphicsWidget(this);
 
+	m_label = new QGraphicsTextItem(m_container);
+	m_label->setTextInteractionFlags(Qt::TextEditable | Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+
+	m_container->setVisible(true);
+	m_container->setContentsMargins(0, 0, 0, 0);
+	m_container->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	//m_container->setGeometry(QRectF(m_container->pos(), m_label->boundingRect().size()));
+	pal = m_container->palette();
+	pal.setBrush(QPalette::Window, QColor(255, 0, 0));
+	m_container->setPalette(pal);
+
+	setGeometry(m_container->geometry());
+	m_layout->addItem(m_container);
 	SetLayer(Layer);
 	adjustSize();
 
@@ -62,6 +71,8 @@ void CGraphicsLayer::SetLayer(CBaseLayer * Layer)
 {
 	m_layer = Layer;
 	m_label->setPlainText(m_layer->Name());
+	m_container->adjustSize();
+	adjustSize();
 }
 
 void CGraphicsLayer::OnLayerEvent(CBaseLayerMsg * Event)
