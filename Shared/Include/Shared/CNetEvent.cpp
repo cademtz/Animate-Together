@@ -7,6 +7,7 @@
 
 #include "CNetEvent.h"
 #include "CSharedProject.h"
+#include "NetObjects/CRasterFrame.h"
 
 CBaseLayerMsg::CBaseLayerMsg(EEvent EventType, CBaseLayer * Layer)
 	: CNetEvent(EventType, Layer->RootProject()), m_layer(Layer) { }
@@ -123,4 +124,64 @@ void CLayerEditMsg::_Flip(bool Revert)
 		Layer()->Parent()->Remove(Layer());
 		(Revert ? m_oldparent : m_parent)->Insert(m_index, Layer());
 	}
+}
+
+CBaseFrameMsg::CBaseFrameMsg(EEvent EventType, CBaseFrame * Frame)
+	: CNetEvent(EventType, Frame->Parent()->RootProject()) { }
+
+CFrameAddMsg::CFrameAddMsg(CSharedProject * Proj, CNetMsg * Msg) : CBaseFrameMsg(Event_FrameAdd, Proj)
+{
+	SerialStream s = CSerialize::Stream(Msg->Data());
+	uint8_t eventtype;
+	bool undone;
+
+	s >> eventtype >> m_add >> undone;
+
+	if (m_add) // Get new layer's info and create it
+	{
+		// TO DO: Potential size error in serializing / deserializing a 'CSerialize' type.
+		// funny. Fix that now.
+
+		uint8_t type;
+		CSerialize data;
+		s >> type >> m_index >> data;
+
+		switch (type)
+		{
+		case CBaseFrame::Frame_Raster:
+			SetFrame(new CRasterFrame(Proj, data.Stream()));
+			break;
+		}
+	}
+	else
+	{
+		unsigned parent, handle;
+		s >> parent >> handle;
+
+		SetFrame(Project()->FindLayer(parent)->FindFrame(handle));
+		m_index = Frame()->Index();
+	}
+
+	m_parent = Frame()->Parent();
+
+	// Set to opposite of 'undone' because the client has not yet performed the event
+	SetUndone(!undone);
+}
+
+CSerialize CFrameAddMsg::Serialize() const
+{
+	CSerialize data(Type(), EventType(), m_add, Undone());
+	if (m_add) // Send new frame's info
+		data.Add((uint8_t)Frame()->Type(), Frame()->Index(), Frame()->Serialize());
+	else
+		data.Add(Frame()->Parent()->Handle(), Frame()->Handle());
+	return data;
+}
+
+void CFrameAddMsg::_Flip(bool Revert)
+{
+	if (WasAdded())
+		m_parent->InsertFrame(m_index, Frame());
+	else
+		m_parent->RemoveFrame(Frame());
 }

@@ -71,19 +71,28 @@ public:
 
 	const QList<CBaseFrame*>& Frames() { return m_frames; }
 	const QList<const CBaseFrame*>& Frames() const { return (QList<const CBaseFrame*>&)m_frames; }
-	int IndexOf(const CBaseFrame* Frame) const { return IndexOf(Frame->Handle()); }
-	int IndexOf(const CNetObject& Obj) const;
 	CBaseFrame* LastKey(int Index);
 	const CBaseFrame* LastKey(int Index) const { return LastKey(Index); }
 	void InsertFrame(int Index, CBaseFrame* Frame);
+	bool RemoveFrame(CBaseFrame* Frame) { return m_frames.removeOne(Frame); }
 	inline void AppendFrame(CBaseFrame* Frame) { InsertFrame(m_frames.size(), Frame); }
+
+	int IndexOf(const CBaseFrame* Frame) const { return IndexOf(Frame->Handle()); }
+	int IndexOf(const CNetObject& Obj) const;
+	CBaseFrame* FindFrame(unsigned Handle);
+	const CBaseFrame* FindFrame(unsigned Handle) const;
 
 protected:
 	CBaseLayer(EType Type, CFolderLayer* Parent = nullptr) : m_type(Type), m_parent(Parent) { }
 
-	void SerializeCustom(CSerialize& Data) const override;
+	// - Subtypes of CBaseLayer must implement these if they need additional networked data
+
+	virtual void SerializeLayer(CSerialize& Data) const { }
+	virtual void DeserializeLayer(SerialStream& Data) { }
 
 private:
+	void SerializeCustom(CSerialize& Data) const override;
+
 	uint8_t m_type;
 	CFolderLayer* m_parent = 0;
 	QString m_name;

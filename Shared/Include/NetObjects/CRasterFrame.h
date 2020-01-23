@@ -16,7 +16,8 @@
 class CRasterFrame : public CBaseFrame
 {
 public:
-	CRasterFrame(bool IsKey) : CBaseFrame(IsKey) { }
+	CRasterFrame(bool IsKey) : CBaseFrame(Frame_Raster, IsKey) { }
+	CRasterFrame(CSharedProject* Proj, SerialStream& Data) : CBaseFrame(Frame_Raster, Proj, Data) { }
 
 	bool IsEmpty() const override { return true; }
 

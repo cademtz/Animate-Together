@@ -23,6 +23,16 @@ class CSharedProject;
 class CBaseFrame : public CNetObject
 {
 public:
+	enum EType : uint8_t
+	{
+		Frame_Raster,
+		Frame_Vector,
+		Frame_Stick,
+		Frame_Audio
+	};
+
+	inline EType Type() const { return m_type; }
+
 	// - Returns the key that a hold frame is holding
 	// - Value will be the frame itself if it is a key
 	template<typename T = CBaseFrame>
@@ -44,8 +54,8 @@ public:
 
 protected:
 	// - If 'IsKey' is false, a hold frame is created
-	CBaseFrame(bool IsKey) : m_isKey(IsKey) { }
-	CBaseFrame(CSharedProject* Proj, SerialStream& Data);
+	CBaseFrame(EType Type, bool IsKey) : m_type(Type), m_isKey(IsKey) { }
+	CBaseFrame(EType Type, CSharedProject* Proj, SerialStream& Data);
 	void SerializeCustom(CSerialize& Data) const override;
 
 	virtual CBaseFrame* NewClone() const = 0;
@@ -55,6 +65,7 @@ protected:
 	inline void SetParent(CBaseLayer* Layer) { m_parent = Layer; }
 
 private:
+	EType m_type;
 	bool m_isKey;
 	CBaseLayer* m_parent;
 };

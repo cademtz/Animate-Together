@@ -13,15 +13,16 @@ int CBaseFrame::Index() const {
 	return m_parent->IndexOf(this);
 }
 
-CBaseFrame::CBaseFrame(CSharedProject* Proj, SerialStream & Data)
+CBaseFrame::CBaseFrame(EType Type, CSharedProject* Proj, SerialStream & Data) : CNetObject(Data), m_type(Type)
 {
 	unsigned parent;
-	Data >> parent >> m_isKey;
+	uint8_t type;
+	Data >> type >> parent >> m_isKey;
 	m_parent = Proj->FindLayer(parent);
 }
 
 void CBaseFrame::SerializeCustom(CSerialize & Data) const {
-	Data.Add(m_parent->Handle(), m_isKey, IsEmpty());
+	Data.Add((uint8_t)m_type, m_parent->Handle(), m_isKey, IsEmpty());
 }
 
 CBaseFrame * CBaseFrame::FindKey() {

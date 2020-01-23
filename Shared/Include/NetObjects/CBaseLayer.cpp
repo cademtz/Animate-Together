@@ -20,6 +20,7 @@ CBaseLayer::CBaseLayer(EType Type, CSharedProject * Proj, SerialStream& Data) : 
 
 	assert(m_type == type);
 	m_parent = Proj->FindLayer<CFolderLayer>(parent, Layer_Folder);
+	DeserializeLayer(Data);
 }
 
 int CBaseLayer::Index() const {
@@ -50,6 +51,22 @@ int CBaseLayer::IndexOf(const CNetObject & Obj) const
 	return -1;
 }
 
+CBaseFrame * CBaseLayer::FindFrame(unsigned Handle)
+{
+	for (CBaseFrame* frame : m_frames)
+		if (frame->Handle() == Handle)
+			return frame;
+	return nullptr;
+}
+
+const CBaseFrame * CBaseLayer::FindFrame(unsigned Handle) const
+{
+	for (CBaseFrame* frame : m_frames)
+		if (frame->Handle() == Handle)
+			return frame;
+	return nullptr;
+}
+
 CBaseFrame * CBaseLayer::LastKey(int Index)
 {
 	if (!m_frames.size())
@@ -67,6 +84,8 @@ void CBaseLayer::InsertFrame(int Index, CBaseFrame * Frame)
 	m_frames.insert(Index, Frame);
 }
 
-void CBaseLayer::SerializeCustom(CSerialize & Data) const {
-	Data.Add(m_parent->Handle(), m_name, m_type);
+void CBaseLayer::SerializeCustom(CSerialize & Data) const
+{
+	Data.Add(m_parent->Handle(), m_name, (uint8_t)m_type);
+	SerializeLayer(Data);
 }

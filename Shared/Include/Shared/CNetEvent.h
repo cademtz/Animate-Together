@@ -14,6 +14,7 @@
 
 #include "CNetMsg.h"
 
+class CBaseFrame;
 class CBaseLayer;
 class CFolderLayer;
 class CSharedProject;
@@ -26,6 +27,7 @@ public:
 		Event_SharedProj = 0,
 		Event_LayerAdd,
 		Event_LayerEdit,
+		Event_FrameAdd,
 	};
 
 	// - Performs the event. Every call toggles between revert and redo
@@ -160,6 +162,55 @@ private:
 	unsigned m_owner, m_oldowner;
 	CFolderLayer* m_parent, * m_oldparent;
 	int m_index, m_oldindex;
+};
+
+/* TO DO: Make CBaseLayerMsg & CLayerAddMsg more abstract to be used for frames and strokes as well.
+ * Currently these message classes are almost entirely copy-pasted for the frame events.
+ */
+
+class CBaseFrameMsg : public CNetEvent
+{
+public:
+	CBaseFrameMsg(EEvent EventType, CBaseFrame* Frame);
+	CBaseFrameMsg(EEvent EventType, CSharedProject* Proj)
+		: CNetEvent(EventType, Proj), m_frame(nullptr) { }
+
+	template<class T = CBaseFrame>
+	inline T* Frame() const { return (T*)m_frame; }
+
+protected:
+	inline void SetFrame(CBaseFrame* Frame) { m_frame = Frame; }
+
+private:
+	CBaseFrame* m_frame;
+};
+
+class CFrameAddMsg : public CBaseFrameMsg
+{
+public:
+	// - Creates an add or remove event depending on 'Add'
+	CFrameAddMsg(CBaseFrame * Frame, bool Add) : CBaseFrameMsg(Event_FrameAdd, Frame), m_add(Add) { }
+	CFrameAddMsg(CSharedProject* Proj, CNetMsg* Msg);
+	~CFrameAddMsg()
+	{
+		if (Undone())
+			delete Frame();
+	}
+
+	// - Returns true if the event describes an added layer, false if it's a removed layer
+	inline bool IsAdd() const { return m_add; }
+
+	// - Returns true if the layer was last added or removed
+	inline bool WasAdded() const { return m_add != Undone(); }
+
+protected:
+	CSerialize Serialize() const override;
+	void _Flip(bool Revert) override;
+
+private:
+	CBaseLayer* m_parent;
+	int m_index = 0;
+	bool m_add;
 };
 
 #endif // CNetEvent_H
