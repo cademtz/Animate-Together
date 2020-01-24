@@ -142,7 +142,7 @@ void CClient::HandleMsg(CNetMsg * Msg)
 				CBaseLayer* parent = layer;
 				while ((parent = parent->Parent()) && !parent->IsRoot())
 					out.prepend(parent->Name() + " > ");
-				qInfo() << out;
+				qInfo().noquote() << out;
 			}
 			break;
 		}
@@ -151,6 +151,21 @@ void CClient::HandleMsg(CNetMsg * Msg)
 			CLayerEditMsg edit(m_proj, Msg);
 			edit.Perform();
 			CreateEvent(edit);
+			break;
+		}
+		case CNetEvent::Event_FrameAdd:
+		{
+			CFrameAddMsg add(m_proj, Msg);
+			add.Perform();
+			qInfo() << "Current frames:";
+			auto layers = m_proj->Root().Layers1D();
+			for (auto layer : layers)
+			{
+				QString out;
+				for (auto frame : layer->Frames())
+					out += frame->IsKey() ? '#' : ' ';
+				qInfo().noquote() << out;
+			}
 		}
 		}
 		break;

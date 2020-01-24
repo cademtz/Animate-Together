@@ -15,21 +15,22 @@
 CGraphicsLayer::CGraphicsLayer(CBaseLayer * Layer, QGraphicsItem * Parent)
 	: QGraphicsWidget(Parent), m_layer(Layer)
 {
+	setContentsMargins(0, 0, 0, 0);
 	setAutoFillBackground(true);
 	QPalette pal = palette();
 	pal.setBrush(QPalette::Window, QColor(0x808080));
 	setPalette(pal);
 
-	m_layout = new QGraphicsLinearLayout(Qt::Horizontal);
-	setLayout(m_layout);
-
 	// Keep everything aligned if certain icons aren't visible
-	QSizePolicy policy = m_layout->sizePolicy();
-	policy.setRetainSizeWhenHidden(true);
-	policy.setVerticalPolicy(QSizePolicy::Minimum);
-	policy.setHorizontalPolicy(QSizePolicy::Minimum);
-	m_layout->setSizePolicy(policy);
-	setContentsMargins(0, 0, 0, 0);
+	//QSizePolicy policy = m_layout->sizePolicy();
+	//policy.setRetainSizeWhenHidden(true);
+	//policy.setVerticalPolicy(QSizePolicy::Minimum);
+	//policy.setHorizontalPolicy(QSizePolicy::Minimum);
+
+	m_layout = new QGraphicsLinearLayout(Qt::Horizontal);
+	m_layout->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	m_layout->setContentsMargins(0, 0, 0, 0);
+	setLayout(m_layout);
 
 	/*
 	Normal QGraphics items cannot be used in layouts,
@@ -46,19 +47,20 @@ CGraphicsLayer::CGraphicsLayer(CBaseLayer * Layer, QGraphicsItem * Parent)
 
 	m_label = new QGraphicsTextItem(m_container);
 	m_label->setTextInteractionFlags(Qt::TextEditable | Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+	m_label->setPos(0, 0);
 
 	m_container->setVisible(true);
 	m_container->setContentsMargins(0, 0, 0, 0);
-	m_container->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-	//m_container->setGeometry(QRectF(m_container->pos(), m_label->boundingRect().size()));
+	m_container->setPreferredSize(m_label->boundingRect().size());
+	//m_container->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	pal = m_container->palette();
 	pal.setBrush(QPalette::Window, QColor(255, 0, 0));
 	m_container->setPalette(pal);
 
-	setGeometry(m_container->geometry());
+	setPreferredSize(20, 100);
 	m_layout->addItem(m_container);
 	SetLayer(Layer);
-	adjustSize();
+	//adjustSize();
 
 	m_listener = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
 }
@@ -71,8 +73,10 @@ void CGraphicsLayer::SetLayer(CBaseLayer * Layer)
 {
 	m_layer = Layer;
 	m_label->setPlainText(m_layer->Name());
-	m_container->adjustSize();
-	adjustSize();
+	//m_container->adjustSize();
+	m_container->setPreferredSize(m_label->boundingRect().size());
+	setPreferredSize(100, 20);
+	//adjustSize();
 }
 
 void CGraphicsLayer::OnLayerEvent(CBaseLayerMsg * Event)

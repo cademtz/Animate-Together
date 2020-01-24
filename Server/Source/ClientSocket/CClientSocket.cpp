@@ -156,5 +156,9 @@ void CClientSocket::Joined()
 
 	auto layers = proj->Root().Layers1D();
 	for (auto layer : layers) // Send all layers in order
+	{
 		SendMsg(CLayerAddMsg(layer, true));
+		for (auto frame : layer->Frames())
+			SendMsg(CFrameAddMsg(frame, true));
+	}
 }

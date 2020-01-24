@@ -14,27 +14,41 @@ CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder, QGraphicsItem* Parent) :
 {
 	setAutoFillBackground(true);
 	QPalette pal = palette();
-	pal.setBrush(QPalette::Window, QColor(0xC0C0C0));
+	pal.setBrush(QPalette::Window, QColor(0, 255, 0));
 	setPalette(pal);
+	setContentsMargins(0, 0, 0, 0);
+
+	QSizePolicy policy = sizePolicy();
+	policy.setHorizontalPolicy(QSizePolicy::Maximum);
+	policy.setVerticalPolicy(QSizePolicy::Fixed);
+	//setSizePolicy(policy);
 
 	m_layout = new QGraphicsLinearLayout(Qt::Vertical);
+	m_layout->setSizePolicy(policy);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
 
 	m_item = new CGraphicsLayer(m_folder, this);
 	m_layout->addItem(m_item);
+	m_item->setSizePolicy(policy);
 
 	m_layerlist = new QGraphicsWidget(this);
+	m_layerlist->setSizePolicy(policy);
 	pal = m_layerlist->palette();
 	pal.setBrush(QPalette::Window, QColor(0x404040));
 	setPalette(pal);
+
 	m_listlayout = new QGraphicsLinearLayout(Qt::Vertical);
 	m_listlayout->setContentsMargins(15, 0, 0, 0);
-	m_layerlist->setLayout(m_listlayout);
+	m_listlayout->setSizePolicy(policy);
 	m_listlayout->setSpacing(0);
+
+	m_layerlist->setLayout(m_listlayout);
 
 	SetFolder(Folder);
 
-	adjustSize();
+	//adjustSize();
+	//setMinimumSize(size() + QSizeF(15, 0));
 
 	m_listenlayer = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
 	m_listenclient = CClient::Listen([this](CBaseMsg* Event) { OnClientEvent(Event); });
@@ -99,7 +113,7 @@ void CGraphicsFolder::InsertLayer(CBaseLayer* Layer)
 		item = new CGraphicsFolder((CFolderLayer*)Layer);
 	else
 		item = new CGraphicsLayer(Layer);
-	//item->setFlag(QGraphicsItem::ItemIsMovable);
+	item->setFlag(QGraphicsItem::ItemIsMovable);
 	m_listlayout->insertItem(Layer->Index(), item);
 }
 

@@ -8,6 +8,7 @@
 #include "CMotdView.h"
 #include <Shared/CNetMsg.h>
 #include <qtextbrowser.h>
+#include <qshortcut.h>
 #include <qicon.h>
 
 CMotdView::CMotdView(const CWelcomeMsg & Msg, QWidget * Parent) :	QWidget(Parent)
@@ -29,6 +30,8 @@ CMotdView::CMotdView(const CWelcomeMsg & Msg, QWidget * Parent) :	QWidget(Parent
 	}
 
 	m_layout->addWidget(m_display);
+	QShortcut* esc = new QShortcut(Qt::Key_Escape, this);
+	connect(esc, &QShortcut::activated, this, &CMotdView::close);
 }
 
 void CMotdView::Open(const CWelcomeMsg& Msg)

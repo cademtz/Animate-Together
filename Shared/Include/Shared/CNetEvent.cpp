@@ -127,7 +127,7 @@ void CLayerEditMsg::_Flip(bool Revert)
 }
 
 CBaseFrameMsg::CBaseFrameMsg(EEvent EventType, CBaseFrame * Frame)
-	: CNetEvent(EventType, Frame->Parent()->RootProject()) { }
+	: CNetEvent(EventType, Frame->Parent()->RootProject()), m_frame(Frame) { }
 
 CFrameAddMsg::CFrameAddMsg(CSharedProject * Proj, CNetMsg * Msg) : CBaseFrameMsg(Event_FrameAdd, Proj)
 {
