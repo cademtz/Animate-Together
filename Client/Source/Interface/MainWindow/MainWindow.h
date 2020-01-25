@@ -31,9 +31,10 @@ class MainWindow : public QMainWindow
 	CCanvas* m_canvas;
 	CToolBar* m_toolbar;
 	CTimeline* m_timeline;
+	QWidget* m_client;
 
 	QLayout* l_mainlayout;
-	QVBoxLayout* l_panels;
+	QVBoxLayout* l_panels, * l_client;
 
 	static QString m_globalstyle;
 

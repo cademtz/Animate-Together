@@ -23,9 +23,11 @@ public:
 private:
 	CLogin(bool HasPass);
 	void Confirm();
+	void closeEvent(QCloseEvent *event) override;
 
 	QLineEdit* m_name, * m_pass;
 	QPushButton* m_ok;
+	bool m_confirmed = false;
 };
 
 #endif // CLogin_H

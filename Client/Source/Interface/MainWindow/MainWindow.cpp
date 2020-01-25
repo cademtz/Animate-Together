@@ -76,10 +76,17 @@ MainWindow::MainWindow(QWidget *parent)
 	resize(width(), height() + m_titlebar->height() + m_toolbar->height() + m_timeline->minimumHeight());
 
 #ifdef _DEBUG
+	m_client = new QWidget(this);
+	m_client->setFixedWidth(200);
+	l_client = new QVBoxLayout(m_client);
 	QGraphicsView* view = new QGraphicsView(&CTimelineScene::Scene());
 	CChatPanel* chat = new CChatPanel();
-	chat->show();
-	view->show();
+	l_client->addWidget(chat);
+	l_client->addWidget(view);
+	//chat->show();
+	//view->show();
+	l_mainlayout->addWidget(m_client);
+
 #endif
 
 	CUndoStack::Listen([this](const CUndoAction* Undo) { UndoStackEvent(Undo); });

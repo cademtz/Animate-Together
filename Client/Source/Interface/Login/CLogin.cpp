@@ -8,6 +8,7 @@
 #include "CLogin.h"
 #include <qshortcut.h>
 #include <qlayout.h>
+#include <qevent.h>
 #include "Client\CClient.h"
 
 CLogin::CLogin(bool HasPass)
@@ -42,5 +43,13 @@ CLogin::CLogin(bool HasPass)
 void CLogin::Confirm()
 {
 	CClient::Login(m_name->text(), m_pass->text());
+	m_confirmed = true;
 	close();
+}
+
+void CLogin::closeEvent(QCloseEvent *event)
+{
+	if (!m_confirmed)
+		CClient::Close();
+	event->accept();
 }
