@@ -18,6 +18,7 @@ class CBaseMsg;
 class CBaseLayerMsg;
 class CSharedProject;
 class CGraphicsFolder;
+class QGraphicsLinearLayout;
 
 class CTimelineScene : public QGraphicsScene
 {
@@ -39,6 +40,8 @@ private:
 	void OnClientEvent(CBaseMsg* Msg);
 	void OnLayerEvent(CBaseLayerMsg* Msg);
 
+	QGraphicsWidget* m_widget, * m_drag;
+	QGraphicsLinearLayout* m_layout;
 	CGraphicsFolder* m_root;
 };
 
