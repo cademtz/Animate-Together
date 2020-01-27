@@ -18,23 +18,23 @@ CTimelineScene::CTimelineScene()
 	m_layout = new QGraphicsLinearLayout(Qt::Horizontal, m_widget);
 
 	QPalette pal = m_widget->palette();
-	pal.setBrush(QPalette::Window, Qt::red);
-	m_widget->setPalette(pal);
-
-	pal = m_drag->palette();
 	pal.setBrush(QPalette::Window, Qt::black);
-	m_drag->setPalette(pal);
-	m_drag->setPreferredWidth(10);
+	m_widget->setPalette(pal);
+	m_widget->setAutoFillBackground(true);
+	m_widget->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
+	m_drag->setPreferredWidth(5);
+	m_drag->setFlag(QGraphicsItem::ItemIsMovable);
 
 	addItem(m_widget);
 
-	m_layout->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+	m_layout->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	m_layout->setContentsMargins(0, 0, 0, 0);
+	m_layout->setSpacing(0);
 	m_layout->addItem(m_drag);
-
-	//addItem(m_drag);
 
 	CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
 	CClient::Listen([this](CBaseMsg* Msg) { OnClientEvent(Msg); });
+	connect(m_drag, &QGraphicsWidget::geometryChanged, this, &CTimelineScene::OnDrag);
 }
 
 void CTimelineScene::ResetScene(CSharedProject * Project)
@@ -44,9 +44,8 @@ void CTimelineScene::ResetScene(CSharedProject * Project)
 	else if (!m_root)
 	{
 		m_root = new CGraphicsFolder(&Project->Root());
-		m_root->setPreferredWidth(800);
-		//addItem(m_root);
 		m_layout->insertItem(0, m_root);
+		m_widget->adjustSize();
 	}
 	else
 		m_root->SetFolder(&Project->Root());
@@ -65,4 +64,17 @@ void CTimelineScene::OnClientEvent(CBaseMsg * Msg)
 void CTimelineScene::OnLayerEvent(CBaseLayerMsg * Event)
 {
 
+}
+
+void CTimelineScene::OnDrag()
+{
+	if (m_root)
+	{
+		int width = m_drag->pos().x();
+		if (width < m_root->minimumWidth())
+			width = m_root->minimumWidth();
+		m_root->setPreferredWidth(width);
+		m_widget->adjustSize();
+	}
+	m_layout->updateGeometry();
 }

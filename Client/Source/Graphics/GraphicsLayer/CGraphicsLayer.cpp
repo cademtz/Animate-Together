@@ -46,21 +46,15 @@ CGraphicsLayer::CGraphicsLayer(CBaseLayer * Layer, QGraphicsItem * Parent)
 	m_container = new QGraphicsWidget(this);
 
 	m_label = new QGraphicsTextItem(m_container);
-	m_label->setTextInteractionFlags(Qt::TextEditable | Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 	m_label->setPos(0, 0);
 
 	m_container->setVisible(true);
 	m_container->setContentsMargins(0, 0, 0, 0);
 	m_container->setPreferredSize(m_label->boundingRect().size());
-	//m_container->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-	pal = m_container->palette();
-	pal.setBrush(QPalette::Window, QColor(255, 0, 0));
-	m_container->setPalette(pal);
 
 	setPreferredSize(20, 100);
 	m_layout->addItem(m_container);
 	SetLayer(Layer);
-	//adjustSize();
 
 	m_listener = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
 }
@@ -73,10 +67,8 @@ void CGraphicsLayer::SetLayer(CBaseLayer * Layer)
 {
 	m_layer = Layer;
 	m_label->setPlainText(m_layer->Name());
-	//m_container->adjustSize();
 	m_container->setPreferredSize(m_label->boundingRect().size());
 	setPreferredSize(100, 20);
-	//adjustSize();
 }
 
 void CGraphicsLayer::OnLayerEvent(CBaseLayerMsg * Event)

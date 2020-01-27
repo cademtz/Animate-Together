@@ -39,6 +39,7 @@ private:
 
 	void OnClientEvent(CBaseMsg* Msg);
 	void OnLayerEvent(CBaseLayerMsg* Msg);
+	void OnDrag();
 
 	QGraphicsWidget* m_widget, * m_drag;
 	QGraphicsLinearLayout* m_layout;

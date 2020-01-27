@@ -13,34 +13,26 @@
 CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder, QGraphicsItem* Parent) : QGraphicsWidget(Parent), m_folder(Folder)
 {
 	setAutoFillBackground(true);
-	QPalette pal = palette();
-	pal.setBrush(QPalette::Window, QColor(0, 255, 0));
-	setPalette(pal);
 	setContentsMargins(0, 0, 0, 0);
 
-	QSizePolicy policy = sizePolicy();
-	policy.setHorizontalPolicy(QSizePolicy::Maximum);
-	policy.setVerticalPolicy(QSizePolicy::Fixed);
-	//setSizePolicy(policy);
-
 	m_layout = new QGraphicsLinearLayout(Qt::Vertical);
-	m_layout->setSizePolicy(policy);
+	m_layout->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
 
 	m_item = new CGraphicsLayer(m_folder, this);
 	m_layout->addItem(m_item);
-	m_item->setSizePolicy(policy);
+	m_item->setSizePolicy(m_layout->sizePolicy());
 
 	m_layerlist = new QGraphicsWidget(this);
-	m_layerlist->setSizePolicy(policy);
-	pal = m_layerlist->palette();
+	//m_layerlist->setSizePolicy(policy);
+	QPalette pal = m_layerlist->palette();
 	pal.setBrush(QPalette::Window, QColor(0x404040));
 	setPalette(pal);
 
 	m_listlayout = new QGraphicsLinearLayout(Qt::Vertical);
 	m_listlayout->setContentsMargins(15, 0, 0, 0);
-	m_listlayout->setSizePolicy(policy);
+	//m_listlayout->setSizePolicy(policy);
 	m_listlayout->setSpacing(0);
 
 	m_layerlist->setLayout(m_listlayout);
