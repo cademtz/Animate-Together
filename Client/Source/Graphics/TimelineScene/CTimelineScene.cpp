@@ -27,7 +27,7 @@ CTimelineScene::CTimelineScene()
 
 	addItem(m_widget);
 
-	m_layout->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	m_layout->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setSpacing(0);
 	m_layout->addItem(m_drag);
@@ -44,11 +44,13 @@ void CTimelineScene::ResetScene(CSharedProject * Project)
 	else if (!m_root)
 	{
 		m_root = new CGraphicsFolder(&Project->Root());
+		m_root->adjustSize();
+		m_drag->setPos(m_root->preferredWidth(), 0);
 		m_layout->insertItem(0, m_root);
-		m_widget->adjustSize();
 	}
 	else
 		m_root->SetFolder(&Project->Root());
+	OnDrag();
 }
 
 void CTimelineScene::OnClientEvent(CBaseMsg * Msg)

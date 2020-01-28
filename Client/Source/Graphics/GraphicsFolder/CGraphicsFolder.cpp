@@ -15,27 +15,28 @@ CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder, QGraphicsItem* Parent) :
 	setAutoFillBackground(true);
 	setContentsMargins(0, 0, 0, 0);
 
-	m_layout = new QGraphicsLinearLayout(Qt::Vertical);
+	m_layout = new QGraphicsLinearLayout(Qt::Vertical, this);
 	m_layout->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
 	m_layout->setContentsMargins(0, 0, 0, 0);
-	setLayout(m_layout);
+	m_layout->setSpacing(0);
 
 	m_item = new CGraphicsLayer(m_folder, this);
 	m_layout->addItem(m_item);
 	m_item->setSizePolicy(m_layout->sizePolicy());
 
 	m_layerlist = new QGraphicsWidget(this);
+	m_layerlist->setMinimumHeight(0);
 	//m_layerlist->setSizePolicy(policy);
 	QPalette pal = m_layerlist->palette();
 	pal.setBrush(QPalette::Window, QColor(0x404040));
 	setPalette(pal);
 
-	m_listlayout = new QGraphicsLinearLayout(Qt::Vertical);
+	m_listlayout = new QGraphicsLinearLayout(Qt::Vertical, m_layerlist);
 	m_listlayout->setContentsMargins(15, 0, 0, 0);
-	//m_listlayout->setSizePolicy(policy);
+	m_listlayout->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 	m_listlayout->setSpacing(0);
+	//m_listlayout->setPreferredHeight(0);
 
-	m_layerlist->setLayout(m_listlayout);
 
 	SetFolder(Folder);
 
@@ -164,6 +165,14 @@ void CGraphicsFolder::OnLayerEvent(CBaseLayerMsg * Event)
 	}
 }
 
-void CGraphicsFolder::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event) {
+void CGraphicsFolder::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
+{
 	m_layerlist->setVisible(m_open = !m_open);
+	for (QGraphicsWidget* widg = m_layerlist; widg; widg = widg->parentWidget())
+	{
+		widg->adjustSize();
+		//if (widg->layout())
+			//widg->layout()->updateGeometry();
+		//widg->update();
+	}
 }
