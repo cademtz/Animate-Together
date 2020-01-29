@@ -238,6 +238,10 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Source\Graphics\FrameItem\CFrameItem.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Graphics\GraphicsFolder\CGraphicsFolder.cpp">
       <SubType>
       </SubType>
@@ -432,6 +436,10 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="Source\Graphics\CanvasScene\CCanvasScene.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\FrameItem\CFrameItem.h">
       <SubType>
       </SubType>
     </ClInclude>
