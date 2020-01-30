@@ -23,7 +23,7 @@ public:
 	inline qreal Width() const { return m_size.width(); }
 	void SetWidth(qreal Width = 9);
 
-	int		type() const { return (int)e_graphicstype::ScrubBar; }
+	int		type() const { return (int)EGraphicsType::ScrubBar; }
 	void	paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QSizeF	sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
 	void	setGeometry(const QRectF &geom);

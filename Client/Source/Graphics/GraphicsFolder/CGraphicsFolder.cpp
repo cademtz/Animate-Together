@@ -75,14 +75,14 @@ QGraphicsWidget * CGraphicsFolder::FindLayerWidget(const CBaseLayer * Layer)
 		QGraphicsWidget* found = nullptr;
 		switch (item->type())
 		{
-		case (int)e_graphicstype::FolderLayer:
+		case (int)EGraphicsType::FolderLayer:
 		{
 			CGraphicsFolder* folder = (CGraphicsFolder*)item;
 			if (folder->Folder() == Layer)
 				found = folder;
 			break;
 		}
-		case (int)e_graphicstype::Layer:
+		case (int)EGraphicsType::Layer:
 		{
 			CGraphicsLayer* layer = (CGraphicsLayer*)item;
 			if (layer->Layer() == Layer)

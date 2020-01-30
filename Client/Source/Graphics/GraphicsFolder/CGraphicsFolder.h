@@ -26,7 +26,7 @@ public:
 
 	inline CFolderLayer* Folder() const { return m_folder; }
 	void SetFolder(CFolderLayer* Folder);
-	int	type() const override { return (int)e_graphicstype::FolderLayer; }
+	int	type() const override { return (int)EGraphicsType::FolderLayer; }
 
 private:
 	QGraphicsWidget* FindLayerWidget(const CBaseLayer* Layer);

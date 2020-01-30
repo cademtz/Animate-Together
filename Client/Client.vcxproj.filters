@@ -134,6 +134,9 @@
     <ClCompile Include="Source\Graphics\FrameItem\CFrameItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Graphics\GraphicsFrameList\CGraphicsFrameList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -307,6 +310,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\FrameItem\CFrameItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\GraphicsFrameList\CGraphicsFrameList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

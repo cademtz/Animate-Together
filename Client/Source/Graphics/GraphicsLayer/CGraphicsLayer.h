@@ -29,7 +29,7 @@ public:
 	inline CBaseLayer* Layer() const { return m_layer; }
 	void SetLayer(CBaseLayer* Layer);
 
-	int type() const override { return (int)e_graphicstype::Layer; }
+	int type() const override { return (int)EGraphicsType::Layer; }
 
 private:
 	void OnLayerEvent(CBaseLayerMsg* Event);

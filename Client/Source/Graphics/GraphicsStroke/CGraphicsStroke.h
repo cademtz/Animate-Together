@@ -23,7 +23,7 @@ public:
 	void Add(const CStroke& Other);
 
 protected:
-	int	type() const { return (int)e_graphicstype::Stroke; }
+	int	type() const { return (int)EGraphicsType::Stroke; }
 
 private:
 	CStroke m_stroke;

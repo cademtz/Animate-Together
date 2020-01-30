@@ -23,7 +23,7 @@ public:
 
 	CBaseFrame* Frame();
 
-	int		type() const override { return (int)e_graphicstype::Frame; }
+	int		type() const override { return (int)EGraphicsType::Frame; }
 	void	paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 	QSizeF	sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override { return m_size; }
 	void	setGeometry(const QRectF &geom) override;

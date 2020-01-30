@@ -13,10 +13,11 @@
 
 #include <qgraphicsitem.h>
 
-enum class e_graphicstype
+enum class EGraphicsType
 {
 	null = QGraphicsItem::UserType,
 	Frame,
+	FrameList,
 	Layer,
 	FolderLayer,
 	FrameLayout,

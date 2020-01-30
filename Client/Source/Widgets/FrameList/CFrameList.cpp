@@ -242,7 +242,7 @@ bool CFrameList::Drag(QMouseEvent * Event)
 		if (m_drag == e_drag::None && Event->button() == Qt::LeftButton)
 		{
 			QGraphicsItem* item = itemAt(Event->pos());
-			if (!item || item->type() != (int)e_graphicstype::Frame)
+			if (!item || item->type() != (int)EGraphicsType::Frame)
 				break;
 
 			auto gframe = (CGraphicsFrame*)item;
@@ -323,7 +323,7 @@ bool CFrameList::Drag(QMouseEvent * Event)
 			m_boxoverlay->setVisible(false);
 
 			QGraphicsItem* item = scene()->itemAt(m_boxoverlay->rect().topLeft(), QTransform());
-			if (item->type() == (int)e_graphicstype::Frame)
+			if (item->type() == (int)EGraphicsType::Frame)
 			{
 				auto gframe = (CGraphicsFrame*)item;
 				int frame = gframe->Index(), layer = gframe->Layer()->Index(),
@@ -366,7 +366,7 @@ bool CFrameList::Drag(QMouseEvent * Event)
 			m_boxoverlay->setVisible(false); // Just to stop itemAt from hitting it
 			auto item = scene()->itemAt(pos, QTransform());
 			m_boxoverlay->setVisible(true);
-			if (!item || item->type() != (int)e_graphicstype::Frame)
+			if (!item || item->type() != (int)EGraphicsType::Frame)
 				break;
 			auto frame = (CGraphicsFrame*)item;
 
@@ -399,7 +399,7 @@ bool CFrameList::Select(QMouseEvent * Event)
 			while (p.x() <= end.x())
 			{
 				QGraphicsItem* item = scene()->itemAt(p, transform());
-				if (item && item->type() == (int)e_graphicstype::Frame)
+				if (item && item->type() == (int)EGraphicsType::Frame)
 				{
 					CGraphicsFrame* frame = (CGraphicsFrame*)item;
 					frame->SelectFrame();

@@ -31,7 +31,7 @@ public:
 
 	void HandleFrameEvent(CFrameEvent* Event, QGraphicsScene* Scene);
 
-	int type() { return (int)e_graphicstype::FrameLayout; }
+	int type() { return (int)EGraphicsType::FrameLayout; }
 };
 
 #endif // CFrameLayout_H

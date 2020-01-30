@@ -28,7 +28,7 @@ public:
 	void SelectFrame(bool Select = true);
 	inline CFrameLayout* Parent() { return (CFrameLayout*)parentLayoutItem(); }
 
-	int		type() const { return (int)e_graphicstype::Frame; }
+	int		type() const { return (int)EGraphicsType::Frame; }
 	void	paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	QSizeF	sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
 	void	setGeometry(const QRectF &geom);

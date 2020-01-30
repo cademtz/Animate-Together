@@ -25,7 +25,7 @@ public:
 
 	CFrameLayout* Layer(int Index) { return (CFrameLayout*)itemAt(Index); }
 	int IndexOf(CFrameLayout* Layer);
-	int type() { return (int)e_graphicstype::LayerLayout; }
+	int type() { return (int)EGraphicsType::LayerLayout; }
 
 	void HandleEvent(CCustomEvent* Event, QGraphicsScene* Scene);
 };
