@@ -11,16 +11,17 @@
 #pragma once
 #endif
 
-#include <qgraphicsitem.h>
 #include <qgraphicslayoutitem.h>
 #include "Graphics/GraphicsTypes.h"
 
 class CBaseFrame;
+class CGraphicsFrameList;
 
 class CFrameItem : public QGraphicsLayoutItem, public QGraphicsItem
 {
 public:
 
+	int Index();
 	CBaseFrame* Frame();
 
 	int		type() const override { return (int)EGraphicsType::Frame; }
@@ -33,7 +34,7 @@ public:
 	static void SetSize(QSizeF Size) { m_size = Size; }
 	inline bool IsSelected() const { return m_selected; }
 	inline void SetSelected(bool Selected) { m_selected = Selected; }
-	int Index();
+	inline CGraphicsFrameList* Parent() { return (CGraphicsFrameList*)parentWidget(); }
 
 private:
 	static QSizeF m_size;

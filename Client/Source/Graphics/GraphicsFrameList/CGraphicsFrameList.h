@@ -12,15 +12,18 @@
 #endif
 
 #include <qgraphicswidget.h>
-#include <qgraphicslinearlayout.h>
 #include "Graphics/GraphicsTypes.h"
 
 class CBaseLayer;
+class QGraphicsLinearLayout;
 
 class CGraphicsFrameList : public QGraphicsWidget
 {
 public:
 	CGraphicsFrameList(CBaseLayer* Layer, QGraphicsItem* Parent = 0);
+
+	CBaseLayer* Layer() { return m_layer; }
+	void SetLayer(CBaseLayer* Layer);
 
 	int type() const override { return (int)EGraphicsType::FrameList; }
 	QRectF boundingRect() const override { return rect(); }
@@ -28,6 +31,8 @@ public:
 private:
 	QGraphicsLinearLayout* m_layout;
 	CBaseLayer* m_layer;
+
+	unsigned m_listenlayer, m_listenclient;
 };
 
 #endif // CGraphicsFrameList_H

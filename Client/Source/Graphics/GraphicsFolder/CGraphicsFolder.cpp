@@ -169,10 +169,5 @@ void CGraphicsFolder::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
 {
 	m_layerlist->setVisible(m_open = !m_open);
 	for (QGraphicsWidget* widg = m_layerlist; widg; widg = widg->parentWidget())
-	{
 		widg->adjustSize();
-		//if (widg->layout())
-			//widg->layout()->updateGeometry();
-		//widg->update();
-	}
 }
