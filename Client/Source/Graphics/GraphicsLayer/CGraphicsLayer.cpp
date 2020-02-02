@@ -12,6 +12,32 @@
 #include "NetObjects/CFolderLayer.h"
 #include "Client/CClient.h"
 
+class TestThing : public QGraphicsTextItem, public CEventHandler<TestThing>
+{
+public:
+	TestThing(QGraphicsItem* Parent = 0) : QGraphicsTextItem(Parent) { }
+protected:
+	void focusOutEvent(QFocusEvent* Event) override
+	{
+		//Event->accept();
+		QGraphicsTextItem::focusOutEvent(Event);
+		CreateEvent(*this);
+	}
+
+	void keyPressEvent(QKeyEvent* Event) override
+	{
+		if (Event->key() == Qt::Key_Return)
+		{
+			CreateEvent(*this);
+			Event->accept();
+		}
+		else
+			QGraphicsTextItem::keyPressEvent(Event);
+	}
+};
+
+TestThing::Listeners_t TestThing::m_listeners;
+
 CGraphicsLayer::CGraphicsLayer(CBaseLayer * Layer, QGraphicsItem * Parent)
 	: QGraphicsWidget(Parent), m_layer(Layer)
 {
@@ -32,20 +58,8 @@ CGraphicsLayer::CGraphicsLayer(CBaseLayer * Layer, QGraphicsItem * Parent)
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
 
-	/*
-	Normal QGraphics items cannot be used in layouts,
-	so basically every single primitive is useless.
-	I Guess I'll have to make a whole class to shove a text item inside another layout item.
-	Maybe tomorrow.
-
-	Update: Okay so first attempt. Fingers crossed.
-	Update: Okay so it failed. I'll figure it out tomorrow (again)
-	Update: Well the only option is to parent them individualy to a whole new widget item just for themselves
-	*/
-
 	m_container = new QGraphicsWidget(this);
-
-	m_label = new QGraphicsTextItem(m_container);
+	m_label = new TestThing(m_container);
 	m_label->setPos(0, 0);
 
 	m_container->setVisible(true);
@@ -56,11 +70,12 @@ CGraphicsLayer::CGraphicsLayer(CBaseLayer * Layer, QGraphicsItem * Parent)
 	m_layout->addItem(m_container);
 	SetLayer(Layer);
 
-	m_listener = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
+	m_listenlayer = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
+	m_listenclient = CClient::Listen([this](CBaseMsg* Msg) { OnClientEvent(Msg); });
 }
 
 CGraphicsLayer::~CGraphicsLayer() {
-	CBaseLayer::EndListen(m_listener);
+	CBaseLayer::EndListen(m_listenlayer);
 }
 
 void CGraphicsLayer::SetLayer(CBaseLayer * Layer)
@@ -76,7 +91,7 @@ void CGraphicsLayer::OnLayerEvent(CBaseLayerMsg * Event)
 	if (Event->Layer() != m_layer)
 		return;
 
-	switch (Event->Type())
+	switch (Event->EventType())
 	{
 	case CNetEvent::Event_LayerEdit:
 	{
@@ -88,12 +103,31 @@ void CGraphicsLayer::OnLayerEvent(CBaseLayerMsg * Event)
 	}
 }
 
+void CGraphicsLayer::OnClientEvent(CBaseMsg * Msg)
+{
+	switch (Msg->Type())
+	{
+	case CBaseMsg::Msg_Event:
+		OnLayerEvent((CBaseLayerMsg*)Msg);
+		break;
+	}
+}
+
+void CGraphicsLayer::NameEdited()
+{
+	m_label->setTextInteractionFlags(Qt::TextInteractionFlag::NoTextInteraction);
+	CLayerEditMsg edit(m_layer);
+	edit.SetNewName(m_label->toPlainText());
+	CClient::Send(edit);
+}
+
 void CGraphicsLayer::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
 	QMenu menu;
 	QAction* remove = menu.addAction(tr("Remove")),
 		* moveup = menu.addAction(tr("Move up")),
-		* movedown = menu.addAction(tr("Move down"));
+		* movedown = menu.addAction(tr("Move down")),
+		* rename = menu.addAction(tr("Rename"));
 
 	if (!m_layer->Parent())
 	{
@@ -130,5 +164,11 @@ void CGraphicsLayer::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 			move.SetNewPlace(index, parent);
 			CClient::Send(move);
 		}
+	}
+	else if (action == rename)
+	{
+		m_label->setTextInteractionFlags(Qt::TextEditable | Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+		m_label->setFocus();
+		((TestThing*)m_label)->Listen([this](TestThing* thing) { NameEdited(); });
 	}
 }

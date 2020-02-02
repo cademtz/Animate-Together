@@ -16,6 +16,7 @@
 #include "Graphics/GraphicsTypes.h"
 #include "Graphics/LayoutWrap/CLayoutWrap.h"
 
+class CBaseMsg;
 class CBaseLayer;
 class CBaseLayerMsg;
 class QGraphicsLinearLayout;
@@ -33,9 +34,11 @@ public:
 
 private:
 	void OnLayerEvent(CBaseLayerMsg* Event);
+	void OnClientEvent(CBaseMsg* Msg);
+	void NameEdited();
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
-	unsigned m_listener;
+	unsigned m_listenlayer, m_listenclient;
 	CBaseLayer* m_layer;
 	QGraphicsTextItem* m_label;
 	QGraphicsWidget* m_container;

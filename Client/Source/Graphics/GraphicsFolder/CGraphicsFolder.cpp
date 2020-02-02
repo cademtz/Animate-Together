@@ -26,7 +26,6 @@ CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder, QGraphicsItem* Parent) :
 
 	m_layerlist = new QGraphicsWidget(this);
 	m_layerlist->setMinimumHeight(0);
-	//m_layerlist->setSizePolicy(policy);
 	QPalette pal = m_layerlist->palette();
 	pal.setBrush(QPalette::Window, QColor(0x404040));
 	setPalette(pal);
@@ -35,13 +34,9 @@ CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder, QGraphicsItem* Parent) :
 	m_listlayout->setContentsMargins(15, 0, 0, 0);
 	m_listlayout->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 	m_listlayout->setSpacing(0);
-	//m_listlayout->setPreferredHeight(0);
 
 
 	SetFolder(Folder);
-
-	//adjustSize();
-	//setMinimumSize(size() + QSizeF(15, 0));
 
 	m_listenlayer = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
 	m_listenclient = CClient::Listen([this](CBaseMsg* Event) { OnClientEvent(Event); });

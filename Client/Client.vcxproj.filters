@@ -116,9 +116,6 @@
     <ClCompile Include="Source\Graphics\GraphicsStroke\CGraphicsStroke.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Graphics\GraphicsLayer\CGraphicsLayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Graphics\TimelineScene\CTimelineScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -135,6 +132,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\GraphicsFrameList\CGraphicsFrameList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\GraphicsLayer\CGraphicsLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
