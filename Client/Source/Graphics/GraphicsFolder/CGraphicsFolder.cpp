@@ -35,7 +35,6 @@ CGraphicsFolder::CGraphicsFolder(CFolderLayer * Folder, QGraphicsItem* Parent) :
 	m_listlayout->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 	m_listlayout->setSpacing(0);
 
-
 	SetFolder(Folder);
 
 	m_listenlayer = CBaseLayer::Listen([this](CBaseLayerMsg* Event) { OnLayerEvent(Event); });
@@ -51,7 +50,6 @@ CGraphicsFolder::~CGraphicsFolder()
 void CGraphicsFolder::SetFolder(CFolderLayer * Folder)
 {
 	m_folder = Folder;
-	m_open = true;
 
 	while (m_layerlist->children().size())
 		delete m_layerlist->children().back();
@@ -59,7 +57,7 @@ void CGraphicsFolder::SetFolder(CFolderLayer * Folder)
 	for (auto layer : m_folder->Layers())
 		InsertLayer(layer);
 
-	m_layerlist->setVisible(m_open);
+	m_layerlist->setVisible(m_folder->IsOpen());
 	m_layout->addItem(m_layerlist);
 }
 
@@ -162,7 +160,8 @@ void CGraphicsFolder::OnLayerEvent(CBaseLayerMsg * Event)
 
 void CGraphicsFolder::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
 {
-	m_layerlist->setVisible(m_open = !m_open);
+	m_folder->SetIsOpen(!m_folder->IsOpen());
+	m_layerlist->setVisible(m_folder->IsOpen());
 	for (QGraphicsWidget* widg = m_layerlist; widg; widg = widg->parentWidget())
 		widg->adjustSize();
 }

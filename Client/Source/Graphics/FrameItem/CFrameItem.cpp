@@ -13,8 +13,11 @@
 #include <qmenu.h>
 #include "Graphics/GraphicsFrameList/CGraphicsFrameList.h"
 #include "NetObjects/CBaseLayer.h"
+#include "Client/CClient.h"
 
-QSizeF CFrameItem::m_size;
+QSizeF CFrameItem::m_size = QSizeF(9, 17);
+
+CFrameItem::CFrameItem(CBaseFrame * Frame) : m_frame(Frame) { }
 
 int CFrameItem::Index()
 {
@@ -30,7 +33,21 @@ CBaseFrame * CFrameItem::Frame() {
 }
 
 void CFrameItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget) {
-	painter->fillRect(boundingRect(), Qt::blue);
+	painter->fillRect(boundingRect(), m_frame->IsKey() ? Qt::blue : Qt::red);
+}
+
+QSizeF CFrameItem::sizeHint(Qt::SizeHint which, const QSizeF & constraint) const
+{
+	switch (which)
+	{
+	case Qt::MinimumSize:
+	case Qt::PreferredSize:
+	case Qt::MaximumSize:
+		return m_size;
+	default:
+		break;
+	}
+	return constraint;
 }
 
 void CFrameItem::setGeometry(const QRectF & geom)
@@ -38,7 +55,6 @@ void CFrameItem::setGeometry(const QRectF & geom)
 	prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(geom);
 	setPos(geom.topLeft());
-	m_size = geom.size();
 }
 
 void CFrameItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
@@ -50,11 +66,12 @@ void CFrameItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 		* color = menu.addAction(QObject::tr("Color...")),
 		* lock = menu.addAction(QObject::tr("Lock"));
 
-	del->setEnabled(false);
 	copy->setEnabled(false);
 	paste->setEnabled(false);
 	color->setEnabled(false);
 	lock->setEnabled(false);
 
-	menu.exec(event->screenPos());
+	QAction* action = menu.exec(event->screenPos());
+	if (action == del)
+		CClient::Send(CFrameAddMsg(m_frame, false));
 }

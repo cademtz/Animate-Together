@@ -41,8 +41,8 @@ private:
 	void OnLayerEvent(CBaseLayerMsg* Msg);
 	void OnDrag();
 
-	QGraphicsWidget* m_widget, * m_drag;
-	QGraphicsLinearLayout* m_layout;
+	QGraphicsWidget* m_widget, * m_drag, * m_layerframes;
+	QGraphicsLinearLayout* m_layout, * m_layerframeslayout;
 	CGraphicsFolder* m_root;
 };
 

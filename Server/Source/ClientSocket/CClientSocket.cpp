@@ -112,6 +112,15 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 			m_parent->SendAll(edit);
 			break;
 		}
+		case CNetEvent::Event_FrameAdd:
+		{
+			if (!(m_user->Perms() & CUser::Perm_Guest))
+				break;
+			CFrameAddMsg add(m_parent->Project(), Msg);
+			add.Perform();
+			m_parent->SendAll(add);
+			break;
+		}
 		}
 	}
 	}

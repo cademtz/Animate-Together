@@ -157,6 +157,7 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		{
 			CFrameAddMsg add(m_proj, Msg);
 			add.Perform();
+			CreateEvent(add);
 			qInfo() << "Current frames:";
 			auto layers = m_proj->Root().Layers1D();
 			for (auto layer : layers)

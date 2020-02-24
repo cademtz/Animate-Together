@@ -42,7 +42,6 @@ private:
 	CGraphicsLayer* m_item;
 	QGraphicsWidget* m_layerlist;
 	QGraphicsLinearLayout* m_layout, * m_listlayout;
-	bool m_open = true;
 	unsigned m_listenlayer, m_listenclient;
 };
 

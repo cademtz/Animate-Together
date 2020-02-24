@@ -116,6 +116,7 @@ public:
 
 	// - Returns true if the layer was last added or removed
 	inline bool WasAdded() const { return m_add != Undone(); }
+	inline int Index() const { return m_index; }
 
 protected:
 	CSerialize Serialize() const override;
@@ -197,11 +198,12 @@ public:
 			delete Frame();
 	}
 
-	// - Returns true if the event describes an added layer, false if it's a removed layer
+	// - Returns true if the event describes an added frame, false if it's a removed frame
 	inline bool IsAdd() const { return m_add; }
 
-	// - Returns true if the layer was last added or removed
+	// - Returns true if the frame was last added or removed
 	inline bool WasAdded() const { return m_add != Undone(); }
+	inline int Index() const { return m_index; }
 
 protected:
 	CSerialize Serialize() const override;

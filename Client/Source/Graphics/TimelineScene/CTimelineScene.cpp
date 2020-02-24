@@ -6,15 +6,19 @@
  */
 
 #include "CTimelineScene.h"
+#include <qcursor.h>
 #include <Shared/CSharedProject.h>
 #include <qgraphicslinearlayout.h>
 #include "Client/CClient.h"
 #include "Graphics/GraphicsFolder/CGraphicsFolder.h"
+#include "Graphics/GraphicsFrameList/CGraphicsFrameList.h"
 
 CTimelineScene::CTimelineScene()
 {
 	m_widget = new QGraphicsWidget();
 	m_drag = new QGraphicsWidget();
+	m_layerframes = new QGraphicsWidget();
+	m_layerframeslayout = new QGraphicsLinearLayout(Qt::Vertical);
 	m_layout = new QGraphicsLinearLayout(Qt::Horizontal, m_widget);
 
 	QPalette pal = m_widget->palette();
@@ -24,6 +28,8 @@ CTimelineScene::CTimelineScene()
 	m_widget->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
 	m_drag->setPreferredWidth(5);
 	m_drag->setFlag(QGraphicsItem::ItemIsMovable);
+	m_drag->setCursor(QCursor(Qt::SizeHorCursor));
+	m_layerframes->setLayout(m_layerframeslayout);
 
 	addItem(m_widget);
 
@@ -47,9 +53,20 @@ void CTimelineScene::ResetScene(CSharedProject * Project)
 		m_root->adjustSize();
 		m_drag->setPos(m_root->preferredWidth(), 0);
 		m_layout->insertItem(0, m_root);
+		auto layers = Project->Root().Layers1D();
+		for (auto layer : layers)
+			m_layerframeslayout->addItem(new CGraphicsFrameList(layer));
+		m_layout->addItem(m_layerframes);
 	}
 	else
+	{
+		for (int i = m_layerframeslayout->count() - 1; i >= 0; i--)
+			delete m_layerframeslayout->itemAt(i);
+		auto layers = Project->Root().Layers1D();
+		for (auto layer : layers)
+			m_layerframeslayout->addItem(new CGraphicsFrameList(layer));
 		m_root->SetFolder(&Project->Root());
+	}
 	OnDrag();
 }
 
@@ -65,7 +82,18 @@ void CTimelineScene::OnClientEvent(CBaseMsg * Msg)
 
 void CTimelineScene::OnLayerEvent(CBaseLayerMsg * Event)
 {
-
+	switch (Event->EventType())
+	{
+	case CNetEvent::Event_LayerAdd:
+	{
+		CLayerAddMsg* add = (CLayerAddMsg*)Event;
+		if (add->IsAdd())
+			m_layerframeslayout->insertItem(add->Index(), new CGraphicsFrameList(add->Layer()));
+		else
+			m_layerframeslayout->removeAt(add->Index());
+		break;
+	}
+	}
 }
 
 void CTimelineScene::OnDrag()

@@ -11,24 +11,26 @@
 #pragma once
 #endif
 
+#include <qgraphicswidget.h>
 #include <qgraphicslayoutitem.h>
 #include "Graphics/GraphicsTypes.h"
 
 class CBaseFrame;
 class CGraphicsFrameList;
 
-class CFrameItem : public QGraphicsLayoutItem, public QGraphicsItem
+class CFrameItem : public QGraphicsWidget
 {
 public:
+	CFrameItem(CBaseFrame* Frame);
 
 	int Index();
 	CBaseFrame* Frame();
 
 	int		type() const override { return (int)EGraphicsType::Frame; }
 	void	paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-	QSizeF	sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override { return m_size; }
+	QSizeF	sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 	void	setGeometry(const QRectF &geom) override;
-	QRectF	boundingRect() const override { return QRectF(pos(), m_size); }
+	QRectF	boundingRect() const override { return QRectF(QPoint(0, 0), m_size); }
 	void	contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
 	static void SetSize(QSizeF Size) { m_size = Size; }
@@ -39,5 +41,6 @@ public:
 private:
 	static QSizeF m_size;
 	bool m_selected = false;
+	CBaseFrame* m_frame;
 };
 #endif // CFrameItem_H

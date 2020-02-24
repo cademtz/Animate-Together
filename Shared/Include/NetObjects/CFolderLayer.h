@@ -41,6 +41,8 @@ public:
 	// - In order of parent before children including current layer
 	LayerList_t Layers1D();
 	ConstLayerList_t Layers1D() const;
+	inline bool IsOpen() const { return m_open; }
+	inline void SetIsOpen(bool Open) { m_open = Open; }
 
 	// - Finds a child or the current layer by handle
 	// - Return is null if the layer is not listed
@@ -107,6 +109,7 @@ private:
 
 	CSharedProject* m_proj = 0;
 	LayerList_t m_layers;
+	bool m_open = true;
 };
 
 #endif // CFolderLayer_H
