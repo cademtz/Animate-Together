@@ -69,7 +69,7 @@ void CGraphicsFrameList::OnClientEvent(CBaseMsg * Msg)
 					m_layout->insertItem(add->Index(), frame);
 				}
 				else
-					m_layout->removeAt(add->Index());
+					delete m_layout->itemAt(add->Index());
 			}
 		}
 		}

@@ -183,7 +183,6 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		CLeaveMsg left(Msg);
 		CreateEvent(left);
 
-		CUser* ragequit = nullptr;
 		for (auto it = m_users.begin(); it != m_users.end(); it++)
 		{
 			if (left.UserHandle() == (*it)->Handle())
