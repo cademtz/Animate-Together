@@ -72,7 +72,6 @@ void CServer::ClientConnect()
 	QTcpSocket* sock = nextPendingConnection();
 	sock->connect(sock, &QTcpSocket::disconnected, this, &CServer::ClientDisconnect);
 	m_clients.push_back(new CClientSocket(sock, this));
-	qInfo() << sock->peerAddress() << "Connected";
 }
 
 void CServer::ClientDisconnect()

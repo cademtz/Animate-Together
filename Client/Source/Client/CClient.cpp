@@ -135,6 +135,9 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		{
 			CLayerAddMsg add(m_proj, Msg);
 			add.Perform();
+
+#ifdef _DEBUG
+			qInfo() << "Event_LayerAdd";
 			auto layers = m_proj->Root().Layers1D();
 			for (auto layer : layers)
 			{
@@ -144,6 +147,7 @@ void CClient::HandleMsg(CNetMsg * Msg)
 					out.prepend(parent->Name() + " > ");
 				qInfo().noquote() << out;
 			}
+#endif
 			break;
 		}
 		case CNetEvent::Event_LayerEdit:
@@ -158,7 +162,9 @@ void CClient::HandleMsg(CNetMsg * Msg)
 			CFrameAddMsg add(m_proj, Msg);
 			add.Perform();
 			CreateEvent(add);
-			qInfo() << "Current frames:";
+
+#ifdef _DEBUG
+			qInfo() << "Event_FrameAdd";
 			auto layers = m_proj->Root().Layers1D();
 			for (auto layer : layers)
 			{
@@ -167,6 +173,7 @@ void CClient::HandleMsg(CNetMsg * Msg)
 					out += frame->IsKey() ? '#' : ' ';
 				qInfo().noquote() << out;
 			}
+#endif
 		}
 		}
 		break;

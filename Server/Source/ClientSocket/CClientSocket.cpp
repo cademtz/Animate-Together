@@ -34,10 +34,12 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 		{
 			m_stage = ATNet::Stage_Join;
 			SendMsg(m_parent->Auth());
-			qInfo() << Socket()->peerAddress() << ": Good protocol";
 		}
 		else
+		{
+			qInfo() << Socket()->peerAddress() << ": Disconnected for bad protocol";
 			Socket()->abort();
+		}
 		return;
 	case ATNet::Stage_Join:
 		switch (Msg->Type())
@@ -92,6 +94,8 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 			add.Perform();
 			m_parent->SendAll(add);
 
+#ifdef _DEBUG
+			qInfo() << "Event_LayerAdd";
 			auto layers = add.Project()->Root().Layers1D();
 			for (auto layer : layers)
 			{
@@ -101,6 +105,7 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 					out.prepend(parent->Name() + " > ");
 				qInfo() << out;
 			}
+#endif
 			break;
 		}
 		case CNetEvent::Event_LayerEdit:
@@ -151,6 +156,8 @@ CClientSocket::ELogin CClientSocket::CheckLogin(const CLoginMsg& Login)
 
 void CClientSocket::Joined()
 {
+	qInfo() << m_user->Name() << "Joined the session with IP" << Socket()->peerAddress();
+
 	// The first message a new joining user recieves will be their own information
 	CJoinMsg join(m_user);
 	m_parent->SendAll(join);
