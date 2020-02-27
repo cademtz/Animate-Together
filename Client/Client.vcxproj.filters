@@ -137,6 +137,9 @@
     <ClCompile Include="Source\Graphics\GraphicsLayer\CGraphicsLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Models\CLayerModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -313,6 +316,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\GraphicsFrameList\CGraphicsFrameList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Models\CLayerModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

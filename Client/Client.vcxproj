@@ -318,6 +318,10 @@
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtWidgets</IncludePath>
     </ClCompile>
+    <ClCompile Include="Source\Models\CLayerModel.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Source\Projects\Frame\CFrame.cpp" />
     <ClCompile Include="Source\Projects\Frame\CRasterFrame.cpp">
       <SubType>
@@ -504,6 +508,10 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="Source\Interface\Login\CLogin.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Source\Models\CLayerModel.h">
       <SubType>
       </SubType>
     </ClInclude>
