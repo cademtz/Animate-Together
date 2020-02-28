@@ -7,6 +7,19 @@
 
 #include "CLayerModel.h"
 #include <Shared/CSharedProject.h>
+#include "Client/CClient.h"
+
+CLayerModel::CLayerModel(CSharedProject * Proj, QObject * Parent) : QAbstractItemModel(Parent), m_proj(Proj)
+{
+	m_clientlistener = CClient::Listen([this](CBaseMsg* Msg) { OnClientEvent(Msg); });
+	m_layerlistener = CBaseLayer::Listen([this](CBaseLayerMsg* Msg) { OnLayerEvent(Msg); });
+}
+
+CLayerModel::~CLayerModel()
+{
+	CClient::EndListen(m_clientlistener);
+	CBaseLayer::EndListen(m_layerlistener);
+}
 
 Qt::ItemFlags CLayerModel::flags(const QModelIndex & index) const
 {
@@ -67,4 +80,22 @@ int CLayerModel::rowCount(const QModelIndex & parent) const
 	if (parentLayer->Type() == CBaseLayer::Layer_Folder)
 		return ((CFolderLayer*)parentLayer)->Layers().size();
 	return 0;
+}
+
+void CLayerModel::OnClientEvent(CBaseMsg * Msg)
+{
+}
+
+void CLayerModel::OnLayerEvent(CBaseLayerMsg * Msg)
+{
+	switch (Msg->EventType())
+	{
+	case CBaseLayerMsg::Event_LayerAdd:
+	{
+		CLayerAddMsg* add = (CLayerAddMsg*)Msg;
+		if (add->WasAdded())
+		{
+		}
+	}
+	}
 }

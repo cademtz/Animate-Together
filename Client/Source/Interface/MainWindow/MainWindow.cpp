@@ -6,6 +6,7 @@
 #include <qlayout.h>
 #include <qevent.h>
 #include <qgraphicsview.h>
+#include <qtreeview.h>
 
 #include "Client/CClient.h"
 #include "Projects/CProject.h"
@@ -18,6 +19,8 @@
 #include "Interface/ColorPicker/ColorPicker.h"
 #include "Interface/Login/CLogin.h"
 #include "Graphics/TimelineScene/CTimelineScene.h"
+#include "Models/CLayerModel.h"
+#include "Shared/CSharedProject.h"
 
 QString MainWindow::m_globalstyle;
 
@@ -83,8 +86,23 @@ MainWindow::MainWindow(QWidget *parent)
 	CChatPanel* chat = new CChatPanel();
 	l_client->addWidget(chat);
 	l_client->addWidget(view);
-	//chat->show();
-	//view->show();
+	
+	CBaseLayer::Listen([&](CBaseLayerMsg* Msg)
+		{
+			if (Msg->EventType() == CBaseLayerMsg::Event_LayerAdd)
+			{
+				CLayerAddMsg* add = (CLayerAddMsg*)Msg;
+				if (!add->Layer()->IsRoot() && add->Layer()->Index() > 0)
+				{
+					auto proj = CClient::Project();
+					auto model = new CLayerModel(proj);
+					/*QTreeView* treeview = new QTreeView();
+					treeview->setModel(model);
+					treeview->show();*/
+					// QTreeView instance immediately crashes with bad ptr upon calling functions
+				}
+			}
+		});
 	l_mainlayout->addWidget(m_client);
 
 #endif

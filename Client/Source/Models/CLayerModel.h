@@ -13,12 +13,15 @@
 
 #include <qabstractitemmodel.h>
 
+class CBaseMsg;
+class CBaseLayerMsg;
 class CSharedProject;
 
 class CLayerModel : public QAbstractItemModel
 {
 public:
-	CLayerModel(CSharedProject* Proj, QObject* Parent = 0) : QAbstractItemModel(Parent), m_proj(Proj) { }
+	CLayerModel(CSharedProject* Proj, QObject* Parent = 0);
+	~CLayerModel();
 
 	QVariant data(const QModelIndex& index, int role) const override { return "a layer. nice :)"; }
 	Qt::ItemFlags flags(const QModelIndex& index) const override;
@@ -29,7 +32,12 @@ public:
 	int columnCount(const QModelIndex& parent = QModelIndex()) const override { return 0; }
 
 private:
+	void OnClientEvent(CBaseMsg* Msg);
+	void OnLayerEvent(CBaseLayerMsg* Msg);
+
 	CSharedProject* m_proj;
+	unsigned m_clientlistener;
+	unsigned m_layerlistener;
 };
 
 #endif // CLayerModel_H
