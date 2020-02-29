@@ -14,6 +14,7 @@
 #include <qabstractitemmodel.h>
 
 class CBaseMsg;
+class CBaseLayer;
 class CBaseLayerMsg;
 class CSharedProject;
 
@@ -23,15 +24,16 @@ public:
 	CLayerModel(CSharedProject* Proj, QObject* Parent = 0);
 	~CLayerModel();
 
-	QVariant data(const QModelIndex& index, int role) const override { return "a layer. nice :)"; }
+	QVariant data(const QModelIndex& index, int role) const override;
 	Qt::ItemFlags flags(const QModelIndex& index) const override;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 	QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
 	QModelIndex parent(const QModelIndex& index) const override;
 	int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-	int columnCount(const QModelIndex& parent = QModelIndex()) const override { return 0; }
+	int columnCount(const QModelIndex& parent = QModelIndex()) const override { return 1; }
 
 private:
+	QModelIndex index(CBaseLayer* Layer) const;
 	void OnClientEvent(CBaseMsg* Msg);
 	void OnLayerEvent(CBaseLayerMsg* Msg);
 

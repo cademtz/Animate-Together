@@ -21,6 +21,16 @@ CLayerModel::~CLayerModel()
 	CBaseLayer::EndListen(m_layerlistener);
 }
 
+QVariant CLayerModel::data(const QModelIndex & index, int role) const
+{
+	switch (role)
+	{
+	case Qt::DisplayRole:
+		return ((CBaseLayer*)index.internalPointer())->Name();
+	}
+	return QVariant();
+}
+
 Qt::ItemFlags CLayerModel::flags(const QModelIndex & index) const
 {
 	if (!index.isValid())
@@ -47,7 +57,7 @@ QModelIndex CLayerModel::index(int row, int column, const QModelIndex & parent) 
 
 	CBaseLayer *child = nullptr;
 	if (parentLayer->Type() == CBaseLayer::Layer_Folder)
-		((CFolderLayer*)parentLayer)->Layers()[row];
+		child = ((CFolderLayer*)parentLayer)->Layers()[row];
 
 	if (child)
 		return createIndex(row, column, child);
@@ -82,6 +92,13 @@ int CLayerModel::rowCount(const QModelIndex & parent) const
 	return 0;
 }
 
+QModelIndex CLayerModel::index(CBaseLayer * Layer) const
+{
+	if (!Layer->IsRoot() && Layer->RootProject() == m_proj)
+		return createIndex(Layer->Index(), 0, Layer);
+	return QModelIndex();
+}
+
 void CLayerModel::OnClientEvent(CBaseMsg * Msg)
 {
 }
@@ -93,8 +110,20 @@ void CLayerModel::OnLayerEvent(CBaseLayerMsg * Msg)
 	case CBaseLayerMsg::Event_LayerAdd:
 	{
 		CLayerAddMsg* add = (CLayerAddMsg*)Msg;
+		int row = add->Index();
+		QModelIndex parent = index(add->Parent());
 		if (add->WasAdded())
 		{
+			beginInsertRows(parent, row, row);
+			endInsertRows();
+		}
+		else
+		{
+			// TODO: idk. The layer is already removed, meaning sometimes row ! < rowCount. Qt does not like that.
+			// maybe ficks that
+			//rowCount(parent);
+			//beginRemoveRows(parent, row, row);
+			//endRemoveRows();
 		}
 	}
 	}

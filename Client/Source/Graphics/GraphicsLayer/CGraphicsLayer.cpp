@@ -137,7 +137,7 @@ void CGraphicsLayer::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 
 	QAction* action = menu.exec(event->screenPos());
 	if (action == remove)
-		CClient::Send(CLayerAddMsg(m_layer, false));
+		CClient::Send(CLayerAddMsg(m_layer, m_layer->Index(), m_layer->Parent(), false));
 	else if (action == moveup || action == movedown)
 	{
 		bool cool = false;

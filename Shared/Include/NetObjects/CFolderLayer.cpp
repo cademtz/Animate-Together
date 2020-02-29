@@ -47,11 +47,12 @@ void CFolderLayer::Insert(int Index, CBaseLayer * Layer)
 {
 	Layer->SetParent(this);
 	m_layers.insert(Index, Layer);
-	CreateEvent(CLayerAddMsg(Layer, true));
+	CreateEvent(CLayerAddMsg(Layer, IndexOf(Layer), this, true));
 }
 
 bool CFolderLayer::Remove(CBaseLayer * Layer)
 {
+	int index = IndexOf(Layer);
 	bool removed = false;
 	if (m_layers.removeOne(Layer))
 		removed = true;
@@ -71,7 +72,7 @@ bool CFolderLayer::Remove(CBaseLayer * Layer)
 	}
 
 	if (removed)
-		CreateEvent(CLayerAddMsg(Layer, false));
+		CreateEvent(CLayerAddMsg(Layer, index, this, false));
 	return removed;
 }
 

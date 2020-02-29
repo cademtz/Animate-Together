@@ -52,9 +52,9 @@ public:
 	int Index() const;
 	inline EType Type() const { return (EType)m_type; }
 	CFolderLayer* Root();
-	inline const CFolderLayer* Root() const { return Root(); }
+	const CFolderLayer* Root() const;
 	CSharedProject* RootProject();
-	inline const CSharedProject* RootProject() const { return RootProject(); }
+	const CSharedProject* RootProject() const;
 	inline bool IsRoot() const { return !m_parent; }
 	inline CFolderLayer* Parent() { return m_parent; }
 	inline const CFolderLayer* Parent() const { return m_parent; }

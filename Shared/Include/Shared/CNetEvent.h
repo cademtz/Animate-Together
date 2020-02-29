@@ -103,7 +103,8 @@ class CLayerAddMsg : public CBaseLayerMsg
 {
 public:
 	// - Creates an add or remove event depending on 'Add'
-	CLayerAddMsg(CBaseLayer * Layer, bool Add) : CBaseLayerMsg(Event_LayerAdd, Layer), m_add(Add) { }
+	CLayerAddMsg(CBaseLayer * Layer, int Index, CFolderLayer* Parent, bool Add)
+		: CBaseLayerMsg(Event_LayerAdd, Layer), m_add(Add), m_parent(Parent), m_index(Index) { }
 	CLayerAddMsg(CSharedProject* Proj, CNetMsg* Msg);
 	~CLayerAddMsg()
 	{
@@ -117,6 +118,7 @@ public:
 	// - Returns true if the layer was last added or removed
 	inline bool WasAdded() const { return m_add != Undone(); }
 	inline int Index() const { return m_index; }
+	inline CFolderLayer* Parent() const { return m_parent; }
 
 protected:
 	CSerialize Serialize() const override;

@@ -87,7 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
 	l_client->addWidget(chat);
 	l_client->addWidget(view);
 	
-	CBaseLayer::Listen([&](CBaseLayerMsg* Msg)
+	/*CBaseLayer::Listen([&](CBaseLayerMsg* Msg)
 		{
 			if (Msg->EventType() == CBaseLayerMsg::Event_LayerAdd)
 			{
@@ -96,11 +96,21 @@ MainWindow::MainWindow(QWidget *parent)
 				{
 					auto proj = CClient::Project();
 					auto model = new CLayerModel(proj);
-					/*QTreeView* treeview = new QTreeView();
+					QTreeView* treeview = new QTreeView();
 					treeview->setModel(model);
-					treeview->show();*/
-					// QTreeView instance immediately crashes with bad ptr upon calling functions
+					treeview->show();
 				}
+			}
+		});*/
+	CClient::Listen([&](CBaseMsg* Msg)
+		{
+			if (Msg->Type() == CBaseMsg::Msg_ProjSetup)
+			{
+				auto proj = CClient::Project();
+				auto model = new CLayerModel(proj);
+				QTreeView* treeview = new QTreeView();
+				treeview->setModel(model);
+				treeview->show();
 			}
 		});
 	l_mainlayout->addWidget(m_client);

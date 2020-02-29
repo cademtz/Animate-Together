@@ -39,7 +39,24 @@ CFolderLayer * CBaseLayer::Root()
 	return folder;
 }
 
+const CFolderLayer * CBaseLayer::Root() const
+{
+	const CFolderLayer* folder;
+	if (Type() == Layer_Folder)
+		folder = (CFolderLayer*)this;
+	else
+		folder = Parent();
+	while (folder->Parent())
+		folder = folder->Parent();
+	return folder;
+}
+
 CSharedProject * CBaseLayer::RootProject() {
+	return Root()->Project();
+}
+
+const CSharedProject * CBaseLayer::RootProject() const
+{
 	return Root()->Project();
 }
 
