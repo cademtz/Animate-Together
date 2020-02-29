@@ -11,6 +11,7 @@
 
 CLayerModel::CLayerModel(CSharedProject * Proj, QObject * Parent) : QAbstractItemModel(Parent), m_proj(Proj)
 {
+	m_root = new LayerModelItem(&Proj->Root());
 	m_clientlistener = CClient::Listen([this](CBaseMsg* Msg) { OnClientEvent(Msg); });
 	m_layerlistener = CBaseLayer::Listen([this](CBaseLayerMsg* Msg) { OnLayerEvent(Msg); });
 }
@@ -19,6 +20,7 @@ CLayerModel::~CLayerModel()
 {
 	CClient::EndListen(m_clientlistener);
 	CBaseLayer::EndListen(m_layerlistener);
+	delete m_root;
 }
 
 QVariant CLayerModel::data(const QModelIndex & index, int role) const
@@ -26,7 +28,7 @@ QVariant CLayerModel::data(const QModelIndex & index, int role) const
 	switch (role)
 	{
 	case Qt::DisplayRole:
-		return ((CBaseLayer*)index.internalPointer())->Name();
+		return ((LayerModelItem*)index.internalPointer())->m_layer->Name();
 	}
 	return QVariant();
 }
@@ -48,16 +50,14 @@ QModelIndex CLayerModel::index(int row, int column, const QModelIndex & parent) 
 	if (!hasIndex(row, column, parent))
 		return QModelIndex();
 
-	CBaseLayer *parentLayer;
+	LayerModelItem *item;
 
 	if (!parent.isValid())
-		parentLayer = &m_proj->Root();
+		item = m_root;
 	else
-		parentLayer = (CBaseLayer*)parent.internalPointer();
+		item = (LayerModelItem*)parent.internalPointer();
 
-	CBaseLayer *child = nullptr;
-	if (parentLayer->Type() == CBaseLayer::Layer_Folder)
-		child = ((CFolderLayer*)parentLayer)->Layers()[row];
+	LayerModelItem* child = &item->m_children[row];
 
 	if (child)
 		return createIndex(row, column, child);
@@ -69,33 +69,48 @@ QModelIndex CLayerModel::parent(const QModelIndex & index) const
 	if (!index.isValid())
 		return QModelIndex();
 
-	CBaseLayer* parent = ((CBaseLayer*)index.internalPointer())->Parent();
-	if (parent == &m_proj->Root())
+	LayerModelItem* parent = ((LayerModelItem*)index.internalPointer())->m_parent;
+	if (parent == m_root)
 		return QModelIndex();
 
-	return createIndex(parent->Index(), 0, parent);
+	return createIndex(parent->row(), 0, parent);
 }
 
 int CLayerModel::rowCount(const QModelIndex & parent) const
 {
-	CBaseLayer *parentLayer;
+	LayerModelItem *item;
 	if (parent.column() > 0)
 		return 0;
 
 	if (!parent.isValid())
-		parentLayer = &m_proj->Root();
+		item = m_root;
 	else
-		parentLayer = (CBaseLayer*)parent.internalPointer();
+		item = (LayerModelItem*)parent.internalPointer();
 
-	if (parentLayer->Type() == CBaseLayer::Layer_Folder)
-		return ((CFolderLayer*)parentLayer)->Layers().size();
-	return 0;
+	return item->rowCount();
+}
+
+LayerModelItem* CLayerModel::FindItem(CBaseLayer * Layer, LayerModelItem* Parent) const
+{
+	if (!Parent)
+		Parent = m_root;
+
+	for (auto& item : Parent->m_children)
+	{
+		if (item.m_layer == Layer)
+			return &item;
+		FindItem(Layer, &item);
+	}
+	return nullptr;
 }
 
 QModelIndex CLayerModel::index(CBaseLayer * Layer) const
 {
 	if (!Layer->IsRoot() && Layer->RootProject() == m_proj)
-		return createIndex(Layer->Index(), 0, Layer);
+	{
+		LayerModelItem* item = FindItem(Layer);
+		return createIndex(item->row(), 0, item);
+	}
 	return QModelIndex();
 }
 
@@ -112,19 +127,51 @@ void CLayerModel::OnLayerEvent(CBaseLayerMsg * Msg)
 		CLayerAddMsg* add = (CLayerAddMsg*)Msg;
 		int row = add->Index();
 		QModelIndex parent = index(add->Parent());
+
+		LayerModelItem* item;
+		if (!parent.isValid())
+			item = m_root;
+		else
+			item = ((LayerModelItem*)parent.internalPointer());
+
 		if (add->WasAdded())
 		{
 			beginInsertRows(parent, row, row);
+			item->m_children.insert(row, LayerModelItem(add->Layer(), item));
 			endInsertRows();
 		}
 		else
 		{
-			// TODO: idk. The layer is already removed, meaning sometimes row ! < rowCount. Qt does not like that.
-			// maybe ficks that
-			//rowCount(parent);
-			//beginRemoveRows(parent, row, row);
-			//endRemoveRows();
+			beginRemoveRows(parent, row, row);
+			item->m_children.removeAt(row);
+			endRemoveRows();
 		}
 	}
 	}
+}
+
+LayerModelItem::LayerModelItem(CBaseLayer * Layer, LayerModelItem* Parent)
+	: m_layer(Layer), m_parent(Parent)
+{
+	if (Layer->Type() == CBaseLayer::Layer_Folder)
+	{
+		CFolderLayer* folder = (CFolderLayer*)Layer;
+		for (CBaseLayer* layer : folder->Layers())
+			m_children.append(LayerModelItem(Layer, this));
+	}
+}
+
+int LayerModelItem::row() const
+{
+	if (m_parent)
+	{
+		int i = 0;
+		for (auto& item : m_parent->m_children)
+		{
+			if (&item == this)
+				return i;
+			i++;
+		}
+	}
+	return -1;
 }

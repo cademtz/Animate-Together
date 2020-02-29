@@ -18,6 +18,17 @@ class CBaseLayer;
 class CBaseLayerMsg;
 class CSharedProject;
 
+struct LayerModelItem
+{
+	LayerModelItem(CBaseLayer* Layer, LayerModelItem* Parent = 0);
+	CBaseLayer* m_layer;
+	LayerModelItem* m_parent;
+	QList<LayerModelItem> m_children;
+
+	inline int rowCount() const { return m_children.size(); }
+	int row() const;
+};
+
 class CLayerModel : public QAbstractItemModel
 {
 public:
@@ -33,11 +44,13 @@ public:
 	int columnCount(const QModelIndex& parent = QModelIndex()) const override { return 1; }
 
 private:
+	LayerModelItem* FindItem(CBaseLayer* Layer, LayerModelItem* Parent = 0) const;
 	QModelIndex index(CBaseLayer* Layer) const;
 	void OnClientEvent(CBaseMsg* Msg);
 	void OnLayerEvent(CBaseLayerMsg* Msg);
 
 	CSharedProject* m_proj;
+	LayerModelItem* m_root;
 	unsigned m_clientlistener;
 	unsigned m_layerlistener;
 };

@@ -66,7 +66,7 @@ void CLayerAddMsg::_Flip(bool Revert)
 	if (WasAdded())
 		m_parent->Insert(m_index, Layer());
 	else
-		Project()->Root().Remove(Layer());
+		m_parent->Remove(Layer());
 }
 
 CLayerEditMsg::CLayerEditMsg(CBaseLayer * Layer)
