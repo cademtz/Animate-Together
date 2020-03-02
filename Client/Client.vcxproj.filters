@@ -140,6 +140,9 @@
     <ClCompile Include="Source\Models\CLayerModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Widgets\LayerView\CLayerView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -319,6 +322,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Models\CLayerModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Widgets\LayerView\CLayerView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

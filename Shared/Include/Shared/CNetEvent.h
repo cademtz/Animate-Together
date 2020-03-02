@@ -149,8 +149,8 @@ public:
 	inline const unsigned OldOwner() const { return m_oldowner; }
 	inline int NewIndex() const { return m_index; }
 	inline int OldIndex() const { return m_oldindex; }
-	inline CFolderLayer* NewParent() const { m_parent; }
-	inline CFolderLayer* OldParent() const { m_oldparent; }
+	inline CFolderLayer* NewParent() const { return m_parent; }
+	inline CFolderLayer* OldParent() const { return m_oldparent; }
 	void SetNewName(const QString& Name) { m_name = Name, m_edits |= Edit_Name; }
 	void SetNewOwner(const unsigned Handle) { m_owner = Handle, m_edits |= Edit_Owner; }
 	void SetNewPlace(int Index, CFolderLayer* Parent) { m_index = Index, m_parent = Parent, m_edits |= Edit_Place; }

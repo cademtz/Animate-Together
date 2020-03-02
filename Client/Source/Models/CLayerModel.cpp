@@ -9,9 +9,11 @@
 #include <Shared/CSharedProject.h>
 #include "Client/CClient.h"
 
-CLayerModel::CLayerModel(CSharedProject * Proj, QObject * Parent) : QAbstractItemModel(Parent), m_proj(Proj)
+CLayerModel::CLayerModel(QObject * Parent) : QAbstractItemModel(Parent)
 {
-	m_root = new LayerModelItem(&Proj->Root());
+	m_proj = CClient::Project();
+	SetProj(m_proj);
+
 	m_clientlistener = CClient::Listen([this](CBaseMsg* Msg) { OnClientEvent(Msg); });
 	m_layerlistener = CBaseLayer::Listen([this](CBaseLayerMsg* Msg) { OnLayerEvent(Msg); });
 }
@@ -21,6 +23,10 @@ CLayerModel::~CLayerModel()
 	CClient::EndListen(m_clientlistener);
 	CBaseLayer::EndListen(m_layerlistener);
 	delete m_root;
+}
+
+CBaseLayer * CLayerModel::LayerAt(const QModelIndex & Index) const {
+	return ((LayerModelItem*)Index.internalPointer())->m_layer;
 }
 
 QVariant CLayerModel::data(const QModelIndex & index, int role) const
@@ -47,7 +53,7 @@ QVariant CLayerModel::headerData(int section, Qt::Orientation orientation, int r
 
 QModelIndex CLayerModel::index(int row, int column, const QModelIndex & parent) const
 {
-	if (!hasIndex(row, column, parent))
+	if (!m_proj || !hasIndex(row, column, parent))
 		return QModelIndex();
 
 	LayerModelItem *item;
@@ -66,7 +72,7 @@ QModelIndex CLayerModel::index(int row, int column, const QModelIndex & parent) 
 
 QModelIndex CLayerModel::parent(const QModelIndex & index) const
 {
-	if (!index.isValid())
+	if (! m_proj || !index.isValid())
 		return QModelIndex();
 
 	LayerModelItem* parent = ((LayerModelItem*)index.internalPointer())->m_parent;
@@ -79,7 +85,7 @@ QModelIndex CLayerModel::parent(const QModelIndex & index) const
 int CLayerModel::rowCount(const QModelIndex & parent) const
 {
 	LayerModelItem *item;
-	if (parent.column() > 0)
+	if (!m_proj || parent.column() > 0)
 		return 0;
 
 	if (!parent.isValid())
@@ -88,6 +94,28 @@ int CLayerModel::rowCount(const QModelIndex & parent) const
 		item = (LayerModelItem*)parent.internalPointer();
 
 	return item->rowCount();
+}
+
+void CLayerModel::SetProj(CSharedProject * Proj)
+{
+	if (m_proj)
+	{
+		beginRemoveRows(QModelIndex(), 0, m_root->rowCount() - 1);
+		delete m_root;
+		m_root = nullptr, m_proj = nullptr;
+		endRemoveRows();
+	}
+
+	if (Proj)
+	{
+		m_proj = Proj;
+		bool newLayers = !Proj->Root().Layers().isEmpty();
+		if (newLayers)
+			beginInsertRows(QModelIndex(), 0, Proj->Root().Layers().size());
+		m_root = new LayerModelItem(&Proj->Root());
+		if (newLayers)
+			endInsertRows();
+	}
 }
 
 LayerModelItem* CLayerModel::FindItem(CBaseLayer * Layer, LayerModelItem* Parent) const
@@ -116,6 +144,8 @@ QModelIndex CLayerModel::index(CBaseLayer * Layer) const
 
 void CLayerModel::OnClientEvent(CBaseMsg * Msg)
 {
+	if (Msg->Type() == CBaseMsg::Msg_ProjSetup)
+		SetProj(CClient::Project());
 }
 
 void CLayerModel::OnLayerEvent(CBaseLayerMsg * Msg)
@@ -145,6 +175,30 @@ void CLayerModel::OnLayerEvent(CBaseLayerMsg * Msg)
 			beginRemoveRows(parent, row, row);
 			item->m_children.removeAt(row);
 			endRemoveRows();
+		}
+		break;
+	}
+	case CBaseLayerMsg::Event_LayerEdit:
+	{
+		CLayerEditMsg* edit = (CLayerEditMsg*)Msg;
+		QModelIndex layerIndex = index(edit->Layer());
+		QModelIndex parent = layerIndex.parent();
+		if (!(edit->Edited() & CLayerEditMsg::Edit_Place))
+		{
+			dataChanged(layerIndex, layerIndex);
+		}
+		else
+		{
+			LayerModelItem item = *(LayerModelItem*)layerIndex.internalPointer();
+			beginRemoveRows(layerIndex.parent(), layerIndex.row(), layerIndex.row());
+			item.m_parent->m_children.removeAt(item.row());
+			endRemoveRows();
+
+			parent = index(edit->NewParent());
+			LayerModelItem* parentItem = (LayerModelItem*)parent.internalPointer();
+			beginInsertRows(parent, edit->NewIndex(), edit->NewIndex());
+			parentItem->m_children.insert(edit->NewIndex(), item);
+			endInsertRows();
 		}
 	}
 	}

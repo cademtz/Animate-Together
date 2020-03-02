@@ -1,5 +1,5 @@
 /*	Description:
- *		A model to represent the layers in a project
+ *		A model to represent the layers in a client's current project
  *
  *	Author: Hold on!
  *	Created: 2/26/2020 10:49:37 PM
@@ -32,8 +32,10 @@ struct LayerModelItem
 class CLayerModel : public QAbstractItemModel
 {
 public:
-	CLayerModel(CSharedProject* Proj, QObject* Parent = 0);
+	CLayerModel(QObject* Parent = 0);
 	~CLayerModel();
+
+	CBaseLayer* LayerAt(const QModelIndex& Index) const;
 
 	QVariant data(const QModelIndex& index, int role) const override;
 	Qt::ItemFlags flags(const QModelIndex& index) const override;
@@ -44,6 +46,7 @@ public:
 	int columnCount(const QModelIndex& parent = QModelIndex()) const override { return 1; }
 
 private:
+	void SetProj(CSharedProject* Proj);
 	LayerModelItem* FindItem(CBaseLayer* Layer, LayerModelItem* Parent = 0) const;
 	QModelIndex index(CBaseLayer* Layer) const;
 	void OnClientEvent(CBaseMsg* Msg);

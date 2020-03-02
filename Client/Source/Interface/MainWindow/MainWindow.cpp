@@ -6,7 +6,6 @@
 #include <qlayout.h>
 #include <qevent.h>
 #include <qgraphicsview.h>
-#include <qtreeview.h>
 
 #include "Client/CClient.h"
 #include "Projects/CProject.h"
@@ -15,6 +14,7 @@
 #include "Widgets/TitleBar/CTitleBar.h"
 #include "Widgets/Timeline/CTimeline.h"
 #include "Widgets/ChatPanel/CChatPanel.h"
+#include "Widgets/LayerView/CLayerView.h"
 #include "Widgets/MiniPalette/CMiniPalette.h"
 #include "Interface/ColorPicker/ColorPicker.h"
 #include "Interface/Login/CLogin.h"
@@ -84,35 +84,10 @@ MainWindow::MainWindow(QWidget *parent)
 	l_client = new QVBoxLayout(m_client);
 	QGraphicsView* view = new QGraphicsView(&CTimelineScene::Scene());
 	CChatPanel* chat = new CChatPanel();
+	CLayerView* layerview = new CLayerView();
 	l_client->addWidget(chat);
 	l_client->addWidget(view);
-	
-	/*CBaseLayer::Listen([&](CBaseLayerMsg* Msg)
-		{
-			if (Msg->EventType() == CBaseLayerMsg::Event_LayerAdd)
-			{
-				CLayerAddMsg* add = (CLayerAddMsg*)Msg;
-				if (!add->Layer()->IsRoot() && add->Layer()->Index() > 0)
-				{
-					auto proj = CClient::Project();
-					auto model = new CLayerModel(proj);
-					QTreeView* treeview = new QTreeView();
-					treeview->setModel(model);
-					treeview->show();
-				}
-			}
-		});*/
-	CClient::Listen([&](CBaseMsg* Msg)
-		{
-			if (Msg->Type() == CBaseMsg::Msg_ProjSetup)
-			{
-				auto proj = CClient::Project();
-				auto model = new CLayerModel(proj);
-				QTreeView* treeview = new QTreeView();
-				treeview->setModel(model);
-				treeview->show();
-			}
-		});
+	l_client->addWidget(layerview);
 	l_mainlayout->addWidget(m_client);
 
 #endif
