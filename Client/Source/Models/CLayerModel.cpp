@@ -34,7 +34,13 @@ QVariant CLayerModel::data(const QModelIndex & index, int role) const
 	switch (role)
 	{
 	case Qt::DisplayRole:
-		return ((LayerModelItem*)index.internalPointer())->m_layer->Name();
+	{
+		LayerModelItem* item = (LayerModelItem*)index.internalPointer();
+		if (index.column())
+			return item->m_frames.at(index.column() - 1).m_frame->IsKey() ? "K" : "-";
+		else
+			return item->m_layer->Name();
+	}
 	}
 	return QVariant();
 }
@@ -72,7 +78,7 @@ QModelIndex CLayerModel::index(int row, int column, const QModelIndex & parent) 
 
 QModelIndex CLayerModel::parent(const QModelIndex & index) const
 {
-	if (! m_proj || !index.isValid())
+	if (!m_proj || !index.isValid())
 		return QModelIndex();
 
 	LayerModelItem* parent = ((LayerModelItem*)index.internalPointer())->m_parent;
@@ -84,16 +90,31 @@ QModelIndex CLayerModel::parent(const QModelIndex & index) const
 
 int CLayerModel::rowCount(const QModelIndex & parent) const
 {
-	LayerModelItem *item;
 	if (!m_proj || parent.column() > 0)
 		return 0;
 
+	LayerModelItem *item;
 	if (!parent.isValid())
 		item = m_root;
 	else
 		item = (LayerModelItem*)parent.internalPointer();
 
 	return item->rowCount();
+}
+
+int CLayerModel::columnCount(const QModelIndex & parent) const
+{
+	if (!m_proj)
+		return 0;
+	else if (parent.column() > 0)
+		return 1;
+
+	LayerModelItem *item;
+	if (!parent.isValid())
+		item = m_root;
+	else
+		item = (LayerModelItem*)parent.internalPointer();
+	return item->columnCount();
 }
 
 void CLayerModel::SetProj(CSharedProject * Proj)
@@ -127,7 +148,8 @@ LayerModelItem* CLayerModel::FindItem(CBaseLayer * Layer, LayerModelItem* Parent
 	{
 		if (item.m_layer == Layer)
 			return &item;
-		FindItem(Layer, &item);
+		if (LayerModelItem* found = FindItem(Layer, &item))
+			return found;
 	}
 	return nullptr;
 }
@@ -144,15 +166,64 @@ QModelIndex CLayerModel::index(CBaseLayer * Layer) const
 
 void CLayerModel::OnClientEvent(CBaseMsg * Msg)
 {
-	if (Msg->Type() == CBaseMsg::Msg_ProjSetup)
+	switch (Msg->Type())
+	{
+	case CBaseMsg::Msg_ProjSetup:
 		SetProj(CClient::Project());
+		break;
+	case CBaseMsg::Msg_Event:
+	{
+		CNetEvent* e = (CNetEvent*)Msg;
+		switch (e->EventType())
+		{
+		case CNetEvent::Event_FrameAdd:
+		{
+			CFrameAddMsg* add = (CFrameAddMsg*)e;
+			if (add->WasAdded())
+			{
+				QModelIndex layerIndex = index(add->Frame()->Parent());
+				LayerModelItem* item = (LayerModelItem*)layerIndex.internalPointer();
+				beginInsertColumns(layerIndex, add->Index() + 1, add->Index() + 1);
+				item->m_frames.insert(add->Index(), FrameItem(add->Frame(), item));
+				endInsertColumns();
+			}
+			break;
+		}
+		case CNetEvent::Event_LayerEdit:
+		{
+			CLayerEditMsg* edit = (CLayerEditMsg*)Msg;
+			QModelIndex layerIndex = index(edit->Layer());
+			QModelIndex parent = layerIndex.parent();
+			if (!(edit->Edited() & CLayerEditMsg::Edit_Place))
+			{
+				dataChanged(layerIndex, layerIndex);
+			}
+			else
+			{
+				LayerModelItem item = *(LayerModelItem*)layerIndex.internalPointer();
+				beginRemoveRows(layerIndex.parent(), layerIndex.row(), layerIndex.row());
+				item.m_parent->m_children.removeAt(item.row());
+				endRemoveRows();
+
+				parent = index(edit->NewParent());
+				LayerModelItem* parentItem = (LayerModelItem*)parent.internalPointer();
+				beginInsertRows(parent, edit->NewIndex(), edit->NewIndex());
+				parentItem->m_children.insert(edit->NewIndex(), item);
+				endInsertRows();
+			}
+			break;
+		}
+		}
+		break;
+	}
+	}
 }
 
 void CLayerModel::OnLayerEvent(CBaseLayerMsg * Msg)
 {
 	switch (Msg->EventType())
 	{
-	case CBaseLayerMsg::Event_LayerAdd:
+	case CNetEvent::Event_LayerAdd: // TODO: Just make client emit these already, man
 	{
 		CLayerAddMsg* add = (CLayerAddMsg*)Msg;
 		int row = add->Index();
@@ -178,29 +249,6 @@ void CLayerModel::OnLayerEvent(CBaseLayerMsg * Msg)
 		}
 		break;
 	}
-	case CBaseLayerMsg::Event_LayerEdit:
-	{
-		CLayerEditMsg* edit = (CLayerEditMsg*)Msg;
-		QModelIndex layerIndex = index(edit->Layer());
-		QModelIndex parent = layerIndex.parent();
-		if (!(edit->Edited() & CLayerEditMsg::Edit_Place))
-		{
-			dataChanged(layerIndex, layerIndex);
-		}
-		else
-		{
-			LayerModelItem item = *(LayerModelItem*)layerIndex.internalPointer();
-			beginRemoveRows(layerIndex.parent(), layerIndex.row(), layerIndex.row());
-			item.m_parent->m_children.removeAt(item.row());
-			endRemoveRows();
-
-			parent = index(edit->NewParent());
-			LayerModelItem* parentItem = (LayerModelItem*)parent.internalPointer();
-			beginInsertRows(parent, edit->NewIndex(), edit->NewIndex());
-			parentItem->m_children.insert(edit->NewIndex(), item);
-			endInsertRows();
-		}
-	}
 	}
 }
 
@@ -213,6 +261,9 @@ LayerModelItem::LayerModelItem(CBaseLayer * Layer, LayerModelItem* Parent)
 		for (CBaseLayer* layer : folder->Layers())
 			m_children.append(LayerModelItem(Layer, this));
 	}
+
+	for (auto frame : Layer->Frames())
+		m_frames.append(FrameItem(frame, this));
 }
 
 int LayerModelItem::row() const

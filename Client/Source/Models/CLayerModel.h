@@ -15,8 +15,11 @@
 
 class CBaseMsg;
 class CBaseLayer;
+class CBaseFrame;
 class CBaseLayerMsg;
 class CSharedProject;
+
+struct FrameItem;
 
 struct LayerModelItem
 {
@@ -24,9 +27,18 @@ struct LayerModelItem
 	CBaseLayer* m_layer;
 	LayerModelItem* m_parent;
 	QList<LayerModelItem> m_children;
+	QList<FrameItem> m_frames;
 
 	inline int rowCount() const { return m_children.size(); }
+	inline int columnCount() const { return m_frames.size() + 1; }
 	int row() const;
+};
+
+struct FrameItem
+{
+	FrameItem(CBaseFrame* Frame, LayerModelItem* Parent) : m_frame(Frame), m_parent(Parent) { }
+	CBaseFrame* m_frame;
+	LayerModelItem* m_parent;
 };
 
 class CLayerModel : public QAbstractItemModel
@@ -43,7 +55,7 @@ public:
 	QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
 	QModelIndex parent(const QModelIndex& index) const override;
 	int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-	int columnCount(const QModelIndex& parent = QModelIndex()) const override { return 1; }
+	int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
 private:
 	void SetProj(CSharedProject* Proj);
