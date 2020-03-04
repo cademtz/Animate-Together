@@ -7,6 +7,7 @@
 
 #include "CLayerView.h"
 #include <qmenu.h>
+#include <qheaderview.h>
 #include <Shared/CNetEvent.h>
 #include <Shared/CSharedProject.h>
 #include "Client/CClient.h"
@@ -24,6 +25,8 @@ CLayerView::CLayerView(QWidget * Parent) : QTreeView(Parent)
 
 	m_menu = new QMenu(this);
 	m_menu->addActions({ m_del, m_moveup, m_movedown, m_edit });
+
+	header()->setStretchLastSection(false);
 
 	setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this, &CLayerView::customContextMenuRequested, this, &CLayerView::CustomMenu);
