@@ -135,6 +135,7 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		{
 			CLayerAddMsg add(m_proj, Msg);
 			add.Perform();
+			CreateEvent(add);
 
 #ifdef _DEBUG
 			qInfo() << "Event_LayerAdd";

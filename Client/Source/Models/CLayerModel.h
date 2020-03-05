@@ -62,7 +62,6 @@ private:
 	LayerModelItem* FindItem(CBaseLayer* Layer, LayerModelItem* Parent = 0) const;
 	QModelIndex index(CBaseLayer* Layer) const;
 	void OnClientEvent(CBaseMsg* Msg);
-	void OnLayerEvent(CBaseLayerMsg* Msg);
 
 	CSharedProject* m_proj;
 	LayerModelItem* m_root;

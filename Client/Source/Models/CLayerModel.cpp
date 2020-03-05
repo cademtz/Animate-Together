@@ -15,13 +15,11 @@ CLayerModel::CLayerModel(QObject * Parent) : QAbstractItemModel(Parent)
 	SetProj(m_proj);
 
 	m_clientlistener = CClient::Listen([this](CBaseMsg* Msg) { OnClientEvent(Msg); });
-	m_layerlistener = CBaseLayer::Listen([this](CBaseLayerMsg* Msg) { OnLayerEvent(Msg); });
 }
 
 CLayerModel::~CLayerModel()
 {
 	CClient::EndListen(m_clientlistener);
-	CBaseLayer::EndListen(m_layerlistener);
 	delete m_root;
 }
 
@@ -189,6 +187,32 @@ void CLayerModel::OnClientEvent(CBaseMsg * Msg)
 			}
 			break;
 		}
+		case CNetEvent::Event_LayerAdd:
+		{
+			CLayerAddMsg* add = (CLayerAddMsg*)Msg;
+			int row = add->Index();
+			QModelIndex parent = index(add->Parent());
+
+			LayerModelItem* item;
+			if (!parent.isValid())
+				item = m_root;
+			else
+				item = ((LayerModelItem*)parent.internalPointer());
+
+			if (add->WasAdded())
+			{
+				beginInsertRows(parent, row, row);
+				item->m_children.insert(row, LayerModelItem(add->Layer(), item));
+				endInsertRows();
+			}
+			else
+			{
+				beginRemoveRows(parent, row, row);
+				item->m_children.removeAt(row);
+				endRemoveRows();
+			}
+			break;
+		}
 		case CNetEvent::Event_LayerEdit:
 		{
 			CLayerEditMsg* edit = (CLayerEditMsg*)Msg;
@@ -213,39 +237,6 @@ void CLayerModel::OnClientEvent(CBaseMsg * Msg)
 			}
 			break;
 		}
-		}
-		break;
-	}
-	}
-}
-
-void CLayerModel::OnLayerEvent(CBaseLayerMsg * Msg)
-{
-	switch (Msg->EventType())
-	{
-	case CNetEvent::Event_LayerAdd: // TODO: Just make client emit these already, man
-	{
-		CLayerAddMsg* add = (CLayerAddMsg*)Msg;
-		int row = add->Index();
-		QModelIndex parent = index(add->Parent());
-
-		LayerModelItem* item;
-		if (!parent.isValid())
-			item = m_root;
-		else
-			item = ((LayerModelItem*)parent.internalPointer());
-
-		if (add->WasAdded())
-		{
-			beginInsertRows(parent, row, row);
-			item->m_children.insert(row, LayerModelItem(add->Layer(), item));
-			endInsertRows();
-		}
-		else
-		{
-			beginRemoveRows(parent, row, row);
-			item->m_children.removeAt(row);
-			endRemoveRows();
 		}
 		break;
 	}
