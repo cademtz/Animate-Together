@@ -6,6 +6,7 @@
  */
 
 #include "CLayerModel.h"
+#include <qsize.h>
 #include <Shared/CSharedProject.h>
 #include "Client/CClient.h"
 
@@ -35,7 +36,11 @@ QVariant CLayerModel::data(const QModelIndex & index, int role) const
 	{
 		LayerModelItem* item = (LayerModelItem*)index.internalPointer();
 		if (index.column())
+		{
+			if (index.column() >= item->m_frames.size() + 1)
+				return "-";
 			return item->m_frames.at(index.column() - 1).m_frame->IsKey() ? "K" : "-";
+		}
 		else
 			return item->m_layer->Name();
 	}
@@ -52,6 +57,21 @@ Qt::ItemFlags CLayerModel::flags(const QModelIndex & index) const
 
 QVariant CLayerModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
+	switch (role)
+	{
+	case Qt::SizeHintRole:
+		if (!section)
+			return QSize(100, 15);
+		return QSize(15, 15);
+	case Qt::DisplayRole:
+		if (!section)
+			return "Layer";
+
+		// Doodling around
+		if ((section - 1) % 5)
+			return "-";
+		return QString::number((section - 1) / 5) + 's';
+	}
 	return QVariant();
 }
 
@@ -104,8 +124,6 @@ int CLayerModel::columnCount(const QModelIndex & parent) const
 {
 	if (!m_proj)
 		return 0;
-	else if (parent.column() > 0)
-		return 1;
 
 	LayerModelItem *item;
 	if (!parent.isValid())
@@ -255,6 +273,18 @@ LayerModelItem::LayerModelItem(CBaseLayer * Layer, LayerModelItem* Parent)
 
 	for (auto frame : Layer->Frames())
 		m_frames.append(FrameItem(frame, this));
+}
+
+int LayerModelItem::columnCount() const
+{
+	int max = m_frames.size() + 1;
+	for (auto& child : m_children)
+	{
+		int count = child.columnCount();
+		if (count > max)
+			max = count;
+	}
+	return max;
 }
 
 int LayerModelItem::row() const

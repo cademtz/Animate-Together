@@ -24,6 +24,7 @@ public:
 
 private:
 	void CustomMenu(const QPoint& Pos);
+	void ColumsInserted();
 
 	CLayerModel* m_model;
 	QMenu* m_menu;

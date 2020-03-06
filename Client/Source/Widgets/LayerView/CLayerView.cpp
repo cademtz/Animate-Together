@@ -26,10 +26,9 @@ CLayerView::CLayerView(QWidget * Parent) : QTreeView(Parent)
 	m_menu = new QMenu(this);
 	m_menu->addActions({ m_del, m_moveup, m_movedown, m_edit });
 
-	header()->setStretchLastSection(false);
-
 	setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this, &CLayerView::customContextMenuRequested, this, &CLayerView::CustomMenu);
+	connect(m_model, &CLayerModel::columnsInserted, this, [this] { ColumsInserted(); });
 }
 
 void CLayerView::CustomMenu(const QPoint & Pos)
@@ -72,5 +71,14 @@ void CLayerView::CustomMenu(const QPoint & Pos)
 			move.SetNewPlace(index, parent);
 			CClient::Send(move);
 		}
+	}
+}
+
+void CLayerView::ColumsInserted()
+{
+	for (int i = 0; i < m_model->columnCount(); i++)
+	{
+		QSize size = m_model->headerData(i, Qt::Horizontal, Qt::SizeHintRole).toSize();
+		setColumnWidth(i, size.width());
 	}
 }

@@ -30,7 +30,7 @@ struct LayerModelItem
 	QList<FrameItem> m_frames;
 
 	inline int rowCount() const { return m_children.size(); }
-	inline int columnCount() const { return m_frames.size() + 1; }
+	int columnCount() const;
 	int row() const;
 };
 
