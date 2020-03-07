@@ -30,6 +30,9 @@ CBaseLayer * CLayerModel::LayerAt(const QModelIndex & Index) const {
 
 QVariant CLayerModel::data(const QModelIndex & index, int role) const
 {
+	if (!m_proj)
+		return QVariant();
+
 	switch (role)
 	{
 	case Qt::DisplayRole:
@@ -182,7 +185,7 @@ QModelIndex CLayerModel::index(CBaseLayer * Layer) const
 
 void CLayerModel::OnClientEvent(CBaseMsg * Msg)
 {
-	switch (Msg->Type())
+	switch (Msg->Type()) // TODO: Client event for disconnecting, so we don't keep epicly failing when disconnecting
 	{
 	case CBaseMsg::Msg_ProjSetup:
 		SetProj(CClient::Project());
@@ -195,12 +198,18 @@ void CLayerModel::OnClientEvent(CBaseMsg * Msg)
 		case CNetEvent::Event_FrameAdd:
 		{
 			CFrameAddMsg* add = (CFrameAddMsg*)e;
+			QModelIndex layerIndex = index(add->Frame()->Parent());
+			LayerModelItem* item = (LayerModelItem*)layerIndex.internalPointer();
 			if (add->WasAdded())
 			{
-				QModelIndex layerIndex = index(add->Frame()->Parent());
-				LayerModelItem* item = (LayerModelItem*)layerIndex.internalPointer();
 				beginInsertColumns(layerIndex, add->Index() + 1, add->Index() + 1);
 				item->m_frames.insert(add->Index(), FrameItem(add->Frame(), item));
+				endInsertColumns();
+			}
+			else
+			{
+				beginRemoveColumns(layerIndex, add->Index() + 1, add->Index() + 1);
+				item->m_frames.removeAt(add->Index());
 				endInsertColumns();
 			}
 			break;

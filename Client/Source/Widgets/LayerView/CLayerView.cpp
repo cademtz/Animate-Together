@@ -23,8 +23,9 @@ CLayerView::CLayerView(QWidget * Parent) : QTreeView(Parent)
 	m_movedown =	new QAction("Move down");
 	m_edit =		new QAction("Edit...");
 
-	m_menu = new QMenu(this);
-	m_menu->addActions({ m_del, m_moveup, m_movedown, m_edit });
+	m_layermenu = new QMenu(this), m_framemenu = new QMenu(this);
+	m_layermenu->addActions({ m_del, m_moveup, m_movedown, m_edit });
+	m_framemenu->addAction(m_del);
 
 	setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this, &CLayerView::customContextMenuRequested, this, &CLayerView::CustomMenu);
@@ -37,11 +38,19 @@ void CLayerView::CustomMenu(const QPoint & Pos)
 	if (!index.isValid())
 		return;
 
-	CBaseLayer* layer = m_model->LayerAt(index);
-	m_moveup->setDisabled(layer->Parent()->IsRoot() && index.row() <= 0);
-	m_movedown->setDisabled(layer->Parent()->IsRoot() && index.row() >= layer->Parent()->Layers().size() - 1);
+	if (index.column())
+		FrameMenu(Pos, index);
+	else
+		LayerMenu(Pos, index);
+}
 
-	QAction* action = m_menu->exec(mapToGlobal(Pos));
+void CLayerView::LayerMenu(const QPoint& Pos, const QModelIndex& Index)
+{
+	CBaseLayer* layer = m_model->LayerAt(Index);
+	m_moveup->setDisabled(layer->Parent()->IsRoot() && Index.row() <= 0);
+	m_movedown->setDisabled(layer->Parent()->IsRoot() && Index.row() >= layer->Parent()->Layers().size() - 1);
+
+	QAction* action = m_layermenu->exec(mapToGlobal(Pos));
 
 	if (action == m_del)
 		CClient::Send(CLayerAddMsg(layer, layer->Index(), layer->Parent(), false));
@@ -72,6 +81,14 @@ void CLayerView::CustomMenu(const QPoint & Pos)
 			CClient::Send(move);
 		}
 	}
+}
+
+void CLayerView::FrameMenu(const QPoint & Pos, const QModelIndex & Index)
+{
+	CBaseLayer* layer = m_model->LayerAt(Index);
+	QAction* action = m_framemenu->exec(mapToGlobal(Pos));
+	if (action == m_del)
+		CClient::Send(CFrameAddMsg(layer->Frames().at(Index.column() - 1), false));
 }
 
 void CLayerView::ColumsInserted()

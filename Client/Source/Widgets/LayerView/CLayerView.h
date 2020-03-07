@@ -24,10 +24,12 @@ public:
 
 private:
 	void CustomMenu(const QPoint& Pos);
+	void LayerMenu(const QPoint& Pos, const QModelIndex& Index);
+	void FrameMenu(const QPoint& Pos, const QModelIndex& Index);
 	void ColumsInserted();
 
 	CLayerModel* m_model;
-	QMenu* m_menu;
+	QMenu* m_layermenu, *m_framemenu;
 	QAction* m_del, *m_moveup, *m_movedown, *m_edit;
 };
 
