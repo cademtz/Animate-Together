@@ -67,11 +67,6 @@ void CClient::Disconnected()
 
 	if (m_self)
 		m_self = nullptr;
-	if (m_proj)
-	{
-		delete m_proj;
-		m_proj = nullptr;
-	}
 }
 
 void CClient::HandleMsg(CNetMsg * Msg)
@@ -119,10 +114,12 @@ void CClient::HandleMsg(CNetMsg * Msg)
 	case CBaseMsg::Msg_ProjSetup:
 	{
 		CProjSetupMsg info(Msg);
+		CSharedProject* old = m_proj;
 		m_proj = new CSharedProject();
 		m_proj->SetName(info.Name());
 		m_proj->SetFramerate(info.Framerate());
 		CreateEvent(info);
+		delete old;
 		break;
 	}
 	case CBaseMsg::Msg_Event:
