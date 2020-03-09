@@ -86,8 +86,7 @@ CSerialize CJoinMsg::Serialize() const {
 	return CSerialize(Type(), m_name.utf16(), m_perms, m_handle);
 }
 
-CProjSetupMsg::CProjSetupMsg(CNetMsg * Msg) : CBaseMsg(Msg_ProjSetup)
-{
+CProjSetupMsg::CProjSetupMsg(CNetMsg * Msg) : CBaseMsg(Msg_ProjSetup) {
 	CSerialize::Deserialize(Msg->Data(), m_name, m_framerate);
 }
 
@@ -102,3 +101,14 @@ CSerialize CProjSetupMsg::Serialize() const {
 
 CLeaveMsg::CLeaveMsg(const CUser * User)
 	: CBaseMsg(Msg_Leave), m_handle(User->Handle()) { }
+
+CUndoMsg::CUndoMsg(CNetMsg * Msg) : CBaseMsg(Msg_Undo) {
+	CSerialize::Deserialize(Msg->Data(), m_handle, m_redo);
+}
+
+CUndoMsg::CUndoMsg(const CUser * User, bool Redo)
+	: CBaseMsg(Msg_Undo), m_handle(User->Handle()), m_redo(Redo) { }
+
+CSerialize CUndoMsg::Serialize() const {
+	return CSerialize(Type(), m_handle, m_redo);
+}

@@ -53,6 +53,7 @@ public:
 	{
 		Msg_Server = 0,	// - A message box from the server
 		Msg_Protocol,	// - Sender's protocol info
+		Msg_Event,		// - Server or client has performed a specific action
 		Msg_Login,		// - Sender requesting or sending login info
 		Msg_Join,		// - Server accepts login and sends public user info
 		Msg_Leave,		// - Server notifies clients upon a user leaving
@@ -62,7 +63,7 @@ public:
 		Msg_Welcome,	// - Server is sending the MOTD
 		Msg_ProjSetup,	// - Carries necessary data to initialize shared projects
 		Msg_Object,		// - Carrries data to initialize a net object
-		Msg_Event,		// - Server or client has performed a specific action
+		Msg_Undo,		// - User redid/undid their action action
 	};
 
 	inline uint8_t Type() const { return m_type; }
@@ -234,6 +235,23 @@ protected:
 private:
 	QString m_name;
 	unsigned m_framerate;
+};
+
+class CUndoMsg : public CBaseMsg
+{
+public:
+	CUndoMsg(CNetMsg* Msg);
+	CUndoMsg(const CUser* User, bool Redo = false);
+
+	inline unsigned UserHandle() const { return m_handle; }
+	inline bool IsRedo() const { return m_redo; }
+
+protected:
+	CSerialize Serialize() const override;
+
+private:
+	unsigned m_handle;
+	bool m_redo;
 };
 
 #endif // CNetMsg_H

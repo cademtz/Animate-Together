@@ -10,28 +10,4 @@
 CSharedProject::Listeners_t CSharedProject::m_listeners;
 
 CSharedProject::CSharedProject() : m_root(this) {
-	CBaseLayer::Listen([this](CNetEvent* Event) { OnLayerEvent(Event); });
-}
-
-void CSharedProject::SelectLayer(CBaseLayer * Layer, bool Select)
-{
-	bool selected = IsSelected(Layer);
-	if (Select == selected)
-		return;
-
-	if (!Select)
-		m_selected.removeOne(Layer);
-	else if (Contains(Layer)) // Only select if we own the layer
-		m_selected.push_back(Layer);
-}
-
-void CSharedProject::AddEvent(CNetEvent * Event)
-{
-	Event->Perform();
-	m_events.push_back(Event);
-}
-
-void CSharedProject::OnLayerEvent(CNetEvent* Event)
-{
-	m_events.push_back(Event);
 }

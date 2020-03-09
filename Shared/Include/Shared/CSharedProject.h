@@ -49,22 +49,11 @@ public:
 	inline bool Contains(const CNetObject& Obj) { return m_root.Contains(Obj); }
 	inline bool Contains(const CBaseLayer* Layer) { return Contains(Layer->Handle()); }
 
-	inline const LayerList_t& Selected() const { return m_selected; }
-	inline bool IsSelected(CBaseLayer* Layer) const { return m_selected.contains(Layer); }
-	void SelectLayer(CBaseLayer* Layer, bool Select = true);
-
-	// - Performs a net event and adds its pointer in the 'Events' list
-	void AddEvent(CNetEvent* Event);
-	inline const QList<CNetEvent*>& Events() const { return m_events; }
-
 private:
-	void OnLayerEvent(CNetEvent* Event);
-
 	QString m_name;
 	CFolderLayer m_root;
 	unsigned m_framerate;
-	QList<CBaseLayer*> m_selected;
-	QList<CNetEvent*> m_events;
+	int m_frame;
 };
 
 #endif // CSharedProject_H
