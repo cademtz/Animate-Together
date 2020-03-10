@@ -83,49 +83,33 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 	case CBaseMsg::Msg_Event:
 	{
 		CNetEventInfo eventinfo(Msg);
+		CNetEvent* e = nullptr;
 		switch (eventinfo.EventType())
 		{
 		case CNetEvent::Event_LayerAdd:
 		{
 			if (!(m_user->Perms() & CUser::Perm_Guest))
 				break;
-
-			CLayerAddMsg add(m_parent->Project(), Msg);
-			add.Perform();
-			m_parent->SendAll(add);
-
-#ifdef _DEBUG
-			qInfo() << "Event_LayerAdd";
-			auto layers = add.Project()->Root().Layers1D();
-			for (auto layer : layers)
-			{
-				QString out = layer->Name();
-				CBaseLayer* parent = layer;
-				while ((parent = parent->Parent()) && !parent->IsRoot())
-					out.prepend(parent->Name() + " > ");
-				qInfo() << out;
-			}
-#endif
+			e = new CLayerAddMsg(m_parent->Project(), Msg);
 			break;
 		}
 		case CNetEvent::Event_LayerEdit:
 		{
 			if (!(m_user->Perms() & CUser::Perm_Guest))
 				break;
-			CLayerEditMsg edit(m_parent->Project(), Msg);
-			edit.Perform();
-			m_parent->SendAll(edit);
+			e = new CLayerEditMsg(m_parent->Project(), Msg);
 			break;
 		}
 		case CNetEvent::Event_FrameAdd:
 		{
 			if (!(m_user->Perms() & CUser::Perm_Guest))
 				break;
-			CFrameAddMsg add(m_parent->Project(), Msg);
-			add.Perform();
-			m_parent->SendAll(add);
+			e = new CFrameAddMsg(m_parent->Project(), Msg);
 			break;
 		}
+		m_user->AddAction(e);
+		e->Perform();
+		m_parent->SendAll(*e);
 		}
 	}
 	}
