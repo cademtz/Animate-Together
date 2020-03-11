@@ -43,8 +43,7 @@ private:
 		Valid = 0, Error, BadInfo, Duplicate
 	};
 
-	// - Returns login status and sets user information if valid
-	// - Method of checking depends on server configuration
+	void HandleEvent(CNetMsg* Msg);
 	ELogin CheckLogin(const CLoginMsg& Login);
 
 	// - Called when the client has successfully joined a session

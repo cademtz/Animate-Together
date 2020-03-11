@@ -82,35 +82,8 @@ void CClientSocket::HandleMsg(CNetMsg * Msg)
 	}
 	case CBaseMsg::Msg_Event:
 	{
-		CNetEventInfo eventinfo(Msg);
-		CNetEvent* e = nullptr;
-		switch (eventinfo.EventType())
-		{
-		case CNetEvent::Event_LayerAdd:
-		{
-			if (!(m_user->Perms() & CUser::Perm_Guest))
-				break;
-			e = new CLayerAddMsg(m_parent->Project(), Msg);
-			break;
-		}
-		case CNetEvent::Event_LayerEdit:
-		{
-			if (!(m_user->Perms() & CUser::Perm_Guest))
-				break;
-			e = new CLayerEditMsg(m_parent->Project(), Msg);
-			break;
-		}
-		case CNetEvent::Event_FrameAdd:
-		{
-			if (!(m_user->Perms() & CUser::Perm_Guest))
-				break;
-			e = new CFrameAddMsg(m_parent->Project(), Msg);
-			break;
-		}
-		m_user->AddAction(e);
-		e->Perform();
-		m_parent->SendAll(*e);
-		}
+		HandleEvent(Msg);
+		break;
 	}
 	}
 }
@@ -123,6 +96,39 @@ void CClientSocket::Disconnected()
 	if (m_user)
 		m_parent->SendAll(CLeaveMsg(m_user));
 	*/
+}
+
+void CClientSocket::HandleEvent(CNetMsg * Msg)
+{
+	CNetEvent* e = nullptr;
+	CNetEventInfo info(Msg);
+	switch (info.EventType())
+	{
+	case CNetEvent::Event_LayerAdd:
+	{
+		if (!(m_user->Perms() & CUser::Perm_Guest))
+			break;
+		e = new CLayerAddMsg(m_parent->Project(), Msg);
+		break;
+	}
+	case CNetEvent::Event_LayerEdit:
+	{
+		if (!(m_user->Perms() & CUser::Perm_Guest))
+			break;
+		e = new CLayerEditMsg(m_parent->Project(), Msg);
+		break;
+	}
+	case CNetEvent::Event_FrameAdd:
+	{
+		if (!(m_user->Perms() & CUser::Perm_Guest))
+			break;
+		e = new CFrameAddMsg(m_parent->Project(), Msg);
+		break;
+	}
+	}
+	m_user->AddAction(e);
+	e->Perform();
+	m_parent->SendAll(*e);
 }
 
 CClientSocket::ELogin CClientSocket::CheckLogin(const CLoginMsg& Login)
