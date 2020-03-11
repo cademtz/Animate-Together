@@ -105,26 +105,20 @@ void CClientSocket::HandleEvent(CNetMsg * Msg)
 	switch (info.EventType())
 	{
 	case CNetEvent::Event_LayerAdd:
-	{
 		if (!(m_user->Perms() & CUser::Perm_Guest))
 			break;
 		e = new CLayerAddMsg(m_parent->Project(), Msg);
 		break;
-	}
 	case CNetEvent::Event_LayerEdit:
-	{
 		if (!(m_user->Perms() & CUser::Perm_Guest))
 			break;
 		e = new CLayerEditMsg(m_parent->Project(), Msg);
 		break;
-	}
 	case CNetEvent::Event_FrameAdd:
-	{
 		if (!(m_user->Perms() & CUser::Perm_Guest))
 			break;
 		e = new CFrameAddMsg(m_parent->Project(), Msg);
 		break;
-	}
 	}
 	m_user->AddAction(e);
 	e->Perform();

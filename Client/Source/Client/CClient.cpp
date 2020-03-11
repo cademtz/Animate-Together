@@ -124,56 +124,7 @@ void CClient::HandleMsg(CNetMsg * Msg)
 	}
 	case CBaseMsg::Msg_Event:
 	{
-		// TO DO: Separate the net event handler of course
-		CNetEventInfo type(Msg);
-		switch (type.EventType())
-		{
-		case CNetEvent::Event_LayerAdd:
-		{
-			CLayerAddMsg add(m_proj, Msg);
-			add.Perform();
-			CreateEvent(add);
-
-#ifdef _DEBUG
-			qInfo() << "Event_LayerAdd";
-			auto layers = m_proj->Root().Layers1D();
-			for (auto layer : layers)
-			{
-				QString out = layer->Name();
-				CBaseLayer* parent = layer;
-				while ((parent = parent->Parent()) && !parent->IsRoot())
-					out.prepend(parent->Name() + " > ");
-				qInfo().noquote() << out;
-			}
-#endif
-			break;
-		}
-		case CNetEvent::Event_LayerEdit:
-		{
-			CLayerEditMsg edit(m_proj, Msg);
-			edit.Perform();
-			CreateEvent(edit);
-			break;
-		}
-		case CNetEvent::Event_FrameAdd:
-		{
-			CFrameAddMsg add(m_proj, Msg);
-			add.Perform();
-			CreateEvent(add);
-
-#ifdef _DEBUG
-			qInfo() << "Event_FrameAdd";
-			auto layers = m_proj->Root().Layers1D();
-			for (auto layer : layers)
-			{
-				QString out;
-				for (auto frame : layer->Frames())
-					out += frame->IsKey() ? '#' : ' ';
-				qInfo().noquote() << out;
-			}
-#endif
-		}
-		}
+		HandleEvent(Msg);
 		break;
 	}
 	case CBaseMsg::Msg_Join:
@@ -205,6 +156,27 @@ void CClient::HandleMsg(CNetMsg * Msg)
 		CreateEvent(CChatMsg(Msg));
 		break;
 	}
+}
+
+void CClient::HandleEvent(CNetMsg * Msg)
+{
+	CNetEventInfo info(Msg);
+	CNetEvent* e;
+	switch (info.EventType())
+	{
+	case CNetEvent::Event_LayerAdd:
+		e = new CLayerAddMsg(m_proj, Msg);
+		break;
+	case CNetEvent::Event_LayerEdit:
+		e = new CLayerEditMsg(m_proj, Msg);
+		break;
+	case CNetEvent::Event_FrameAdd:
+		e = new CFrameAddMsg(m_proj, Msg);
+		break;
+	}
+	e->Perform();
+	CreateEvent(*e);
+	// TODO: Net messages must include user who originally created them
 }
 
 void CClient::Error(QTcpSocket::SocketError Error)

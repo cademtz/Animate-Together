@@ -54,6 +54,7 @@ private:
 	void Connected() override;
 	void Disconnected() override;
 	void HandleMsg(CNetMsg* Msg) override;
+	void HandleEvent(CNetMsg* Msg);
 	void Error(QTcpSocket::SocketError Error);
 };
 
