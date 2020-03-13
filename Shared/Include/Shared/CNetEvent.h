@@ -41,6 +41,7 @@ public:
 	inline bool Undone() const { return m_undone; }
 	inline CSharedProject* Project() const { return m_proj; }
 	inline uint8_t EventType() const { return m_eventtype; }
+	inline unsigned UserHandle() const { return m_user; }
 
 protected:
 	CNetEvent(EEvent EventType, CSharedProject* Proj)
@@ -55,6 +56,7 @@ private:
 	uint8_t m_eventtype;
 	bool m_undone = false;
 	CSharedProject* m_proj;
+	unsigned m_user = 0;
 };
 
 class CNetEventInfo : public CBaseMsg
