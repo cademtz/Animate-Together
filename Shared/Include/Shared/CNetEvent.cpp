@@ -8,6 +8,11 @@
 #include "CNetEvent.h"
 #include "CSharedProject.h"
 #include "NetObjects/CRasterFrame.h"
+#include "NetObjects/CUser.h"
+
+void CNetEvent::SetUser(CUser * User) {
+	m_user = User->Handle();
+}
 
 CBaseLayerMsg::CBaseLayerMsg(EEvent EventType, CBaseLayer * Layer)
 	: CNetEvent(EventType, Layer->RootProject()), m_layer(Layer) { }

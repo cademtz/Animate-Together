@@ -120,6 +120,7 @@ void CClientSocket::HandleEvent(CNetMsg * Msg)
 		e = new CFrameAddMsg(m_parent->Project(), Msg);
 		break;
 	}
+	e->SetUser(m_user);
 	m_user->AddAction(e);
 	e->Perform();
 	m_parent->SendAll(*e);

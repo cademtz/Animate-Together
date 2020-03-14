@@ -14,6 +14,7 @@
 
 #include "CNetMsg.h"
 
+class CUser;
 class CBaseFrame;
 class CBaseLayer;
 class CFolderLayer;
@@ -42,15 +43,21 @@ public:
 	inline CSharedProject* Project() const { return m_proj; }
 	inline uint8_t EventType() const { return m_eventtype; }
 	inline unsigned UserHandle() const { return m_user; }
+	void SetUser(CUser* User);
 
 protected:
 	CNetEvent(EEvent EventType, CSharedProject* Proj)
 		: CBaseMsg(Msg_Event), m_eventtype(EventType), m_proj(Proj) { }
+	CNetEvent(const CNetMsg* Msg) : CBaseMsg(Msg_Event) {
+		CSerialize::Deserialize(Msg->Data(), m_eventtype, m_undone, m_proj, m_user);
+	}
 
 	// - When called, the action must be performed or reverted
 	// - 'Revert' determines whether or not to revert the action
 	virtual void _Flip(bool Revert) = 0;
-	void SetUndone(bool Undone) { m_undone = Undone; }
+	inline void SetUndone(bool Undone) { m_undone = Undone; }
+	inline void SetProj(CSharedProject* Proj) { m_proj = Proj; }
+	inline void SetUser(unsigned Handle) { m_user = Handle; }
 
 private:
 	uint8_t m_eventtype;
