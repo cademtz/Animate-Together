@@ -51,6 +51,13 @@ protected:
 	CNetEvent(const CNetMsg* Msg) : CBaseMsg(Msg_Event) {
 		CSerialize::Deserialize(Msg->Data(), m_eventtype, m_undone, m_proj, m_user);
 	}
+	CNetEvent(CSharedProject* Proj, SerialStream& Stream) : CBaseMsg(Stream), m_proj(Proj) {
+		Stream >> m_eventtype >> m_undone >> m_user;
+	}
+
+	virtual CSerialize Serialize() const override {
+		return CBaseMsg::Serialize().Add(m_eventtype, m_undone, m_user);
+	}
 
 	// - When called, the action must be performed or reverted
 	// - 'Revert' determines whether or not to revert the action
@@ -88,7 +95,6 @@ public:
 
 protected:
 	void _Flip(bool Revert) override { }
-	CSerialize Serialize() const override { }
 };
 
 class CBaseLayerMsg : public CNetEvent
@@ -97,6 +103,8 @@ public:
 	CBaseLayerMsg(EEvent EventType, CBaseLayer* Layer);
 	CBaseLayerMsg(EEvent EventType, CSharedProject* Proj)
 		: CNetEvent(EventType, Proj), m_layer(nullptr) { }
+	CBaseLayerMsg(CSharedProject* Proj, SerialStream& Stream)
+		: CNetEvent(Proj, Stream) { }
 
 	template<class T = CBaseLayer>
 	inline T* Layer() const { return (T*)m_layer; }
@@ -114,7 +122,7 @@ public:
 	// - Creates an add or remove event depending on 'Add'
 	CLayerAddMsg(CBaseLayer * Layer, int Index, CFolderLayer* Parent, bool Add)
 		: CBaseLayerMsg(Event_LayerAdd, Layer), m_add(Add), m_parent(Parent), m_index(Index) { }
-	CLayerAddMsg(CSharedProject* Proj, CNetMsg* Msg);
+	CLayerAddMsg(CSharedProject* Proj, SerialStream& Stream);//CNetMsg* Msg);
 	~CLayerAddMsg()
 	{
 		if (Undone())
@@ -149,7 +157,8 @@ public:
 		Edit_Place = (1 << 2), // - Layer was moved
 	};
 	CLayerEditMsg(CBaseLayer* Layer);
-	CLayerEditMsg(CSharedProject* Proj, CNetMsg* Msg);
+	//CLayerEditMsg(CSharedProject* Proj, CNetMsg* Msg);
+	CLayerEditMsg(CSharedProject* Proj, SerialStream& Stream);
 
 	inline EEditFlags Edited() const { return (EEditFlags)m_edits; }
 	inline const QString& NewName() const { return m_name; }

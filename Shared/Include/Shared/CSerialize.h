@@ -57,48 +57,64 @@ public:
 	}
 
 	template<typename T, typename... VarArgs>
-	inline void Add(const T& First, const VarArgs&... Args)
+	inline CSerialize& Add(const T& First, const VarArgs&... Args)
 	{
 		Add(First);
-		Add(Args...);
+		return Add(Args...);
 	}
 
 	// - Adds a QString as Utf8 text unless specified with 'Str.utf16'
-	inline void Add(const QString& Str) { AddUtf(Str, false); }
-	inline void Add(const char* Str) { AddUtf(QString::fromUtf8(Str), false); }
-	inline void Add(const ushort* Str) { AddUtf(QString::fromUtf16(Str), true); }
+	inline CSerialize& Add(const QString& Str)
+	{
+		AddUtf(Str, false);
+		return *this;
+	}
+	inline CSerialize& Add(const char* Str)
+	{
+		AddUtf(QString::fromUtf8(Str), false);
+		return *this;
+	}
+	inline CSerialize& Add(const ushort* Str)
+	{
+		AddUtf(QString::fromUtf16(Str), true);
+		return *this;
+	}
 
-	inline void Add(const bool& Val)
+	inline CSerialize& Add(const bool& Val)
 	{
 		m_bytes.append(Val);
 		UpdateLen();
+		return *this;
 	}
 
 	template<typename T>
-	inline void Add(const T& Val)
+	inline CSerialize& Add(const T& Val)
 	{
 		T big = qToBigEndian(Val);
 		m_bytes.append((char*)&big, sizeof(T));
 		UpdateLen();
+		return *this;
 	}
 
-	inline void Add(const CSerialize& Data)
+	inline CSerialize& Add(const CSerialize& Data)
 	{
 		m_bytes.append(Data.Bytes());
 		UpdateLen();
+		return *this;
 	}
 
 	template<typename T>
-	inline void Add(const QList<T>& List)
+	inline CSerialize& Add(const QList<T>& List)
 	{
 		Add(List.size());
 		for (T item : List)
 			Add(item);
+		return *this;
 	}
 
 private:
 
-	inline void Add() { }
+	CSerialize& Add() { return *this; }
 
 	inline void AddUtf(const QString& Str, bool Utf16)
 	{

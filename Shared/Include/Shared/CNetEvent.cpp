@@ -17,14 +17,9 @@ void CNetEvent::SetUser(CUser * User) {
 CBaseLayerMsg::CBaseLayerMsg(EEvent EventType, CBaseLayer * Layer)
 	: CNetEvent(EventType, Layer->RootProject()), m_layer(Layer) { }
 
-CLayerAddMsg::CLayerAddMsg(CSharedProject* Proj, CNetMsg * Msg) : CBaseLayerMsg(Event_LayerAdd, Proj)
+CLayerAddMsg::CLayerAddMsg(CSharedProject* Proj, SerialStream& Stream) : CBaseLayerMsg(Proj, Stream)
 {
-	SerialStream s = CSerialize::Stream(Msg->Data());
-	uint8_t eventtype;
-	bool undone;
-
-	s >> eventtype >> m_add >> undone;
-
+	Stream >> m_add;
 	if (m_add) // Get new layer's info and create it
 	{
 		// TO DO: Potential size error in serializing / deserializing a 'CSerialize' type.
@@ -32,7 +27,7 @@ CLayerAddMsg::CLayerAddMsg(CSharedProject* Proj, CNetMsg * Msg) : CBaseLayerMsg(
 
 		uint8_t type;
 		CSerialize data;
-		s >> type >> m_index >> data;
+		Stream >> type >> m_index >> data;
 
 		switch (type)
 		{
@@ -44,7 +39,7 @@ CLayerAddMsg::CLayerAddMsg(CSharedProject* Proj, CNetMsg * Msg) : CBaseLayerMsg(
 	else
 	{
 		unsigned handle;
-		s >> handle;
+		Stream >> handle;
 
 		SetLayer(Project()->FindLayer(handle));
 		m_index = Layer()->Index();
@@ -53,12 +48,12 @@ CLayerAddMsg::CLayerAddMsg(CSharedProject* Proj, CNetMsg * Msg) : CBaseLayerMsg(
 	m_parent = Layer()->Parent();
 
 	// Set to opposite of 'undone' because the client has not yet performed the event
-	SetUndone(!undone);
+	SetUndone(!Undone());
 }
 
 CSerialize CLayerAddMsg::Serialize() const
 {
-	CSerialize data(Type(), EventType(), m_add, Undone());
+	CSerialize data = CBaseLayerMsg::Serialize().Add(m_add);//(Type(), EventType(), m_add, Undone());
 	if (m_add) // Send new layer's info
 		data.Add((uint8_t)Layer()->Type(), Layer()->Index(), Layer()->Serialize());
 	else
@@ -77,38 +72,35 @@ void CLayerAddMsg::_Flip(bool Revert)
 CLayerEditMsg::CLayerEditMsg(CBaseLayer * Layer)
 	: CBaseLayerMsg(Event_LayerEdit, Layer), m_oldindex(Layer->Index()), m_oldname(Layer->Name()), m_oldowner(Layer->Parent()->Handle()) { }
 
-CLayerEditMsg::CLayerEditMsg(CSharedProject * Proj, CNetMsg * Msg) : CBaseLayerMsg(Event_LayerEdit, Proj)
+//CLayerEditMsg::CLayerEditMsg(CSharedProject * Proj, CNetMsg * Msg) : CBaseLayerMsg(Event_LayerEdit, Proj)
+CLayerEditMsg::CLayerEditMsg(CSharedProject * Proj, SerialStream& Stream) : CBaseLayerMsg(Proj, Stream)
 {
 	uint8_t type, eventtype;
 	bool undone;
 	unsigned layer;
 
-	SerialStream s = CSerialize::Stream(Msg->Data());
-	s >> eventtype >> undone >> layer >> m_edits;
-
+	//SerialStream s = CSerialize::Stream(Msg->Data());
+	//s >> eventtype >> undone >> layer >> m_edits;
+	Stream >> layer >> m_edits;
 	SetLayer(Proj->FindLayer(layer));
 	SetUndone(!undone);
 
 	m_oldindex = Layer()->Index(), m_oldname = Layer()->Name(), m_oldowner = Layer()->Parent()->Handle(), m_oldparent = Layer()->Parent();
 	if (m_edits & Edit_Name)
-		s >> m_name;
+		Stream >> m_name;
 	if (m_edits & Edit_Owner)
-	{
-		unsigned owner;
-		s >> owner;
-		m_owner = owner;
-	}
+		Stream >> m_owner;
 	if (m_edits & Edit_Place)
 	{
 		unsigned parent;
-		s >> m_index >> parent;
+		Stream >> m_index >> parent;
 		m_parent = Proj->FindLayer<CFolderLayer>(parent, CBaseLayer::Layer_Folder);
 	}
 }
 
 CSerialize CLayerEditMsg::Serialize() const
 {
-	CSerialize data(Type(), EventType(), Undone(), Layer()->Handle(), m_edits);
+	CSerialize data = CBaseLayerMsg::Serialize().Add(Layer()->Handle(), m_edits);
 	if (m_edits & Edit_Name)
 		data.Add(m_name);
 	if (m_edits & Edit_Owner)

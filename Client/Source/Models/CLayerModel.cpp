@@ -252,12 +252,15 @@ void CLayerModel::OnClientEvent(CBaseMsg * Msg)
 			else
 			{
 				LayerModelItem item = *(LayerModelItem*)layerIndex.internalPointer();
-				beginRemoveRows(layerIndex.parent(), layerIndex.row(), layerIndex.row());
+				beginRemoveRows(layerIndex.parent(), layerIndex.row(), layerIndex.row()); // Item isn't being removed
 				item.m_parent->m_children.removeAt(item.row());
 				endRemoveRows();
 
 				parent = index(edit->NewParent());
-				LayerModelItem* parentItem = (LayerModelItem*)parent.internalPointer();
+				LayerModelItem* parentItem;
+				if (!parent.isValid())
+					parentItem = m_root;
+				else parentItem = (LayerModelItem*)parent.internalPointer();
 				beginInsertRows(parent, edit->NewIndex(), edit->NewIndex());
 				parentItem->m_children.insert(edit->NewIndex(), item);
 				endInsertRows();

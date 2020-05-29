@@ -26,6 +26,7 @@ class CSharedProject;
 struct CNetMsg
 {
 	inline const char* Raw() const { return (const char*)this; }
+	inline const char* Dumb() const { return (const char*)&m_type; }
 	inline const char* Data() const { return m_rawdata; }
 	inline size_t Length() const { return qFromBigEndian(m_len); }
 	inline uint8_t Type() const { return qFromBigEndian(m_type); }
@@ -66,20 +67,21 @@ public:
 		Msg_Undo,		// - User redid/undid their action action
 	};
 
+	CBaseMsg(SerialStream& Stream) { Stream >> m_type; }
 	inline uint8_t Type() const { return m_type; }
 
 	inline void Send(QTcpSocket* Socket) const {
 		Socket->write(Serialize().Bytes());
 	}
 
-	virtual CSerialize Serialize() const = 0;
+	virtual CSerialize Serialize() const { return CSerialize((uint8_t)m_type); }
 	virtual ~CBaseMsg() { }
 
 protected:
 	CBaseMsg(EType Type) : m_type(Type) { }
 
 private:
-	EType m_type;
+	uint8_t m_type;
 };
 
 class CServerMsg : public CBaseMsg

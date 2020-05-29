@@ -102,17 +102,18 @@ void CClientSocket::HandleEvent(CNetMsg * Msg)
 {
 	CNetEvent* e = nullptr;
 	CNetEventInfo info(Msg);
+	SerialStream stream = CSerialize::Stream(Msg->Dumb());
 	switch (info.EventType())
 	{
 	case CNetEvent::Event_LayerAdd:
 		if (!(m_user->Perms() & CUser::Perm_Guest))
 			break;
-		e = new CLayerAddMsg(m_parent->Project(), Msg);
+		e = new CLayerAddMsg(m_parent->Project(), stream);
 		break;
 	case CNetEvent::Event_LayerEdit:
 		if (!(m_user->Perms() & CUser::Perm_Guest))
 			break;
-		e = new CLayerEditMsg(m_parent->Project(), Msg);
+		e = new CLayerEditMsg(m_parent->Project(), stream);
 		break;
 	case CNetEvent::Event_FrameAdd:
 		if (!(m_user->Perms() & CUser::Perm_Guest))

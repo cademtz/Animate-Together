@@ -63,7 +63,7 @@ CChatMsg::CChatMsg(QString Text, const CUser* Sender)
 }
 
 CSerialize CChatMsg::Serialize() const {
-	return CSerialize(Type(), m_user, m_text.utf16());
+	return CBaseMsg::Serialize().Add(m_user, m_text.utf16());
 }
 
 CWelcomeMsg::CWelcomeMsg(CNetMsg * Msg) : CBaseMsg(Msg_Welcome) {
@@ -71,7 +71,7 @@ CWelcomeMsg::CWelcomeMsg(CNetMsg * Msg) : CBaseMsg(Msg_Welcome) {
 }
 
 CSerialize CWelcomeMsg::Serialize() const {
-	return CSerialize(Type(), m_url, m_motd.utf16());
+	return CBaseMsg::Serialize().Add(m_url, m_motd.utf16());
 }
 
 CJoinMsg::CJoinMsg(CNetMsg * Msg) : CBaseMsg(Msg_Join) {

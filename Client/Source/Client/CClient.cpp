@@ -162,13 +162,14 @@ void CClient::HandleEvent(CNetMsg * Msg)
 {
 	CNetEventInfo info(Msg);
 	CNetEvent* e;
+	SerialStream stream = CSerialize::Stream(Msg->Dumb());
 	switch (info.EventType())
 	{
 	case CNetEvent::Event_LayerAdd:
-		e = new CLayerAddMsg(m_proj, Msg);
+		e = new CLayerAddMsg(m_proj, stream);
 		break;
 	case CNetEvent::Event_LayerEdit:
-		e = new CLayerEditMsg(m_proj, Msg);
+		e = new CLayerEditMsg(m_proj, stream);
 		break;
 	case CNetEvent::Event_FrameAdd:
 		e = new CFrameAddMsg(m_proj, Msg);
